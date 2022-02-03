@@ -91,6 +91,9 @@ sudo htpasswd /container1/auth/.htpasswd username
 ```
 To create more than 1 user, simply run the command again for a new username.
 
-Once user:password created, run "docker-compose up" or "docker-compose up -d" to run daemonised.
+Once user:password created, run docker compose in base directory (-d to daemonise):
+```bash
+docker-compose up 
+```
 
-WEB ACCESS: http://localhost/app/
+Once both containers have initialised, web access via http://localhost/app/

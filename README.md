@@ -6,27 +6,31 @@ La Trobe University and HiveKeepers internship project
 ## Outline of containers:
 
 #### services:
-container1: nginx, fail2ban
-container2: python Dash
+container1: nginx, fail2ban   
+container2: python Dash   
 
 #### container network:
-subnet: 172.75.0.0/16
-container1 ip: 172.75.0.2
-container2 ip: 172.75.0.3
+subnet: 172.75.0.0/16   
+container1 ip: 172.75.0.2   
+container2 ip: 172.75.0.3   
 
 ### Container1: nginx and fail2ban
 
 So far, have nginx running as simple webserver/reverse-proxy with fail2ban banning IPs that fail nginx basic-auth.
-Nginx's basic-auth file .htpasswd is stored locally in dir container1/auth/.  Have made it so that the file can
-be created outside of container and either passed to the container within the Dockerfile, or shared via --volume -v in docker-compos>
+Nginx's basic-auth file .htpasswd is stored locally in dir container1/auth/.  Have made it so the password file can
+be created outside of container and either passed in via the Dockerfile, or shared via --volume -v in docker-compose.yaml
 
-Nginx's proxy redirection to dash implemented in file nginx/default
+Nginx's proxy redirection to dash implemented in file nginx/default.
 
 Nginx also has a basic health check location /healthcheck that returns http code 200 on success.
 This is implemented as a basic container HEALTHCHECK within the Dockerfile
 
-To get fail2ban to work with iptables requires container privilege capability NET_ADMIN to be used
-Also --cap-add=NET_RAW may be necessary...
+To get fail2ban to work with iptables requires container privilege capabilities to be used:
+```bash
+cap_add:
+  - CAP_NET_ADMIN
+  - CAP_NET_RAW
+```
 
 Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...
 

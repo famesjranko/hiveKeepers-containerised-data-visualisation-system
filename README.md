@@ -84,6 +84,7 @@ container2/
 First, clone the repositoriy to local machine and cd into project directory. 
 
 Then create a user and encrypted password for nginx access.   
+   
 Simplest way to do this is to use apache2-utils (Debian, Ubuntu) or httpd-tools (RHEL/CentOS/Oracle Linux) for this purpose.
 
 Debian example: in the project directory, run:

@@ -20,7 +20,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3-pip \
     util-linux \
     nano \
-    apache2 \
     && rm -rf /var/lib/apt/lists/*
 
 # update pip

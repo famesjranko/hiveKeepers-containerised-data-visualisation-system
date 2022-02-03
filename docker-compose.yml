@@ -18,6 +18,9 @@ services:
       # nginx configuration files
       - './container1/nginx/default:/etc/nginx/sites-enabled/default'
       - './container1/nginx/nginx.conf:/etc/nginx/nginx.conf'
+      # nginx root web page
+      - './container1/nginx/index.html:/var/www/html/index.html'
+      - './container1/nginx/background.jpg://var/www/html/background.jpg'
       # fail2ban configuration files
       - './container1/fail2ban:/etc/fail2ban/'
     restart: "unless-stopped"

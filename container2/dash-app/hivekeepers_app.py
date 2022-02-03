@@ -21,6 +21,9 @@ data.sort_values("timestamp", inplace=True)
 # load dash
 app = dash.Dash(__name__, url_base_pathname='/app/')
 
+# server var for gunicorn - not used
+#server = app.server
+
 # dash layout section
 app.layout = html.Div(
     children=[

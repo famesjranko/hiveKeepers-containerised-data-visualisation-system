@@ -89,7 +89,7 @@ Simplest way to do this is to use apache2-utils (Debian, Ubuntu) or httpd-tools 
 
 Debian example: in the project directory, run:
 ```bash
-sudo htpasswd /container1/auth/.htpasswd username
+sudo htpasswd container1/auth/.htpasswd username
 ```
 To create more than 1 user, simply run the command again for a new username.
 

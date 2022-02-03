@@ -23,6 +23,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apache2 \
     && rm -rf /var/lib/apt/lists/*
 
+# update pip
+RUN python3 -m pip install --upgrade pip setuptools
+
 # create app directory
 RUN mkdir -p /hivekeepers/dash_app
 

@@ -1,0 +1,71 @@
+I've been able to get nginx and fail2ban to work within an originally fail2ban image dockerfile
+that I converted to also install nginx in.
+
+see the Dockerfile located in this directory to see exactly what is meant by the above.
+
+So far, have nginx running as simple webserver with fail2ban banning ips that fail nginx basic-auth.
+Nginx's basic-auth file .htpasswd needs to be in /etc/nginx/auth.  Have made it so that the file can
+be created outside of container using "sudo htpasswd -c .htpasswd username" and either passed to the
+expected location within the container after creation, or shared via --volume -v at creation.
+
+Nginx redirection to dash implemented in default.
+
+Nginx also has a basic health check location /healthcheck that returns http code 200 on success.
+This is implemented as a basic container HEALTHCHECK within the Dockerfile
+
+To get fail2ban to work with iptables requires container privilege capability NET_ADMIN to be used
+Also --cap-add=NET_RAW may be necessary...
+
+Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...
+
+Basic implementations complete:
+        contianer 1:
+                - debian stable-slim
+		- healthcheck (nginx up?)
+                - http basic auth (nginx, default)
+                - ip ban on 5 failed attempted (fail2ban)
+                - redirect to dash_app (nginx, default)
+                        - currently via ip for dev, but will move to localhost later
+		- built basic docker-compose.yml file
+			- to use: 
+				"sudo docker-compose build" to build image
+				"sudo docker-compose up" to start container with output
+				"sudo docker-compose up -d" to start container daemonised
+			
+See docker build command below:
+
+	sudo docker build -t nginx .
+
+See docker run command below:
+
+	sudo docker run -it --rm -d \
+	  -p 80:80 \
+	  -p 443:443 \ 
+	  --cap-add=NET_ADMIN \
+          --cap-add=NET_RAW \
+	  -v /home/andy/HiveKeepers/docker/docker-fail2ban/nginx/auth:/etc/nginx/auth \
+	  --name nginx-proxy \
+	  nginx
+
+NEED TO DO:
+
+1. build debian-lite image for container 2
+  1.n all container 2 stuf...
+
+File locations:
+
+Container1:
+	HiveKeepers/docker/docker-fail2ban/
+					  Dockerfile
+					  jail.local
+					  docker-entrypoint.sh
+					  action.d/
+					  auth/
+					  filter.d/
+						  nginx-http-auth.conf
+					  jail.d/
+					        nginx.conf
+					  nginx/
+			                       default
+					       nginx.conf
+						

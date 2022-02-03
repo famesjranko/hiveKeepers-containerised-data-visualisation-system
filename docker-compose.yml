@@ -1,0 +1,54 @@
+# HiveKeepers - project - docker-compose.yaml
+# written by: Andrew McDonald
+# initial: 27/01/22
+# current: 2/02/22
+# version: 0.8
+
+version: '3.3'
+
+# build containers
+services:
+  container1:
+    build: ./container1/.
+    #image: reverse-proxy-image
+    container_name: 'reverse-proxy'
+    volumes:
+      # nginx basic_auth cred file
+      - './container1/nginx/.htpasswd:/etc/nginx/auth/.htpasswd'
+      # nginx configuration files
+      - './container1/nginx/default:/etc/nginx/sites-enabled/default'
+      - './container1/nginx/nginx.conf:/etc/nginx/nginx.conf'
+      # fail2ban configuration files
+      - './container1/fail2ban:/etc/fail2ban/'
+    restart: "unless-stopped"
+    networks:
+      container_net:
+        ipv4_address: 172.75.0.2
+    cap_add:
+      - CAP_NET_ADMIN
+      - CAP_NET_RAW
+    ports:
+      - '80:80'
+      - '443:443'
+
+  container2:
+    build: ./container2/.
+    container_name: 'dash-app'
+    volumes:
+      # dash app folder
+      - './container2/dash-app:/hivekeepers/dash_app/'
+    restart: "unless-stopped"
+    networks:
+      container_net:
+        ipv4_address: 172.75.0.3
+    mem_limit: 6000m
+
+# build container network to control access to containers
+networks:
+    container_net:
+      name: container_net
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.75.0.0/16

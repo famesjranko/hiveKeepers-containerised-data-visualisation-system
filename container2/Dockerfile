@@ -1,8 +1,8 @@
 # HiveKeepers - container1 - Dockerfile
 # written by: Andrew McDonald
 # initial: 28/01/22
-# current: 30/01/22
-# version: 0.1
+# current: 04/02/22
+# version: 0.4
 
 FROM debian:stable-slim
 
@@ -18,15 +18,14 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3 \
     python3-dev \
     python3-pip \
+    python3-venv \
     util-linux \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
-# update pip
-RUN python3 -m pip install --upgrade pip setuptools
-
-# create app directory
+# create app & logging directories
 RUN mkdir -p /hivekeepers/dash_app
+RUN mkdir -p /hivekeepers/dash_app/gunicorn-logs/
 
 # copy script and make executable
 COPY docker-entrypoint.sh /entrypoint.sh

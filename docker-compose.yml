@@ -14,13 +14,13 @@ services:
     container_name: 'reverse-proxy'
     volumes:
       # nginx basic_auth cred file
-      - './container1/nginx/.htpasswd:/etc/nginx/auth/.htpasswd'
+      - './container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd'
       # nginx configuration files
       - './container1/nginx/default:/etc/nginx/sites-enabled/default'
       - './container1/nginx/nginx.conf:/etc/nginx/nginx.conf'
       # nginx root web page
       - './container1/nginx/index.html:/var/www/html/index.html'
-      - './container1/nginx/background.jpg://var/www/html/background.jpg'
+      - './container1/nginx/background.jpg:/var/www/html/background.jpg'
       # fail2ban configuration files
       - './container1/fail2ban:/etc/fail2ban/'
     restart: "unless-stopped"
@@ -38,8 +38,12 @@ services:
     build: ./container2/.
     container_name: 'dash-app'
     volumes:
-      # dash app folder
-      - './container2/dash-app:/hivekeepers/dash_app/'
+      # dash app files
+      - './container2/dash_app/hivekeepers_app.py:/hivekeepers/dash_app/hivekeepers_app.py'
+      - './container2/dash_app/requirements.txt:/hivekeepers/dash_app/requirements.txt'
+      - './container2/dash_app/sync_data_202201231041.csv:/hivekeepers/dash_app/sync_data_202201231041.csv'
+      # gunicorn logging
+      #- './container2/dash_app/gunicorn-logs:/hivekeepers/dash_app/gunicorn-logs'
     restart: "unless-stopped"
     networks:
       container_net:

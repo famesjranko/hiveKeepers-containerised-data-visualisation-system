@@ -87,9 +87,9 @@ Then create a user and encrypted password for nginx access.
    
 Simplest way to do this is to use apache2-utils (Debian, Ubuntu) or httpd-tools (RHEL/CentOS/Oracle Linux) for this purpose.
 
-Debian example: in the project directory, run:
+Debian example: in the project directory, run (-c to create file):
 ```bash
-sudo htpasswd container1/auth/.htpasswd username
+sudo htpasswd -c container1/auth/.htpasswd username
 ```
 To create more than 1 user, simply run the command again for a new username.
 

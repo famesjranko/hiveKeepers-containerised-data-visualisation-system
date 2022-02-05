@@ -23,7 +23,7 @@ function setTimeZone {
 setTimeZone
 
 # cd into app dir
-cd /hivekeepers/dash_app/
+cd /dash_app/
 
 if [ -s requirements.txt ]
   then
@@ -46,19 +46,19 @@ if [ -s requirements.txt ]
 
     # set up gunicorn logs and tailing
     echo "[ENTRYPOINT] setting up gunicorn logging..."
-    touch gunicorn-logs/access.log
-    touch gunicorn-logs/gunicorn.log
-    tail -n 0 -f gunicorn-logs/*.log &
+    touch /gunicorn-logs/access.log
+    touch /gunicorn-logs/gunicorn.log
+    tail -n 0 -f /gunicorn-logs/*.log &
 
-    # start dash app
+    # start dash app via wsgi (gunicorn)
     echo "[ENTRYPOINT] starting application dashboard..."
-    exec gunicorn hivekeepers_app:server \
+    exec gunicorn app:server \
     --name hivekeepers_app \
     --bind 0.0.0.0:8050 \
     --workers 3 \
     --log-level=info \
-    --log-file=gunicorn-logs/gunicorn.log \
-    --access-logfile=gunicorn-logs/access.log \
+    --log-file=/gunicorn-logs/gunicorn.log \
+    --access-logfile=/gunicorn-logs/access.log \
     "$@"
 
   else

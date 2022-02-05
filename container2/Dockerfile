@@ -24,8 +24,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     && rm -rf /var/lib/apt/lists/*
 
 # create app & logging directories
-RUN mkdir -p /hivekeepers/dash_app
-RUN mkdir -p /hivekeepers/dash_app/gunicorn-logs/
+RUN mkdir -p /dash_app
+RUN mkdir -p /gunicorn-logs
 
 # copy script and make executable
 COPY docker-entrypoint.sh /entrypoint.sh

@@ -8,7 +8,7 @@ FROM debian:stable-slim
 
 LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 
-# installations and clean up 
+# installations and clean up
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -y && \
     apt-get install -y \
@@ -18,7 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     bsd-mailx \
     whois \
     nginx \
-    apache2-utils \ 
+    apache2-utils \
     wget \
     util-linux \
     nano \
@@ -28,12 +28,26 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# create log folder for sshd jail - prevents sshd jail log error
-#RUN touch /var/log/auth.log
+# copy fail2ban local/docker configurations
+WORKDIR /etc/fail2ban
+COPY ./fail2ban/jail.local .
+COPY ./fail2ban/fail2ban.local .
+COPY ./fail2ban/action.d/docker-iptables-multiport.conf ./action.d
+COPY ./fail2ban/filter.d/nginx-http-auth.conf ./filter.d
+COPY ./fail2ban/jail.d/nginx.conf ./jail.d
 
-# create fail2ban local configurations
-RUN cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-RUN cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local
+# create log folder for sshd jail - prevents sshd jail log error
+RUN touch /var/log/auth.log
+
+# copy nginx configurations
+WORKDIR /etc/nginx
+COPY ./nginx/nginx.conf .
+COPY ./nginx/default ./sites-enabled
+
+# add HiveKeepers root web page
+WORKDIR /var/www/html
+COPY ./nginx/html/index.html .
+COPY ./nginx/html/background.jpg .
 
 # create dir for basic-auth file .htpasswd
 RUN mkdir -p /etc/nginx/auth

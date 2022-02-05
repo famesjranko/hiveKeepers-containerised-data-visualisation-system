@@ -11,7 +11,7 @@ import pandas as pd
 #import flask
 
 # load data
-data = pd.read_csv("sync_data_202201231041.csv")
+data = pd.read_csv("data.csv")
 
 # select a single device id
 data = data.query("device_id == '340051000a504e5354303420'")

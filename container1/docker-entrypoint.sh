@@ -32,4 +32,4 @@ service fail2ban start
 ## run nginx and tail log
 echo "[ENTRYPOINT] starting nginx and tailing log..."
 nginx
-tail -f /var/log/nginx/access.log
+exec tail -f /var/log/nginx/access.log

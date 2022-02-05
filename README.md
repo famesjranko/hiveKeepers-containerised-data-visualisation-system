@@ -14,6 +14,42 @@ subnet: 172.75.0.0/16
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
 
+#### directory structure
+```bash
+├── container1
+│   ├── auth
+│   │   └── .htpasswd
+│   ├── docker-entrypoint.sh
+│   ├── Dockerfile
+│   ├── fail2ban
+│   │   ├── action.d
+│   │   │   └── docker-iptables-multiport.conf
+│   │   ├── fail2ban.local
+│   │   ├── filter.d
+│   │   │   └── nginx-http-auth.conf
+│   │   ├── jail.d
+│   │   │   └── nginx.conf
+│   │   └── jail.local
+│   ├── nginx
+│   │   ├── auth
+│   │   ├── default
+│   │   ├── html
+│   │   │   ├── background.jpg
+│   │   │   └── index.html
+│   │   └── nginx.conf
+│   └── readme
+├── container2
+│   ├── dash_app
+│   │   ├── gunicorn-logs
+│   │   ├── hivekeepers_app.py
+│   │   ├── requirements.txt
+│   │   └── sync_data_202201231041.csv
+│   ├── docker-entrypoint.sh
+│   └── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+
 ### Container1: nginx and fail2ban
 
 So far, have nginx running as simple webserver/reverse-proxy with fail2ban banning IPs that fail nginx basic-auth.
@@ -34,51 +70,7 @@ cap_add:
 
 Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...
 
-#### directory structure
-
-```bash
-container1/
-├── auth/
-│   └── .htpasswd
-├── docker-entrypoint.sh
-├── Dockerfile
-├── fail2ban
-│   ├── action.d/
-│   │   └── docker-iptables-multiport.conf
-│   ├── fail2ban.conf
-│   ├── fail2ban.d/
-│   ├── fail2ban.local
-│   ├── filter.d/
-│   │   └── nginx-http-auth.conf
-│   ├── jail.conf
-│   ├── jail.d/
-│   │   ├── defaults-debian.conf
-│   │   └── nginx.conf
-│   ├── jail.local
-│   ├── paths-arch.conf
-│   ├── paths-common.conf
-│   ├── paths-debian.conf
-│   └── paths-opensuse.conf
-├── nginx/
-│   ├── default
-│   └── nginx.conf
-└── readme
-```
-
 ### Continer2: python Dash
-
-
-#### directory structure:
-
-```bash
-container2/
-├── dash-app/
-│   ├── hivekeepers_app.py
-│   ├── requirements.txt
-│   └── sync_data_202201231041.csv
-├── docker-entrypoint.sh
-└── Dockerfile
-```
 
 ## Getting started
 First, clone the repositoriy to local machine and cd into project directory. 

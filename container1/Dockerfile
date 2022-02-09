@@ -5,7 +5,7 @@
 # version: 0.1
 
 #FROM debian:stable-slim
-FROM nginx
+FROM nginx:1.20.2
 
 LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 

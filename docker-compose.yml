@@ -14,8 +14,11 @@ services:
       dockerfile: Dockerfile
     container_name: 'reverse-proxy'
     volumes:
+      - ./container1/nginx/templates:/etc/nginx/templates
       # nginx basic_auth cred file
       - './container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd'
+    environment:
+      - GUNICORN_PORT=8050
     restart: "unless-stopped"
     networks:
       container_net:
@@ -32,16 +35,25 @@ services:
       context: container2
       dockerfile: Dockerfile
     container_name: 'dash-app'
+    environment:
+      #- GUNICORN_UID=1000
+      #- GUNICORN_GID=1000
+      - GUNICORN_NAME="HiveKeepers"
+      - GUNICORN_WORKERS=4
+      - GUNICORN_PORT=8050
+      - GUNICORN_LOG_LEVEL="info"
     volumes:
+      # [ NEED TO ATTACH STORAGE FOR OFFLINE CACHING OF TIMESERIES DATA    ]
+      # [ TIMESERIES DATA WILL BE STORED IN PYTHON SHELVE OR SQLITE DB FILE ]
       # dash app files
       - './container2/dash_app/hivekeepers_app.py:/dash_app/app.py'
       - './container2/dash_app/requirements.txt:/dash_app/requirements.txt'
       - './container2/dash_app/sync_data_202201231041.csv:/dash_app/data.csv'
-    restart: "unless-stopped"
     networks:
       container_net:
         ipv4_address: 172.75.0.3
     mem_limit: 6000m
+    restart: "unless-stopped"
 
 # build container network to control access to containers
 networks:

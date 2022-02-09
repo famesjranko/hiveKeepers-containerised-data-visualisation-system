@@ -4,7 +4,8 @@
 # current: 04/02/22
 # version: 0.1
 
-FROM debian:stable-slim
+#FROM debian:stable-slim
+FROM nginx
 
 LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 
@@ -17,7 +18,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     exim4 \
     bsd-mailx \
     whois \
-    nginx \
     apache2-utils \
     wget \
     util-linux \
@@ -42,7 +42,15 @@ RUN touch /var/log/auth.log
 # copy nginx configurations
 WORKDIR /etc/nginx
 COPY ./nginx/nginx.conf .
-COPY ./nginx/default ./sites-enabled
+
+# copy fixed nginx-docker ENV substition template script
+COPY fixed_envsubst-on-templates.sh /docker-entrypoint.d/20-envsubst-on-templates.sh
+RUN chmod +x /docker-entrypoint.d/20-envsubst-on-templates.sh
+
+# setup nginx logging for fail2ban access
+RUN mkdir /nginx-logs
+RUN touch /nginx-logs/error.log
+RUN touch /nginx-logs/access.log
 
 # add HiveKeepers root web page
 WORKDIR /var/www/html

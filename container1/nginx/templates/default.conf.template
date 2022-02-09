@@ -42,7 +42,7 @@ server {
 
 		# address of dash-app container: 172.75.0.3
 		# defined in docker-compose.yml
-	        proxy_pass http://172.75.0.3:8050/app/;
+	        proxy_pass http://172.75.0.3:$GUNICORN_PORT/app/;
 
         }
 

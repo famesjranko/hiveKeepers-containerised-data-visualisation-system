@@ -29,7 +29,12 @@ service fail2ban status > /dev/null && service fail2ban stop
 rm -f /var/run/fail2ban/*
 service fail2ban start
 
+echo "[ENTRYPOINT] running nginx envsubstitution template script..."
+/bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
+
 ## run nginx and tail log
-echo "[ENTRYPOINT] starting nginx and tailing log..."
+echo "[ENTRYPOINT] starting nginx..."
 nginx
-exec tail -f /var/log/nginx/access.log
+
+echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
+exec tail -f /nginx-logs/access.log /var/log/fail2ban.log

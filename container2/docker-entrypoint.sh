@@ -6,6 +6,14 @@
 # current: 04/02/22
 # version: 0.8
 
+# get relevant environment variables, otherwise use defaults
+user="${GUNICORN_UID:-1005}" # 1005 default from gunicorn docs
+group="${GUNICORN_GID:-205}" # 205 default from gunicorn docs
+name="${GUNICORN_NAME:-hivekeepers_app}"
+workers="${GUNICORN_WORKERS:-1}"
+port="${GUNICORN_PORT:-8050}"
+log_level="${GUNICORN_LOGLEVEL:-info}"
+
 function setTimeZone {
     if [ -f "/etc/timezone.host" ]; then
         CLIENT_TIMEZONE=$(cat /etc/timezone)
@@ -25,9 +33,11 @@ setTimeZone
 # cd into app dir
 cd /dash_app/
 
-if [ -s requirements.txt ]
+if [[ -s requirements.txt && -s app.py ]]
   then
-    echo "[ENTRYPOINT] requirements.txt is populated..."
+    echo "[ENTRYPOINT] requirements.txt is populated!"
+    echo "[ENTRYPOINT] app.py is populated!"
+    echo "[ENTRYPOINT] starting python installation..."
 
     # setup virtual env
     echo "[ENTRYPOINT] installing venv..."
@@ -53,14 +63,18 @@ if [ -s requirements.txt ]
     # start dash app via wsgi (gunicorn)
     echo "[ENTRYPOINT] starting application dashboard..."
     exec gunicorn app:server \
-    --name hivekeepers_app \
-    --bind 0.0.0.0:8050 \
-    --workers 3 \
-    --log-level=info \
+    --user $user \
+    --group $group \
+    --name "$name" \
+    --bind 0.0.0.0:$port \
+    --workers $workers \
+    --log-level="$log_level" \
     --log-file=/gunicorn-logs/gunicorn.log \
     --access-logfile=/gunicorn-logs/access.log \
     "$@"
 
   else
-    echo "requirements.txt is empty; not running pip..."
+    echo "[ENTRYPOINT] requirements.txt NOT populated!"
+    echo "[ENTRYPOINT] app.py NOT populated!"
+    echo "[ENTRYPOINT] NOT running python installation..."
 fi

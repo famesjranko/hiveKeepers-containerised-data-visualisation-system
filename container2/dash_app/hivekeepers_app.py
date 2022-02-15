@@ -1,69 +1,351 @@
-# HiveKeepers - container1 - dash - hivekeepers_app.py
-# written by: Andrew McDonald
-# initial: 31/01/22
-# current: 04/02/22
-# version: 0.3
+## =======================
+## Import needed libraries
+## =======================
+
+import plotly.graph_objects as go # or plotly.express as px
+from plotly.subplots import make_subplots
+
+import pandas as pd
 
 import dash
-from dash import dcc
-from dash import html
-import pandas as pd
-#import flask
+from dash import Dash, dcc, html, Input, Output
 
-# load data
+import dash_bootstrap_components as dbc
+
+## ===========================
+## Get data from database/file 
+## ===========================
+
 data = pd.read_csv("data.csv")
 
-# select a single device id
-data = data.query("device_id == '340051000a504e5354303420'")
 
-# sort by timestamp
-data.sort_values("timestamp", inplace=True)
+## ==============================
+## Build apiary id and bins lists
+## ==============================
 
-# define flask app.server
-#server = flask.Flask(__name__)
+unique_list = []  
+for id in data['apiary_id']:
+    # check if exists in unique_list or not
+    if id not in unique_list:
+        unique_list.append(id)
 
-# load dash
+
+## ====================================
+## Create dash app var and set url base
+## ====================================
+
 app = dash.Dash(__name__, url_base_pathname='/app/')
 
 # server var for gunicorn - not used
 server = app.server
 
-# dash layout section
+# initialise figures - might not need with (PreventUpdate prevents ALL outputs updating) ln99
+fig1 = go.Figure()
+fig2 = go.Figure()
+fig3 = go.Figure()
+
+
+## ===================================
+## Set Dash html page layout structure
+## ===================================
+
 app.layout = html.Div(
-    children=[
-        html.H1(children="test dash",),
-        html.P(
-            children="simple test line 1"
-            " simple test line 2"
-            " simple test line 3",
-        ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data["timestamp"],
-                        "y": data["health_state_of_charge"],
-                        "type": "lines",
-                    },
+                children=[
+                    html.Div(
+                        children='HiveKeepers Dash App',
+                        style = {'font-size': '48px',
+                                 'color': '#413F38',
+                                 'backgroundColor': '#F0D466',
+                                 'font-family': 'Bahnschrift'},
+                    ),
+                    
+                    html.Div([dcc.Dropdown(
+                                id='apiary-selector',
+                                options=[{'label': f"Apiary: {i}", 'value': i} for i in unique_list],
+                                placeholder="Select an apiaryID",
+                                clearable=False,
+                                style = {'width': '200px'}
+                            ),
+                        ], #style = {'backgroundColor': '#696A74',}
+                    ), 
+                
+                    # All elements from the top of the page
+                    html.Div([dcc.Graph(id='graph1', figure=fig1)]),
+    
+                    # New Div for all elements in the new 'row' of the page
+                    html.Div([dcc.Graph(id='graph2', figure=fig2)]),
+                                
+                    # New Div for all elements in the new 'row' of the page
+                    html.Div([dcc.Dropdown(
+                                id='bin-selector',
+                                options=[{'label':'fft bins: 0-16',  'value':1},
+                                         {'label':'fft bins: 16-32', 'value':2},
+                                         {'label':'fft bins: 32-48', 'value':3},
+                                         {'label':'fft bins: 48-64', 'value':4},
+                                         {'label':'fft bins: all',   'value':5}],
+                                value=5,
+                                placeholder="Select an FFT bin group",
+                                clearable=False,
+                                style = {'width': '200px'}
+                            )
+                        ], #style = {'backgroundColor': '#696A74',}
+                    ), 
+                    
+                    html.Div([dcc.Graph(id='graph3', figure=fig3)]),
                 ],
-                "layout": {"title": "state of charge"},
-            },
-        ),
-        dcc.Graph(
-            figure={
-                "data": [
-                    {
-                        "x": data["timestamp"],
-                        "y": data["health_signal_strength"],
-                        "type": "lines",
-                    },
-                ],
-                "layout": {"title": "health of signal strength"},
-            },
-        ),
-    ]
 )
+
+
+## =============
+## App callbacks
+## =============
+
+@app.callback(
+    Output('graph3', 'figure'),
+    [Input("bin-selector", "value"),
+     Input("apiary-selector", "value")]
+ )
+def render_fft_graph(bin_group, apiaryID):
+
+    # PreventUpdate prevents ALL outputs updating
+    if bin_group is None or apiaryID is None:
+        raise dash.exceptions.PreventUpdate
+    
+    ## ============================================================================
+    ## 3D FFT chart – Surface Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude)
+    ## ============================================================================
+
+    #filter_data = data[data['apiary_id'] == int(value2)]
+    filter_data = data.loc[data["apiary_id"] == int(apiaryID)].copy()
+    filter_data['timestamp'] = pd.to_datetime(data['timestamp'], unit='s')
+    
+    bins = [col for col in filter_data if col.startswith('fft_bin')]
+
+    if bin_group == 1:
+        bins = bins[0:16]
+    elif bin_group == 2:
+        bins = bins[16:32]
+    elif bin_group == 3:
+        bins = bins[32:48]
+    elif bin_group == 4:
+        bins = bins[-16]
+    elif bin_group == 5:
+        bins = bins
+
+    bin_nums = [bin.replace("fft_bin", "") for bin in bins]
+
+    fig3 = go.Figure(data=[go.Surface(x=filter_data['timestamp'], z=filter_data[bins].values, y=bin_nums)])
+
+    fig3.update_layout(title='3D FFT chart – Surface Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude)',
+                        autosize=True,
+                        height=900)
+
+    fig3.update_layout(scene = dict(
+                        xaxis_title = 'Date',
+                        yaxis_title = 'FFT Bins',
+                        zaxis_title = 'Amplitude'))
+    
+    #fig3.update_layout(paper_bgcolor="LightSteelBlue",)
+    
+    return fig3
+
+@app.callback(
+    [Output('graph1', 'figure'),
+     Output('graph2', 'figure')],
+    [Input("apiary-selector", "value")]
+)
+def render_graphs(apiaryID):
+    
+    # PreventUpdate prevents ALL outputs updating
+    if apiaryID is None:
+        raise dash.exceptions.PreventUpdate
+
+    ## ================================
+    ## Load HiveKeepers data for charts
+    ## ================================
+
+    # get apiary data
+    filter_data = data.loc[data["apiary_id"] == int(apiaryID)].copy()
+    
+    # convert timestamp to human readable
+    filter_data['timestamp'] = pd.to_datetime(data['timestamp'], unit='s')
+
+    ## ==============================================================================
+    ## 2D Chart – Line Plot (X-Axis Time, Y-Axis Internal Temp, Y2-Axis External Temp
+    ## ==============================================================================
+
+    # Create figure with secondary y-axis
+    fig1 = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # add internal temp trace
+    fig1.add_trace(
+        go.Scatter(x=list(filter_data.timestamp), y=list(filter_data.bme680_internal_temperature), name="internal_temperature"), secondary_y=False)
+
+    # add external temp trace
+    fig1.add_trace(
+        go.Scatter(x=list(filter_data.timestamp), y=list(filter_data.bme680_external_temperature), name="external_temperature"), secondary_y=True)
+
+    # add axis titles
+    fig1.update_layout(
+        xaxis_title='date',
+        yaxis_title='temp (C)',
+        yaxis2_title='temp (C)'
+    )
+    
+    # Set title
+    fig1.update_layout(title_text="internal vs external hive temperatures")
+
+    # Add range slider
+    fig1.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1h",
+                         step="hour",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="1d",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=7,
+                         label="1w",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+    
+    #fig1.update_layout(paper_bgcolor="LightSteelBlue",)
+    
+    ## ============================================================================================================
+    ## 2D Chart – Line Plot (X-Axis Time, Y-Axis Internal Temp, Y2-Axis Internal External Temp delta [WITH SCALING]
+    ## ============================================================================================================
+    
+    # get temp delta
+    filter_data['temp_delta'] = filter_data['bme680_internal_temperature'] - filter_data['bme680_external_temperature']
+ 
+    # Create figure with secondary y-axis
+    fig2 = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # add internal temp trace
+    fig2.add_trace(
+        go.Scatter(x=filter_data['timestamp'], y=filter_data['bme680_internal_temperature'], name="internal_temperature"), secondary_y=False)
+
+    # add delta temp trace
+    fig2.add_trace(
+        go.Scatter(x=filter_data['timestamp'], y=filter_data['temp_delta'], name="temp_delta"), secondary_y=True,
+    )
+
+    # add axis titles
+    fig2.update_layout(
+        xaxis_title='date',
+        yaxis_title='temp (C)',
+        yaxis2_title='temp delta (C)'
+    )
+
+    # Set title
+    fig2.update_layout(
+        title_text="internal vs external hive temperature delta"
+    )
+
+    # Add range slider
+    fig2.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label="1h",
+                         step="hour",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="1d",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=7,
+                         label="1w",
+                         step="day",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="1m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=6,
+                         label="6m",
+                         step="month",
+                         stepmode="backward"),
+                    dict(count=1,
+                         label="YTD",
+                         step="year",
+                         stepmode="todate"),
+                    dict(count=1,
+                         label="1y",
+                         step="year",
+                         stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
+    
+    #fig2.update_layout(paper_bgcolor="LightSteelBlue",)
+
+    ## ============================================================================
+    ## 3D FFT chart – Surface Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude)
+    ## ============================================================================
+
+    # bins = [col for col in filter_data if col.startswith('fft_bin')]
+    
+    # bins = bins[32:48]
+
+    # # get bin numbers only fft_bin60 -> 60
+    # bin_nums = [bin.replace("fft_bin", "") for bin in bins]
+
+    # fig3 = go.Figure(data=[go.Surface(x=filter_data['timestamp'], z=filter_data[bins].values, y=bin_nums)])
+
+
+    # fig3.update_layout(title='3D FFT chart – Surface Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude)',
+                        # autosize=True,
+                        # height=900)
+
+
+    # fig3.update_layout(scene = dict(
+                        # xaxis_title = 'Date',
+                        # yaxis_title = 'FFT Bins',
+                        # zaxis_title = 'Amplitude'))
+
+    return fig1, fig2
+
+
+## ==================
+## Call main function
+## ==================
 
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=8050, debug=True)
-    #app.run_server(debug=True)

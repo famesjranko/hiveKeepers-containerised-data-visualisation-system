@@ -15,7 +15,7 @@ services:
     container_name: 'reverse-proxy'
     volumes:
       - ./container1/nginx/templates:/etc/nginx/templates
-      # nginx basic_auth cred file
+      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/auth/.htpasswd USERNAME'
       - './container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd'
     environment:
       - GUNICORN_PORT=8050

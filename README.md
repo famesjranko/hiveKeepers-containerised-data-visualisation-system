@@ -7,7 +7,7 @@ La Trobe University and HiveKeepers internship project
 
 #### services:
 container1: nginx, fail2ban   
-container2: python Dash   
+container2: python Dash, Gunicorn   
 
 #### container network:
 subnet: 172.75.0.0/16   

@@ -1,8 +1,8 @@
 # HiveKeepers - project - docker-compose.yaml
 # written by: Andrew McDonald
 # initial: 27/01/22
-# current: 2/02/22
-# version: 0.8
+# current: 25/02/22
+# version: 0.81
 
 version: '3.3'
 
@@ -15,9 +15,10 @@ services:
     container_name: 'reverse-proxy'
     volumes:
       - ./container1/nginx/templates:/etc/nginx/templates
-      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/auth/.htpasswd USERNAME'
+      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME'
       - './container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd'
     environment:
+      # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
     restart: "unless-stopped"
     networks:
@@ -40,6 +41,7 @@ services:
       #- GUNICORN_GID=1000
       - GUNICORN_NAME="HiveKeepers"
       - GUNICORN_WORKERS=4
+      # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
       - GUNICORN_LOG_LEVEL="info"
     volumes:

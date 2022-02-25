@@ -7,6 +7,7 @@
 #FROM debian:stable-slim
 FROM nginx:1.20.2
 
+# set container maintainer
 LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 
 # installations and clean up
@@ -63,8 +64,14 @@ RUN mkdir -p /etc/nginx/auth
 # set nginx healthcheck
 # nginx    -> done
 # fail2ban -> ?
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD if [ $(curl -s -o /dev/null -w "%{http_code}" localhost/healthcheck) == 200 ]; then echo 0; else echo 1; fi
+#HEALTHCHECK --interval=30s --timeout=3s \
+#  CMD if [ $(curl -s -o /dev/null -w "%{http_code}" localhost/healthcheck) == 200 ]; then echo 0; else echo 1; fi
+
+## how to run a healthcheck script
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /healthcheck.sh
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  
+    CMD /healthcheck.sh
 
 # run final init script
 ENTRYPOINT ["/entrypoint.sh"]

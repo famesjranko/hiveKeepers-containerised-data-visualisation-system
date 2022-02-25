@@ -3,8 +3,8 @@
 # HiveKeepers - container2 - docker-entrypoint.sh
 # written by: Andrew McDonald
 # initial: 28/01/22
-# current: 04/02/22
-# version: 0.8
+# current: 25/02/22
+# version: 0.81
 
 # get relevant environment variables, otherwise use defaults
 user="${GUNICORN_UID:-1005}" # 1005 default from gunicorn docs
@@ -13,6 +13,7 @@ name="${GUNICORN_NAME:-hivekeepers_app}"
 workers="${GUNICORN_WORKERS:-1}"
 port="${GUNICORN_PORT:-8050}"
 log_level="${GUNICORN_LOGLEVEL:-info}"
+threads=$((2*$workers)) # set threads to twice the workers
 
 function setTimeZone {
     if [ -f "/etc/timezone.host" ]; then
@@ -68,6 +69,8 @@ if [[ -s requirements.txt && -s app.py ]]
     --name "$name" \
     --bind 0.0.0.0:$port \
     --workers $workers \
+    --worker-tmp-dir /dev/shm \
+    --threads $threads \
     --log-level="$log_level" \
     --log-file=/gunicorn-logs/gunicorn.log \
     --access-logfile=/gunicorn-logs/access.log \

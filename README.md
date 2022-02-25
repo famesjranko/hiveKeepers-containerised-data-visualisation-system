@@ -91,3 +91,7 @@ docker-compose up
 ```
 
 Once both containers have initialised, web access via http://localhost/app/
+
+### default user
+username: hivekeepers
+password: hivekeepers

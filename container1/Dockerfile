@@ -1,8 +1,8 @@
 # HiveKeepers - container1 - Dockerfile
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 04/02/22
-# version: 0.1
+# current: 25/02/22
+# version: 0.3
 
 #FROM debian:stable-slim
 FROM nginx:1.20.2
@@ -61,13 +61,9 @@ COPY ./nginx/html/background.jpg .
 # create dir for basic-auth file .htpasswd
 RUN mkdir -p /etc/nginx/auth
 
-# set nginx healthcheck
+# service healthchecks
 # nginx    -> done
-# fail2ban -> ?
-#HEALTHCHECK --interval=30s --timeout=3s \
-#  CMD if [ $(curl -s -o /dev/null -w "%{http_code}" localhost/healthcheck) == 200 ]; then echo 0; else echo 1; fi
-
-## how to run a healthcheck script
+# fail2ban -> done
 COPY healthcheck.sh /healthcheck.sh
 RUN chmod +x /healthcheck.sh
 HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  

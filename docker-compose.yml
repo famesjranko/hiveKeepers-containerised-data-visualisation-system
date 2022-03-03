@@ -40,7 +40,7 @@ services:
       #- GUNICORN_UID=1000
       #- GUNICORN_GID=1000
       - GUNICORN_NAME="HiveKeepers"
-      - GUNICORN_WORKERS=4
+      - GUNICORN_WORKERS=2
       # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
       - GUNICORN_LOG_LEVEL="info"
@@ -51,6 +51,7 @@ services:
       - './container2/dash_app/hivekeepers_app.py:/dash_app/app.py'
       - './container2/dash_app/requirements.txt:/dash_app/requirements.txt'
       - './container2/dash_app/sync_data_202201231041.csv:/dash_app/data.csv'
+      - './container2/db/hivekeeper_sql.py:/dash_app/hivekeeper_sql.py'
     networks:
       container_net:
         ipv4_address: 172.75.0.3

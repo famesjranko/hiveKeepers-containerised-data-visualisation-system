@@ -61,6 +61,19 @@ if [[ -s requirements.txt && -s app.py ]]
     touch /gunicorn-logs/gunicorn.log
     tail -n 0 -f /gunicorn-logs/*.log &
 
+    # create sql database file
+    if [[ -f data.csv ]] && [[ -f hivekeeper_sql.py ]]; then
+      echo "[ENTRYPOINT] found CSV file!"
+      echo "[ENTRYPOINT] runnning sqlite3 db script..."
+      python hivekeeper_sql.py
+
+      if [ -f hivekeeper.db ]; then
+        echo "[ENTRYPOINT] sqlite3 db created!"
+      else
+        echo "[ENTRYPOINT] [ERROR] sqlite3 db missing!"
+      fi
+    fi
+
     # start dash app via wsgi (gunicorn)
     echo "[ENTRYPOINT] starting application dashboard..."
     exec gunicorn app:server \

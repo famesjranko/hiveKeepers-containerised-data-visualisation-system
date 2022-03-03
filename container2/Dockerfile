@@ -20,11 +20,17 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3-pip \
     python3-venv \
     util-linux \
+    sqlite3 \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
 # create app & logging directories
-RUN mkdir -p /dash_app
+RUN mkdir -p /dash_app \
+    && chmod 777 /dash_app
+
+#RUN touch /dash_app/hivekeeper.db \
+#    && chmod 777 /dash_app/hivekeeper.db
+
 RUN mkdir -p /gunicorn-logs
 
 # copy script and make executable

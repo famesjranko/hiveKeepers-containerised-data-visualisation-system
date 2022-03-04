@@ -7,8 +7,8 @@
 # version: 0.81
 
 # get relevant environment variables, otherwise use defaults
-user="${GUNICORN_UID:-1005}" # 1005 default from gunicorn docs
-group="${GUNICORN_GID:-205}" # 205 default from gunicorn docs
+user="${GUNICORN_UID:-1000}" # 1005 default from gunicorn docs
+group="${GUNICORN_GID:-1000}" # 205 default from gunicorn docs
 name="${GUNICORN_NAME:-hivekeepers_app}"
 workers="${GUNICORN_WORKERS:-1}"
 port="${GUNICORN_PORT:-8050}"
@@ -32,7 +32,30 @@ function setTimeZone {
 setTimeZone
 
 # cd into app dir
-cd /dash_app/
+cd /home/hivekeeper/dash_app/
+
+# set up gunicorn logs and tailing
+#echo "[ENTRYPOINT] setting up gunicorn logging..."
+#touch gunicorn-logs/access.log
+#touch gunicorn-logs/gunicorn.log
+#tail -n 0 -f gunicorn-logs/*.log &
+
+# create sql database file
+#if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
+#  echo "[ENTRYPOINT] found CSV file!"
+#  echo "[ENTRYPOINT] building database..."
+#  python update_db.py
+
+#  if [ -f hivekeepers.db ]; then
+#    chmod 774 hivekeepers.db
+#    #chown $user:$user hivekeepers.db
+#    #chown 1000:1000 hivekeepers.db
+#    echo "[ENTRYPOINT] database created!"
+#  else
+#    echo "[ENTRYPOINT] [ERROR] database missing!"
+#  fi
+#fi
+
 
 if [[ -s requirements.txt && -s app.py ]]
   then
@@ -57,9 +80,9 @@ if [[ -s requirements.txt && -s app.py ]]
 
     # set up gunicorn logs and tailing
     echo "[ENTRYPOINT] setting up gunicorn logging..."
-    touch /gunicorn-logs/access.log
-    touch /gunicorn-logs/gunicorn.log
-    tail -n 0 -f /gunicorn-logs/*.log &
+    touch /home/hivekeeper/gunicorn-logs/access.log
+    touch /home/hivekeeper/gunicorn-logs/gunicorn.log
+    tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
 
     # create sql database file
     if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
@@ -68,6 +91,9 @@ if [[ -s requirements.txt && -s app.py ]]
       python update_db.py
 
       if [ -f hivekeepers.db ]; then
+        #chmod 774 hivekeepers.db
+        #chown $user:$user hivekeepers.db
+        #chown 1000:1000 hivekeepers.db
         echo "[ENTRYPOINT] database created!"
       else
         echo "[ENTRYPOINT] [ERROR] database missing!"
@@ -85,8 +111,8 @@ if [[ -s requirements.txt && -s app.py ]]
     --worker-tmp-dir /dev/shm \
     --threads $threads \
     --log-level="$log_level" \
-    --log-file=/gunicorn-logs/gunicorn.log \
-    --access-logfile=/gunicorn-logs/access.log \
+    --log-file=/home/hivekeeper/gunicorn-logs/gunicorn.log \
+    --access-logfile=/home/hivekeeper/gunicorn-logs/access.log \
     "$@"
 
   else

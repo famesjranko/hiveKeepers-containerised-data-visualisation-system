@@ -36,6 +36,7 @@ services:
       context: container2
       dockerfile: Dockerfile
     container_name: 'dash-app'
+    user: 1000:1000
     environment:
       #- GUNICORN_UID=1000
       #- GUNICORN_GID=1000
@@ -48,12 +49,12 @@ services:
       # [ NEED TO ATTACH STORAGE FOR OFFLINE CACHING OF TIMESERIES DATA    ]
       # [ TIMESERIES DATA WILL BE STORED IN PYTHON SHELVE OR SQLITE DB FILE ]
       # dash app files
-      - '${PWD}/container2/dash_app/hivekeepers_app.py:/dash_app/app.py:ro'
-      - '${PWD}/container2/dash_app/requirements.txt:/dash_app/requirements.txt:ro'
-      - '${PWD}/container2/dash_app/data.csv:/dash_app/data.csv:ro'
-      - '${PWD}/container2/dash_app/hivekeepers_helpers.py:/dash_app/hivekeepers_helpers.py:ro'
+      - '${PWD}/container2/dash_app/hivekeepers_app.py:/home/hivekeeper/dash_app/app.py:ro'
+      - '${PWD}/container2/dash_app/requirements.txt:/home/hivekeeper/dash_app/requirements.txt:ro'
+      - '${PWD}/container2/dash_app/data.csv:/home/hivekeeper/dash_app/data.csv:ro'
+      - '${PWD}/container2/dash_app/hivekeepers_helpers.py:/home/hivekeeper/dash_app/hivekeepers_helpers.py:ro'
       #- '${PWD}/container2/dash_app/hivekeepers.db:/dash_app/hivekeepers.db'
-      - '${PWD}/container2/dash_app/update_db.py:/dash_app/update_db.py'
+      - '${PWD}/container2/dash_app/update_db.py:/home/hivekeeper/dash_app/update_db.py'
     networks:
       container_net:
         ipv4_address: 172.75.0.3

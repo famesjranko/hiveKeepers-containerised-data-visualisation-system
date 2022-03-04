@@ -24,6 +24,8 @@ from dash import Dash, dcc, html, Input, Output
 
 import dash_bootstrap_components as dbc
 
+import subprocess
+
 import sqlite3
 from sqlalchemy import create_engine # database connection
 
@@ -43,14 +45,12 @@ hivekeepers_data = hp.convert_csv_to_df(data_file)
 # drop unneeded columns, and add interna/external temp delta column
 hivekeepers_data = hp.clean_data(hivekeepers_data)
 
-# store in local sqllite db
-#hp.update_sql_db(hivekeepers_data, 'hivekeepers.db', 'hivedata')
-
 # confirm db creation - print current last index value
 print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
 
 # Build apiary id lists
-apiary_list = hp.get_uniques_in_column(hivekeepers_data, 'apiary_id')
+#apiary_list = hp.get_uniques_in_column(hivekeepers_data, 'apiary_id')
+apiary_list = hivekeepers_data['apiary_id'].unique()
 
 # get fft bin names and amplitude values
 fft_bins = hp.get_fft_bins(hivekeepers_data)
@@ -84,6 +84,34 @@ app.layout = html.Div(
                                  'color': '#413F38',
                                  'backgroundColor': '#F0D466',
                                  'font-family': 'Bahnschrift'},),
+                    
+                    # database update button
+                    html.Div([
+                        html.Button('Update Database', id='update-button', n_clicks=0),
+                        html.Div(id='output-container-button')]),
+                
+                    # timeseries range selector - TESTING - appears in html, but now what?
+                    # set values, marks on df 'timestamp' values
+                    # inputs to chart ranges - build a dictionary of some kind? what is the data range?
+                    #   is it possible to get a fluid range marks? or does it need to be stepped?
+                    #
+                    # value sent would look like: 
+                    #   [2014, 2018]
+                    # ranges in chart call backs may need something like:
+                    #   filtered_data = hivekeepers_data[(hivekeepers_data['timestamp'] > value[0]) & (hivekeepers_data['timestamp'] <= value[1])]
+                    html.Div([
+                        dcc.RangeSlider(
+                            id='range-slider',
+                            marks={
+                                2014: '2014',
+                                2015: '2015',
+                                2016: '2016',
+                                2017: '2017',
+                                2018: '2018'
+                            },
+                            min=2014,
+                            max=2018,
+                            value=[2014, 2018])]),
 
                     # drop down apiary selector for all graphs
                     html.Div([dcc.Dropdown(
@@ -134,6 +162,27 @@ app.layout = html.Div(
 ## ================
 ## Callback Section
 ## ================
+
+@app.callback(
+    dash.dependencies.Output('output-container-button', 'children'),
+    [dash.dependencies.Input('update-button', 'n_clicks')])
+def run_script_onClick(n_clicks):
+    #print('[DEBUG] n_clicks:', n_clicks)
+    
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+        #return dash.no_update
+
+    # without `shell` it needs list ['/full/path/python', 'script.py']           
+    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )  
+
+    # with `shell` it needs string 'python script.py'
+    result = subprocess.check_output('python update_db.py', shell=True)  
+
+    # convert bytes to string
+    result = result.decode()  
+    
+    return result
 
 ## ===========================
 ## 2D charts - Line Plot

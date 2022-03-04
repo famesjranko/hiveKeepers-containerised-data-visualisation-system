@@ -24,7 +24,7 @@ def clean_data(dataframe):
     # option3: int - abs(int - ext)     <- int - (the absolute difference of int and ext)
     
     #hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature']
-    dataframe['temp_delta'] = abs(dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature'])
+    dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
     #hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - abs(hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature'])
 
     # convert timestamp From Unix/Epoch time to Readable date format:
@@ -66,7 +66,7 @@ def get_last_index_db(database, table, index):
 def get_uniques_in_column(dataframe, column):
 
     unique_list = []
-
+    
     for item in dataframe[column]:
         # check if exists in unique_list or not
         if item not in unique_list:

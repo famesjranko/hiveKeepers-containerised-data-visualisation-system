@@ -24,22 +24,39 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
+# create default group and user
+RUN groupadd -g 1000 hivekeeper
+RUN useradd --create-home --gid 1000 --uid 1000 --shell /bin/bash hivekeeper
+
+# set the default user
+USER hivekeeper
+
+# set working directory
+WORKDIR /home/hivekeeper
+
 # create app & logging directories
-RUN mkdir -p /dash_app
-RUN mkdir -p /gunicorn-logs
+RUN mkdir -p /home/hivekeeper/dash_app
+RUN mkdir -p /home/hivekeeper/gunicorn-logs
 #    && chmod 777 /dash_app
 
 # create empty files for binding to
 #RUN touch /dash_app/hivekeepers_helpers.py
 #RUN touch /dash_app/data.csv
-RUN touch /dash_app/hivekeepers.db
-RUN chown 1000:1000 /dash_app/hivekeepers.db
+#RUN touch dash_app/hivekeepers.db
+#RUN chown 1000:1000 /dash_app/hivekeepers.db
 
-RUN chown 1000:1000 -R /dash_app/
+#RUN chown 1000:1000 -R /dash_app/
+#RUN chmod 774 -R /dash_app/
+
+# change user to root 
+USER root
 
 # copy script and make executable
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# change back to default user
+USER hivekeeper
 
 # set app healthcheck
 #HEALTHCHECK --interval=30s --timeout=3s \

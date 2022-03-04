@@ -27,127 +27,36 @@ import dash_bootstrap_components as dbc
 import sqlite3
 from sqlalchemy import create_engine # database connection
 
-
-## ===============
-## Helpers section
-## ===============
-
-def get_4d_data(df, bins, amplitudes):
-    ## --------------------------------
-    ## build new dataframe for 4d chart 
-    ## takes hivekeepers dataframe, a list of the fft_bins and a list of the fft_amplitude values
-    ## returns a dataframe where each index has each fft_bin and fft_amplitude value (total 64 per index)
-    ## --------------------------------
-
-    # get timestamp and internal temp data
-    internal_temps = df['bme680_internal_temperature']
-
-    # build initial df with timestamp and apiary columns
-    data_4d_1 = [df["timestamp"], df["apiary_id"]]
-    headers_4d_1 = ["timestamp", "apiary_id"]
-    df_4d_1 =  pd.concat(data_4d_1, axis=1, keys=headers_4d_1)
-
-    # add internal temperate column and data - repeat for each bin per timestamp index
-    df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True).copy(deep=True)
-
-    # build lists for converting to dataframe
-    amp_list = []
-    bin_list = []
-    for i in amplitudes:
-        n = 0
-        for j in i:
-            amp_list.append(j)
-            bin_list.append(bins[n])
-            n += 1
-
-    # convert each list to dataframe
-    df_fft_amplitude = pd.DataFrame(amp_list, columns=['fft_amplitude'])
-    df_fft_band = pd.DataFrame(bin_list, columns=['fft_band'])
-
-    # final 4d dataframe data
-    data_4d = [df_4d_2["timestamp"],
-                df_4d_2["apiary_id"],
-                df_4d_2["internal_temp"],
-                df_fft_amplitude['fft_amplitude'],
-                df_fft_band['fft_band']]
-
-    # final 4d dataframe headers
-    headers_4d = ["timestamp",
-                    'apiary_id',
-                    "internal_temperature",
-                    "fft_amplitude",
-                    "fft_band"]
-
-    # build 4d dataframe
-    df_4d_final = pd.concat(data_4d,
-                        axis=1,
-                        keys=headers_4d)
-
-    return df_4d_final
-
-def get_fft_bins(bin_group):
-    ## takes int value representing a selected grouping
-    ## returns list of selected fft_bin names
-    if bin_group == 1:
-        bin_set = fft_bins[0:16]
-    elif bin_group == 2:
-        bin_set = fft_bins[16:32]
-    elif bin_group == 3:
-        bin_set = fft_bins[32:48]
-    elif bin_group == 4:
-        bin_set = fft_bins[48:64]
-    elif bin_group == 5:
-        bin_set = fft_bins
-    
-    return bin_set
+import hivekeeper_helpers as hp
 
 ## ===========================
 ## Get data from database/file 
 ## ===========================
 
 data_file = "data.csv"
-
-# read file into dataframe
-try :
-    hivekkeepers_data = pd.read_csv(data_file)
-except FileNotFoundError as error_msg:
-    print(f'{data_file} File not found!{error_msg=}, {type(error_msg)=}')
-except Exception as error_msg:
-    print(f"Unexpected {error_msg=}, {type(error_msg)=}")
+hivekeepers_data = hp.convert_csv_to_df(data_file)
 
 ## ========================
 ## Wrangle Hivekeepers Data
 ## ========================
 
-# drop unnecessary columns
-hivekkeepers_data.drop(hivekkeepers_data.columns[[1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,22,23,24,25,90,91]], axis=1, inplace=True)
+hivekeepers_data = hp.clean_data(hivekeepers_data)
 
-# add internal/external temperature delta column - confirm which they want? 
-# option1: int - ext                <- non-absolute delta of int and delta
-# option2: abs(int - ext)           <- the absolute delta of and ext
-# option3: int - abs(int - ext)     <- int - (the absolute difference of int and ext)
+# store in local sqllite db
+hp.update_sql_db(hivekeepers_data, 'hivekeepers.db', 'hivedata')
 
-#hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature']
-hivekkeepers_data['temp_delta'] = abs(hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature'])
-#hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - abs(hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature'])
-
-# convert timestamp From Unix/Epoch time to Readable date format:
-# eg. from 1635249781 to 2021-10-26 12:03:01
-hivekkeepers_data['timestamp'] = pd.to_datetime(hivekkeepers_data['timestamp'], unit='s')
+# confirm db creation - print current last index value
+print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
 
 # Build apiary id lists
-unique_list = []
-for id in hivekkeepers_data['apiary_id']:
-    # check if exists in unique_list or not
-    if id not in unique_list:
-        unique_list.append(id)
+apiary_list = hp.get_uniques_in_column(hivekeepers_data, 'apiary_id')
 
 # get fft bin names and amplitude values
-fft_bins = [col for col in hivekkeepers_data if col.startswith('fft_bin')]
-fft_amplitudes = hivekkeepers_data[fft_bins].values
+fft_bins = hp.get_fft_bins(hivekeepers_data)
+fft_amplitudes = hivekeepers_data[fft_bins].values
 
 ## build new dataframe for 4d chart 
-hivekeepers_data_4d = get_4d_data(hivekkeepers_data, fft_bins, fft_amplitudes)
+hivekeepers_data_4d = hp.get_4d_data(hivekeepers_data, fft_bins, fft_amplitudes)
 
 ## ====================================
 ## Dash Section server & layout section
@@ -165,37 +74,6 @@ fig2 = go.Figure()
 fig3 = go.Figure()
 fig4 = go.Figure()
 
-# set 2d chart x-axis range slider
-rangeslider_2d_x = dict(buttons=list([dict(count=1,
-                                        label="1h",
-                                        step="hour",
-                                        stepmode="backward"),
-                                     dict(count=1,
-                                        label="1d",
-                                        step="day",
-                                        stepmode="backward"),
-                                     dict(count=7,
-                                        label="1w",
-                                        step="day",
-                                        stepmode="backward"),
-                                     dict(count=1,
-                                        label="1m",
-                                        step="month",
-                                        stepmode="backward"),
-                                     dict(count=6,
-                                        label="6m",
-                                        step="month",
-                                        stepmode="backward"),
-                                     dict(count=1,
-                                        label="YTD",
-                                        step="year",
-                                        stepmode="todate"),
-                                     dict(count=1,
-                                        label="1y",
-                                        step="year",
-                                        stepmode="backward"),
-                                     dict(step="all")])) 
-
 app.layout = html.Div(
                 children=[
                     # web header, title bar
@@ -209,7 +87,7 @@ app.layout = html.Div(
                     # drop down apiary selector for all graphs
                     html.Div([dcc.Dropdown(
                                 id='apiary-selector',
-                                options=[{'label': f"Apiary: {i}", 'value': i} for i in unique_list],
+                                options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
                                 placeholder="Select an apiaryID",
                                 clearable=False,
                                 style = {'width': '200px'}),],), 
@@ -278,7 +156,7 @@ def render_graphs(apiaryID):
         raise dash.exceptions.PreventUpdate
 
     # get apiary data
-    filtered_hivekeepers_data = hivekkeepers_data.loc[hivekkeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
+    filtered_hivekeepers_data = hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
 
     ## ============
     ## build chart1
@@ -308,7 +186,7 @@ def render_graphs(apiaryID):
     # Add range slider
     fig1.update_layout(
         xaxis=dict(
-            rangeselector=rangeslider_2d_x,
+            rangeselector=hp.get_2d_xrangeslider(),
             rangeslider=dict(
                 visible=True
             ),
@@ -347,7 +225,7 @@ def render_graphs(apiaryID):
     # Add range slider
     fig2.update_layout(
         xaxis=dict(
-            rangeselector=rangeslider_2d_x,
+            rangeselector=hp.get_2d_xrangeslider(),
             rangeslider=dict(
                 visible=True
             ),
@@ -375,10 +253,10 @@ def render_fft_graph(bin_group, apiaryID):
         raise dash.exceptions.PreventUpdate
 
     # get apiary specific data
-    filtered_hivekeepers_data = hivekkeepers_data.loc[hivekkeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
+    filtered_hivekeepers_data = hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
 
     # get bins from drop down selection
-    bins = get_fft_bins(bin_group)
+    bins = hp.get_bin_group(bin_group, fft_bins)
 
     # build chart
     fig3 = go.Figure(data=[go.Surface(x=filtered_hivekeepers_data['timestamp'],
@@ -421,7 +299,7 @@ def render_fft_graph(bin_group, apiaryID):
     filtered_hivekeepers_data_4d = hivekeepers_data_4d.loc[hivekeepers_data_4d["apiary_id"] == int(apiaryID)].copy(deep=True)
     
     # get bins from drop down selection
-    bins = get_fft_bins(bin_group)
+    bins = hp.get_bin_group(bin_group, fft_bins)
 
     # get subset with selected bin group 
     filtered_hivekeepers_data_4d = filtered_hivekeepers_data_4d.loc[filtered_hivekeepers_data_4d['fft_band'].isin(bins)]
@@ -463,4 +341,4 @@ def render_fft_graph(bin_group, apiaryID):
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
     #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)
-    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=False, use_reloader=False)
+    app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)

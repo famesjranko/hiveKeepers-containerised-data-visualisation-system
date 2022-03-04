@@ -4,17 +4,15 @@ import sqlite3
 
 def convert_csv_to_df(csv_file):
 
-    data_file = csv_file
-    
     # read file into dataframe
     try :
-        hivekkeepers_data = pd.read_csv(data_file)
+        hivekeepers_data = pd.read_csv(csv_file)
     except FileNotFoundError as error_msg:
-        print(f'{data_file} File not found!{error_msg=}, {type(error_msg)=}')
+        print(f'{csv_file} File not found!{error_msg=}, {type(error_msg)=}')
     except Exception as error_msg:
-        print(f'Unexpected {error_msg=}, {type(error_msg)=}')
+        print(f'{csv_file} Unexpected! {error_msg=}, {type(error_msg)=}')
     
-    return hivekkeepers_data
+    return hivekeepers_data
     
 def clean_data(dataframe):
     # drop unnecessary columns

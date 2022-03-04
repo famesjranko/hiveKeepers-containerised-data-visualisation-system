@@ -62,15 +62,15 @@ if [[ -s requirements.txt && -s app.py ]]
     tail -n 0 -f /gunicorn-logs/*.log &
 
     # create sql database file
-    if [[ -f data.csv ]] && [[ -f hivekeeper_sql.py ]]; then
+    if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
       echo "[ENTRYPOINT] found CSV file!"
-      echo "[ENTRYPOINT] runnning sqlite3 db script..."
-      python hivekeeper_sql.py
+      echo "[ENTRYPOINT] building database..."
+      python update_db.py
 
-      if [ -f hivekeeper.db ]; then
-        echo "[ENTRYPOINT] sqlite3 db created!"
+      if [ -f hivekeepers.db ]; then
+        echo "[ENTRYPOINT] database created!"
       else
-        echo "[ENTRYPOINT] [ERROR] sqlite3 db missing!"
+        echo "[ENTRYPOINT] [ERROR] database missing!"
       fi
     fi
 

@@ -27,23 +27,24 @@ import dash_bootstrap_components as dbc
 import sqlite3
 from sqlalchemy import create_engine # database connection
 
-import hivekeeper_helpers as hp
+import hivekeepers_helpers as hp
 
 ## ===========================
-## Get data from database/file 
+## Get data from database/file
 ## ===========================
 
-data_file = "data.csv"
+data_file = 'data.csv'
 hivekeepers_data = hp.convert_csv_to_df(data_file)
 
 ## ========================
 ## Wrangle Hivekeepers Data
 ## ========================
 
+# drop unneeded columns, and add interna/external temp delta column
 hivekeepers_data = hp.clean_data(hivekeepers_data)
 
 # store in local sqllite db
-hp.update_sql_db(hivekeepers_data, 'hivekeepers.db', 'hivedata')
+#hp.update_sql_db(hivekeepers_data, 'hivekeepers.db', 'hivedata')
 
 # confirm db creation - print current last index value
 print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
@@ -55,7 +56,7 @@ apiary_list = hp.get_uniques_in_column(hivekeepers_data, 'apiary_id')
 fft_bins = hp.get_fft_bins(hivekeepers_data)
 fft_amplitudes = hivekeepers_data[fft_bins].values
 
-## build new dataframe for 4d chart 
+## build new dataframe for 4d chart
 hivekeepers_data_4d = hp.get_4d_data(hivekeepers_data, fft_bins, fft_amplitudes)
 
 ## ====================================
@@ -83,21 +84,21 @@ app.layout = html.Div(
                                  'color': '#413F38',
                                  'backgroundColor': '#F0D466',
                                  'font-family': 'Bahnschrift'},),
-                    
+
                     # drop down apiary selector for all graphs
                     html.Div([dcc.Dropdown(
                                 id='apiary-selector',
                                 options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
                                 placeholder="Select an apiaryID",
                                 clearable=False,
-                                style = {'width': '200px'}),],), 
-                
+                                style = {'width': '200px'}),],),
+
                     # graph 1 div
                     html.Div([dcc.Graph(id='graph1', figure=fig1)]),
-    
+
                     # graph 2 div
                     html.Div([dcc.Graph(id='graph2', figure=fig2)]),
-                    
+
                     # drop down bin selector for graph 3
                     html.Div([dcc.Dropdown(
                                 id='bin-selector1',
@@ -109,11 +110,11 @@ app.layout = html.Div(
                                 value=5,
                                 placeholder="Select an FFT bin group",
                                 clearable=False,
-                                style = {'width': '200px'})],), 
-                    
+                                style = {'width': '200px'})],),
+
                     # graph 3 div
                     html.Div([dcc.Graph(id='graph3', figure=fig3)]),
-                    
+
                     # drop down bin selector for graph 4
                     html.Div([dcc.Dropdown(
                                 id='bin-selector2',
@@ -126,7 +127,7 @@ app.layout = html.Div(
                                 placeholder="Select an FFT bin group",
                                 clearable=False,
                                 style = {'width': '200px'})],),
-                    
+
                     # graph 4 div
                     html.Div([dcc.Graph(id='graph4', figure=fig4)])])
 
@@ -139,7 +140,7 @@ app.layout = html.Div(
 ## chart1 = X-Axis Time,
 ##          Y-Axis1 Internal Temp,
 ##          Y-Axis2 External Temp
-## 
+##
 ## chart2 = X-Axis Time,
 ##          Y-Axis1 Internal Temp,
 ##          Y-Axis2 Internal to External Detla Temp
@@ -147,10 +148,9 @@ app.layout = html.Div(
 @app.callback(
     [Output('graph1', 'figure'),
      Output('graph2', 'figure')],
-    [Input("apiary-selector", "value")]
-)
+    [Input("apiary-selector", "value")])
 def render_graphs(apiaryID):
-    
+
     # PreventUpdate prevents ALL outputs updating
     if apiaryID is None:
         raise dash.exceptions.PreventUpdate
@@ -167,11 +167,17 @@ def render_graphs(apiaryID):
 
     # add internal temp trace
     fig1.add_trace(
-        go.Scatter(x=list(filtered_hivekeepers_data.timestamp), y=list(filtered_hivekeepers_data.bme680_internal_temperature), name="internal_temperature"), secondary_y=False)
+        go.Scatter(x=list(filtered_hivekeepers_data.timestamp),
+                   y=list(filtered_hivekeepers_data.bme680_internal_temperature),
+                   name="internal_temperature"),
+                   secondary_y=False)
 
     # add external temp trace
     fig1.add_trace(
-        go.Scatter(x=list(filtered_hivekeepers_data.timestamp), y=list(filtered_hivekeepers_data.bme680_external_temperature), name="external_temperature"), secondary_y=True)
+        go.Scatter(x=list(filtered_hivekeepers_data.timestamp),
+                   y=list(filtered_hivekeepers_data.bme680_external_temperature),
+                   name="external_temperature"),
+                   secondary_y=True)
 
     # add axis titles
     fig1.update_layout(
@@ -179,7 +185,7 @@ def render_graphs(apiaryID):
         yaxis_title='temp (C)',
         yaxis2_title='temp (C)'
     )
-    
+
     # Set title
     fig1.update_layout(title_text="internal vs external hive temperatures")
 
@@ -193,22 +199,27 @@ def render_graphs(apiaryID):
             type="date"
         )
     )
-    
+
     ## ============
     ## build chart2
     ## ============
- 
+
     # Create figure with secondary y-axis
     fig2 = make_subplots(specs=[[{"secondary_y": True}]])
 
     # add internal temp trace
     fig2.add_trace(
-        go.Scatter(x=filtered_hivekeepers_data['timestamp'], y=filtered_hivekeepers_data['bme680_internal_temperature'], name="internal_temperature"), secondary_y=False)
+        go.Scatter(x=filtered_hivekeepers_data['timestamp'],
+                   y=filtered_hivekeepers_data['bme680_internal_temperature'],
+                   name="internal_temperature"),
+                   secondary_y=False)
 
     # add delta temp trace
     fig2.add_trace(
-        go.Scatter(x=filtered_hivekeepers_data['timestamp'], y=filtered_hivekeepers_data['temp_delta'], name="temp_delta"), secondary_y=True,
-    )
+        go.Scatter(x=filtered_hivekeepers_data['timestamp'],
+                   y=filtered_hivekeepers_data['temp_delta'],
+                   name="temp_delta"),
+                   secondary_y=True)
 
     # add axis titles
     fig2.update_layout(
@@ -244,8 +255,7 @@ def render_graphs(apiaryID):
 @app.callback(
     Output('graph3', 'figure'),
     [Input("bin-selector1", "value"),
-     Input("apiary-selector", "value")]
- )
+     Input("apiary-selector", "value")])
 def render_fft_graph(bin_group, apiaryID):
 
     # PreventUpdate prevents ALL outputs updating
@@ -287,8 +297,7 @@ def render_fft_graph(bin_group, apiaryID):
 @app.callback(
    Output('graph4', 'figure'),
    [Input("bin-selector2", "value"),
-    Input("apiary-selector", "value")]
-) 
+    Input("apiary-selector", "value")])
 def render_fft_graph(bin_group, apiaryID):
 
     # PreventUpdate prevents ALL outputs updating
@@ -297,11 +306,11 @@ def render_fft_graph(bin_group, apiaryID):
 
     # get apiary specific data
     filtered_hivekeepers_data_4d = hivekeepers_data_4d.loc[hivekeepers_data_4d["apiary_id"] == int(apiaryID)].copy(deep=True)
-    
+
     # get bins from drop down selection
     bins = hp.get_bin_group(bin_group, fft_bins)
 
-    # get subset with selected bin group 
+    # get subset with selected bin group
     filtered_hivekeepers_data_4d = filtered_hivekeepers_data_4d.loc[filtered_hivekeepers_data_4d['fft_band'].isin(bins)]
 
     # set chart data config
@@ -315,7 +324,7 @@ def render_fft_graph(bin_group, apiaryID):
                                       opacity=0.8,
                                       showscale=True,
                                       colorbar=dict(title='internal temp (C)'),))
-    
+
     chart_data = [trace1]
 
     # set chart axis labels
@@ -323,7 +332,7 @@ def render_fft_graph(bin_group, apiaryID):
         scene = dict(xaxis = dict(title='timestamp'),
                      yaxis = dict(title='fft_bands'),
                      zaxis = dict(title='amplitude'),),)
-    
+
     # build chart
     fig4 = go.Figure(data=chart_data, layout=layout)
 
@@ -340,5 +349,5 @@ def render_fft_graph(bin_group, apiaryID):
 
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
+    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=False, use_reloader=False)
     #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)
-    app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)

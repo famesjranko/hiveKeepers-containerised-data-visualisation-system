@@ -14,13 +14,13 @@ services:
       dockerfile: Dockerfile
     container_name: 'reverse-proxy'
     volumes:
-      - ./container1/nginx/templates:/etc/nginx/templates
-      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME'
-      - './container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd'
+      - '${PWD}/container1/nginx/templates:/etc/nginx/templates:ro'
+      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
+      - '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
       # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
-    restart: "unless-stopped"
+    #restart: "unless-stopped"
     networks:
       container_net:
         ipv4_address: 172.75.0.2
@@ -48,15 +48,17 @@ services:
       # [ NEED TO ATTACH STORAGE FOR OFFLINE CACHING OF TIMESERIES DATA    ]
       # [ TIMESERIES DATA WILL BE STORED IN PYTHON SHELVE OR SQLITE DB FILE ]
       # dash app files
-      - './container2/dash_app/hivekeepers_app.py:/dash_app/app.py'
-      - './container2/dash_app/requirements.txt:/dash_app/requirements.txt'
-      - './container2/dash_app/sync_data_202201231041.csv:/dash_app/data.csv'
-      - './container2/db/hivekeeper_sql.py:/dash_app/hivekeeper_sql.py'
+      - '${PWD}/container2/dash_app/hivekeepers_app.py:/dash_app/app.py:ro'
+      - '${PWD}/container2/dash_app/requirements.txt:/dash_app/requirements.txt:ro'
+      - '${PWD}/container2/dash_app/data.csv:/dash_app/data.csv:ro'
+      - '${PWD}/container2/dash_app/hivekeepers_helpers.py:/dash_app/hivekeepers_helpers.py:ro'
+      #- '${PWD}/container2/dash_app/hivekeepers.db:/dash_app/hivekeepers.db'
+      - '${PWD}/container2/dash_app/update_db.py:/dash_app/update_db.py'
     networks:
       container_net:
         ipv4_address: 172.75.0.3
     mem_limit: 6000m
-    restart: "unless-stopped"
+    #restart: "unless-stopped"
 
 # build container network to control access to containers
 networks:

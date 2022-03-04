@@ -25,13 +25,17 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     && rm -rf /var/lib/apt/lists/*
 
 # create app & logging directories
-RUN mkdir -p /dash_app \
-    && chmod 777 /dash_app
-
-#RUN touch /dash_app/hivekeeper.db \
-#    && chmod 777 /dash_app/hivekeeper.db
-
+RUN mkdir -p /dash_app
 RUN mkdir -p /gunicorn-logs
+#    && chmod 777 /dash_app
+
+# create empty files for binding to
+#RUN touch /dash_app/hivekeepers_helpers.py
+#RUN touch /dash_app/data.csv
+RUN touch /dash_app/hivekeepers.db
+RUN chown 1000:1000 /dash_app/hivekeepers.db
+
+RUN chown 1000:1000 -R /dash_app/
 
 # copy script and make executable
 COPY docker-entrypoint.sh /entrypoint.sh

@@ -33,6 +33,8 @@ import hivekeepers_helpers as hp
 
 from datetime import date
 
+import copy
+
 ## ===========================
 ## Get data from database/file
 ## ===========================
@@ -82,6 +84,8 @@ days = [date for numd,date in zip([x for x in range(len(hivekeepers_data['timest
 
 app.layout = html.Div(
                 children=[
+                    #dcc.Store(id='memory-apiary'),
+                    #dcc.Store(id='memory-days'),
                     # web header, title bar
                     html.Div(
                         children='HiveKeepers Dash App',
@@ -99,10 +103,13 @@ app.layout = html.Div(
                     html.Div([
                         dcc.DatePickerRange(
                             id='date-picker-range',
-                            min_date_allowed=days[0],
-                            max_date_allowed=days[-1],
-                            initial_visible_month=days[0],
-                            end_date=days[-1]
+                            #start_date_placeholder_text="Start Period",
+                            #end_date_placeholder_text="End Period",
+                            updatemode='bothdates',
+                            #min_date_allowed=days[0],
+                            #max_date_allowed=days[-1],
+                            #initial_visible_month=days[0],
+                            #end_date=days[-1]
                         ),
                         html.Div(id='output-date-picker-range')
                     ]),
@@ -143,6 +150,21 @@ app.layout = html.Div(
 ## ================
 ## Callback Section
 ## ================
+
+@app.callback(
+    Output(component_id='date-picker-range', component_property='min_date_allowed'),
+    Output(component_id='date-picker-range', component_property='max_date_allowed'),
+    Input('apiary-selector', 'value'))
+def get_data_options(apiaryID):
+
+    if apiaryID is None:
+        raise dash.exceptions.PreventUpdate
+
+    # grab data for selected apiary
+    apiary_data = copy.deepcopy(hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)])
+    apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_data['timestamp'].unique()))], apiary_data['timestamp'].dt.date.unique())]
+
+    return apiary_days_range[0], apiary_days_range[-1]
 
 ## dash health-check
 @app.server.route("/ping")
@@ -221,7 +243,7 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
     date_range_df = hivekeepers_data.loc[(hivekeepers_data['timestamp'] >= start_date_string) & (hivekeepers_data['timestamp'] < end_date_string)]
 
     # grab data for selected apiary
-    filtered_hivekeepers_data = date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)].copy(deep=True)
+    filtered_hivekeepers_data = copy.deepcopy(date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)])
 
     ## ===============================================
     ## fig1 = X-Axis Time,

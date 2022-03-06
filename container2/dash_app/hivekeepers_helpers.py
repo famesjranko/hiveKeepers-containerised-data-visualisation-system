@@ -1,6 +1,7 @@
 # pandas vers==1.4.0
 import pandas as pd
 import sqlite3
+import copy
 
 def convert_csv_to_df(csv_file):
 
@@ -48,7 +49,7 @@ def update_sql_db(dataframe, database, table):
 
     return None
 
-def get_last_index_db(database, table, index):
+def get_last_index_db(database):
     # open connection to db - experienced permission issues in container!!!
     connection = sqlite3.connect(database)
     
@@ -98,15 +99,17 @@ def get_4d_data(dataframe, bins, amplitudes):
     ## --------------------------------
 
     # get timestamp and internal temp data
-    internal_temps = dataframe['bme680_internal_temperature']
+    internal_temps = copy.deepcopy(dataframe['bme680_internal_temperature'])
 
     # build initial df with timestamp and apiary columns
-    data_4d_1 = [dataframe['timestamp'], dataframe['apiary_id']]
+    data_4d_1 = [copy.deepcopy(dataframe['timestamp']), copy.deepcopy(dataframe['apiary_id'])]
     headers_4d_1 = ['timestamp', 'apiary_id']
     df_4d_1 =  pd.concat(data_4d_1, axis=1, keys=headers_4d_1)
 
     # add internal temperate column and data - repeat for each bin per timestamp index
-    df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True).copy(deep=True)
+    df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
+    #df_4d_2 = copy.deepcopy(df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True))
+    #df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
 
     # build lists for converting to dataframe
     amp_list = []

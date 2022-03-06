@@ -103,8 +103,8 @@ app.layout = html.Div(
                     html.Div([
                         dcc.DatePickerRange(
                             id='date-picker-range',
-                            #start_date_placeholder_text="Start Period",
-                            #end_date_placeholder_text="End Period",
+                            start_date_placeholder_text="Set start Period",
+                            end_date_placeholder_text="Set End Period",
                             updatemode='bothdates',
                             #min_date_allowed=days[0],
                             #max_date_allowed=days[-1],

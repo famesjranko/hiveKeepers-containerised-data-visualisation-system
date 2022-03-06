@@ -1,8 +1,8 @@
 # HiveKeepers - project - docker-compose.yaml
 # written by: Andrew McDonald
 # initial: 27/01/22
-# current: 25/02/22
-# version: 0.81
+# current: 06/03/22
+# version: 0.82
 
 version: '3.3'
 
@@ -29,7 +29,7 @@ services:
       - CAP_NET_RAW
     ports:
       - '80:80'
-      - '443:443'
+      #- '443:443'
 
   container2:
     build:

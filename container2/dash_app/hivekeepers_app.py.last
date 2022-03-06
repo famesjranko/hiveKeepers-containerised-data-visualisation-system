@@ -31,8 +31,6 @@ from sqlalchemy import create_engine # database connection
 
 import hivekeepers_helpers as hp
 
-from datetime import date
-
 ## ===========================
 ## Get data from database/file
 ## ===========================
@@ -51,12 +49,11 @@ hivekeepers_data = hp.clean_data(hivekeepers_data)
 #print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
 
 # Build apiary id lists
+#apiary_list = hp.get_uniques_in_column(hivekeepers_data, 'apiary_id')
 apiary_list = hivekeepers_data['apiary_id'].unique()
 
 # get fft bin names and amplitude values
 fft_bins = hp.get_fft_bins(hivekeepers_data)
-
-# get fft bin names and amplitude values
 fft_amplitudes = hivekeepers_data[fft_bins].values
 
 ## build new dataframe for 4d chart
@@ -78,8 +75,6 @@ fig2 = go.Figure()
 fig3 = go.Figure()
 fig4 = go.Figure()
 
-days = [date for numd,date in zip([x for x in range(len(hivekeepers_data['timestamp'].unique()))], hivekeepers_data['timestamp'].dt.date.unique())]
-
 app.layout = html.Div(
                 children=[
                     # web header, title bar
@@ -89,31 +84,42 @@ app.layout = html.Div(
                                  'color': '#413F38',
                                  'backgroundColor': '#F0D466',
                                  'font-family': 'Bahnschrift'},),
-
+                    
                     # database update button
                     html.Div([
                         html.Button('Update Database', id='update-button', n_clicks=0),
                         html.Div(id='output-container-button')]),
-
-                    # date range picker
+                
+                    # timeseries range selector - TESTING - appears in html, but now what?
+                    # set values, marks on df 'timestamp' values
+                    # inputs to chart ranges - build a dictionary of some kind? what is the data range?
+                    #   is it possible to get a fluid range marks? or does it need to be stepped?
+                    #
+                    # value sent would look like: 
+                    #   [2014, 2018]
+                    # ranges in chart call backs may need something like:
+                    #   filtered_data = hivekeepers_data[(hivekeepers_data['timestamp'] > value[0]) & (hivekeepers_data['timestamp'] <= value[1])]
                     html.Div([
-                        dcc.DatePickerRange(
-                            id='date-picker-range',
-                            min_date_allowed=days[0],
-                            max_date_allowed=days[-1],
-                            initial_visible_month=days[0],
-                            end_date=days[-1]
-                        ),
-                        html.Div(id='output-date-picker-range')
-                    ]),
+                        dcc.RangeSlider(
+                            id='range-slider',
+                            marks={
+                                2014: '2014',
+                                2015: '2015',
+                                2016: '2016',
+                                2017: '2017',
+                                2018: '2018'
+                            },
+                            min=2014,
+                            max=2018,
+                            value=[2014, 2018])]),
 
                     # drop down apiary selector for all graphs
-                     html.Div([dcc.Dropdown(
+                    html.Div([dcc.Dropdown(
                                 id='apiary-selector',
                                 options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
                                 placeholder="Select an apiaryID",
                                 clearable=False,
-                                style = {'width': '200px'})]),
+                                style = {'width': '200px'}),],),
 
                     # graph 1 div
                     html.Div([dcc.Graph(id='graph1', figure=fig1)]),
@@ -121,9 +127,9 @@ app.layout = html.Div(
                     # graph 2 div
                     html.Div([dcc.Graph(id='graph2', figure=fig2)]),
 
-                    # drop down bin selector for fft graphs 3 and 4
+                    # drop down bin selector for graph 3
                     html.Div([dcc.Dropdown(
-                                id='bin-selector',
+                                id='bin-selector1',
                                 options=[{'label':'fft bins: 0-16',  'value':1},
                                          {'label':'fft bins: 16-32', 'value':2},
                                          {'label':'fft bins: 32-48', 'value':3},
@@ -132,10 +138,23 @@ app.layout = html.Div(
                                 value=5,
                                 placeholder="Select an FFT bin group",
                                 clearable=False,
-                                style = {'width': '200px'})]),
+                                style = {'width': '200px'})],),
 
                     # graph 3 div
                     html.Div([dcc.Graph(id='graph3', figure=fig3)]),
+
+                    # drop down bin selector for graph 4
+                    html.Div([dcc.Dropdown(
+                                id='bin-selector2',
+                                options=[{'label':'fft bins: 0-16',  'value':1},
+                                         {'label':'fft bins: 16-32', 'value':2},
+                                         {'label':'fft bins: 32-48', 'value':3},
+                                         {'label':'fft bins: 48-64', 'value':4},
+                                         {'label':'fft bins: all',   'value':5}],
+                                value=5,
+                                placeholder="Select an FFT bin group",
+                                clearable=False,
+                                style = {'width': '200px'})],),
 
                     # graph 4 div
                     html.Div([dcc.Graph(id='graph4', figure=fig4)])])
@@ -144,91 +163,53 @@ app.layout = html.Div(
 ## Callback Section
 ## ================
 
-## dash health-check
-@app.server.route("/ping")
-def ping():
-  return "{status: ok}"
-
-## date range selector
-@app.callback(
-    Output('output-date-picker-range', 'children'),
-    Input('date-picker-range', 'start_date'),
-    Input('date-picker-range', 'end_date'))
-def update_output(start_date, end_date):
-
-    string_prefix = 'You have selected: '
-
-    if start_date is not None:
-        start_date_object = date.fromisoformat(start_date)
-        start_date_string = start_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'Start Date: ' + start_date_string + ' | '
-
-    if end_date is not None:
-        end_date_object = date.fromisoformat(end_date)
-        end_date_string = end_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'End Date: ' + end_date_string
-
-    if len(string_prefix) == len('You have selected: '):
-        return 'Please select a date range for graphs...'
-    else:
-        return string_prefix
-
-## database update button
 @app.callback(
     dash.dependencies.Output('output-container-button', 'children'),
     [dash.dependencies.Input('update-button', 'n_clicks')])
 def run_script_onClick(n_clicks):
     #print('[DEBUG] n_clicks:', n_clicks)
-
+    
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
         #return dash.no_update
 
-    # without `shell` it needs list ['/full/path/python', 'script.py']
-    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )
+    # without `shell` it needs list ['/full/path/python', 'script.py']           
+    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )  
 
     # with `shell` it needs string 'python script.py'
-    result = subprocess.check_output('python update_db.py', shell=True)
+    result = subprocess.check_output('python update_db.py', shell=True)  
 
     # convert bytes to string
-    result = result.decode()
-
+    result = result.decode()  
+    
     return result
 
-## all graphs, using: date range selector,
-##                    apiaryID selector,
-##                    & bin selector,
+## ===========================
+## 2D charts - Line Plot
+## chart1 = X-Axis Time,
+##          Y-Axis1 Internal Temp,
+##          Y-Axis2 External Temp
+##
+## chart2 = X-Axis Time,
+##          Y-Axis1 Internal Temp,
+##          Y-Axis2 Internal to External Detla Temp
+## ===========================
 @app.callback(
     [Output('graph1', 'figure'),
-     Output('graph2', 'figure'),
-     Output('graph3', 'figure'),
-     Output('graph4', 'figure')],
-    [Input('apiary-selector', 'value'),
-     Input('date-picker-range', 'start_date'),
-     Input('date-picker-range', 'end_date'),
-     Input("bin-selector", "value")])
-def render_graphs(apiaryID, start_date, end_date, bin_group):
+     Output('graph2', 'figure')],
+    [Input("apiary-selector", "value")])
+def render_graphs(apiaryID):
 
     # PreventUpdate prevents ALL outputs updating
-    if apiaryID is None or start_date is None or end_date is None or bin_group is None:
+    if apiaryID is None:
         raise dash.exceptions.PreventUpdate
 
-    # convert date objects to formatted date strings
-    start_date_string = date.fromisoformat(start_date).strftime('%Y-%m-%d')
-    end_date_string = date.fromisoformat(end_date).strftime('%Y-%m-%d')
+    # get apiary data
+    filtered_hivekeepers_data = hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
 
-    # grab data within selected date range
-    date_range_df = hivekeepers_data.loc[(hivekeepers_data['timestamp'] >= start_date_string) & (hivekeepers_data['timestamp'] < end_date_string)]
-
-    # grab data for selected apiary
-    filtered_hivekeepers_data = date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)].copy(deep=True)
-
-    ## ===============================================
-    ## fig1 = X-Axis Time,
-    ##        Y-Axis1 Internal Temp,
-    ##        Y-Axis2 External Temp
-    ## 2D line chart
-    ## ===============================================
+    ## ============
+    ## build chart1
+    ## ============
 
     # Create figure with secondary y-axis
     fig1 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -268,12 +249,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
         )
     )
 
-    ## ===============================================
-    ## fig2 = X-Axis Time,
-    ##        Y-Axis1 Internal Temp,
-    ##        Y-Axis2 Internal to External Detla Temp
-    ## 2D line chart
-    ## ==============================================
+    ## ============
+    ## build chart2
+    ## ============
 
     # Create figure with secondary y-axis
     fig2 = make_subplots(specs=[[{"secondary_y": True}]])
@@ -315,15 +293,26 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
         )
     )
 
-    ## ===============================================
-    ## fig3 = X-Axis Time,
-    ##        Y-Axis FFT Bins,
-    ##        Z-Axis Amplitude
-    ## 3D FFT chart - Surface Plot
-    ## ===============================================
+    return fig1, fig2
 
-    # get fft bin names and amplitude values
-    fft_bins = hp.get_fft_bins(filtered_hivekeepers_data)
+## ===========================
+## 3D FFT chart - Surface Plot
+## X-Axis Time,
+## Y-Axis FFT Bins,
+## Z-Axis Amplitude,
+## ===========================
+@app.callback(
+    Output('graph3', 'figure'),
+    [Input("bin-selector1", "value"),
+     Input("apiary-selector", "value")])
+def render_fft_graph(bin_group, apiaryID):
+
+    # PreventUpdate prevents ALL outputs updating
+    if bin_group is None or apiaryID is None:
+        raise dash.exceptions.PreventUpdate
+
+    # get apiary specific data
+    filtered_hivekeepers_data = hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)].copy(deep=True)
 
     # get bins from drop down selection
     bins = hp.get_bin_group(bin_group, fft_bins)
@@ -345,19 +334,33 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
                     yaxis_title = 'fft_bands',
                     zaxis_title = 'amplitude'))
 
-    ## ===============================================
-    ## fig4 = X-Axis Time,
-    ##        Y-Axis FFT Bins,
-    ##        Z-Axis Amplitude,
-    ##        C-Axis Internal Temp
-    ## 3D FFT chart - Surface Plot
-    ## ===============================================
+    return fig3
 
-    # grab 4d data within selected date range
-    date_range_df_4d = hivekeepers_data_4d.loc[(hivekeepers_data_4d['timestamp'] >= start_date_string) & (hivekeepers_data_4d['timestamp'] < end_date_string)]
+## ===========================
+## 3D FFT chart - Surface Plot
+## X-Axis Time,
+## Y-Axis FFT Bins,
+## Z-Axis Amplitude,
+## C-Axis Internal Temp
+## ===========================
+@app.callback(
+   Output('graph4', 'figure'),
+   [Input("bin-selector2", "value"),
+    Input("apiary-selector", "value")])
+def render_fft_graph(bin_group, apiaryID):
 
-    # grab data for selected bin group
-    filtered_hivekeepers_data_4d = date_range_df_4d.loc[date_range_df_4d['fft_band'].isin(bins)]
+    # PreventUpdate prevents ALL outputs updating
+    if bin_group is None or apiaryID is None:
+        raise dash.exceptions.PreventUpdate
+
+    # get apiary specific data
+    filtered_hivekeepers_data_4d = hivekeepers_data_4d.loc[hivekeepers_data_4d["apiary_id"] == int(apiaryID)].copy(deep=True)
+
+    # get bins from drop down selection
+    bins = hp.get_bin_group(bin_group, fft_bins)
+
+    # get subset with selected bin group
+    filtered_hivekeepers_data_4d = filtered_hivekeepers_data_4d.loc[filtered_hivekeepers_data_4d['fft_band'].isin(bins)]
 
     # set chart data config
     trace1 = go.Scatter3d(x = filtered_hivekeepers_data_4d['timestamp'],
@@ -371,23 +374,23 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
                                       showscale=True,
                                       colorbar=dict(title='internal temp (C)'),))
 
-    data_4d = [trace1]
+    chart_data = [trace1]
 
     # set chart axis labels
-    layout_4d = go.Layout(
+    layout = go.Layout(
         scene = dict(xaxis = dict(title='timestamp'),
                      yaxis = dict(title='fft_bands'),
                      zaxis = dict(title='amplitude'),),)
 
     # build chart
-    fig4 = go.Figure(data=data_4d, layout=layout_4d)
+    fig4 = go.Figure(data=chart_data, layout=layout)
 
     # set chart title and size
     fig4.update_layout(title='3D FFT chart - Scatter Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude, C-Axis Internal Temp)',
                         autosize=True,
                         height=900)
 
-    return fig1, fig2, fig3, fig4
+    return fig4
 
 ## =================
 ## Serve Dash server
@@ -395,5 +398,5 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
 
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
-    #app.run_server(host="0.0.0.0", port=8050, debug=True, use_reloader=False)
-    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=True, use_reloader=False)
+    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=False, use_reloader=False)
+    #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)

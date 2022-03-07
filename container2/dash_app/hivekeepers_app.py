@@ -31,9 +31,10 @@ from sqlalchemy import create_engine # database connection
 
 import hivekeepers_helpers as hp
 
-from datetime import date
+from datetime import date, timedelta
 
 import copy
+
 
 ## ===========================
 ## Get data from database/file
@@ -106,10 +107,7 @@ app.layout = html.Div(
                             start_date_placeholder_text="Set start Period",
                             end_date_placeholder_text="Set End Period",
                             updatemode='bothdates',
-                            #min_date_allowed=days[0],
-                            #max_date_allowed=days[-1],
-                            #initial_visible_month=days[0],
-                            #end_date=days[-1]
+                            minimum_nights=0,
                         ),
                         html.Div(id='output-date-picker-range')
                     ]),
@@ -165,9 +163,7 @@ def get_data_options(apiaryID):
     # grab data for selected apiary
     apiary_data = copy.deepcopy(hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)])
     apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_data['timestamp'].unique()))], apiary_data['timestamp'].dt.date.unique())]
-
-    from datetime import timedelta
-
+    
     # default to showing the most recent single day of data
     if len(apiary_days_range) > 1:
         min_date = apiary_days_range[0]

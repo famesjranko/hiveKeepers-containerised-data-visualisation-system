@@ -154,6 +154,8 @@ app.layout = html.Div(
 @app.callback(
     Output(component_id='date-picker-range', component_property='min_date_allowed'),
     Output(component_id='date-picker-range', component_property='max_date_allowed'),
+    Output(component_id='date-picker-range', component_property='start_date'),
+    Output(component_id='date-picker-range', component_property='end_date'),
     Input('apiary-selector', 'value'))
 def get_data_options(apiaryID):
 
@@ -164,7 +166,23 @@ def get_data_options(apiaryID):
     apiary_data = copy.deepcopy(hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)])
     apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_data['timestamp'].unique()))], apiary_data['timestamp'].dt.date.unique())]
 
-    return apiary_days_range[0], apiary_days_range[-1]
+    from datetime import timedelta
+
+    # default to showing the most recent single day of data
+    if len(apiary_days_range) > 1:
+        min_date = apiary_days_range[0]
+        max_date =  apiary_days_range[-1] + timedelta(days=1)
+        start_date = apiary_days_range[-2]
+        end_date =  apiary_days_range[-1]
+        return min_date, max_date, start_date, end_date
+    elif len(apiary_days_range) == 1:
+        min_date = apiary_days_range[0]
+        max_date =  apiary_days_range[0] + timedelta(days=1)
+        start_date = min_date
+        end_date =  max_date
+        return min_date, max_date, start_date, max_date
+    else:
+        return None, None, None, None
 
 ## dash health-check
 @app.server.route("/ping")

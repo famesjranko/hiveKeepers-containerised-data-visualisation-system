@@ -11,31 +11,28 @@
 ## =======================
 
 import os
+import subprocess
+from pathlib import PurePath, Path
+from datetime import date, timedelta
+import copy
+import sqlite3
+
+import numpy as np
+
+# pandas vers==1.4.0
+import pandas as pd
+
+from sqlalchemy import create_engine # database connection
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
 
-# pandas vers==1.4.0
-import pandas as pd
-
 import dash
 from dash import Dash, dcc, html, Input, Output
-
 import dash_bootstrap_components as dbc
 
-import subprocess
-
-import sqlite3
-from sqlalchemy import create_engine # database connection
-
 import hivekeepers_helpers as hp
-
-from datetime import date, timedelta
-
-import copy
-
-from pathlib import PurePath, Path
 
 ## ===========================
 ## Get data from database/file
@@ -63,8 +60,8 @@ hivekeepers_data = hp.clean_data(hivekeepers_data)
 # confirm db creation - print current last index value
 #print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
 
-# Build apiary id lists
-apiary_list = hivekeepers_data['apiary_id'].unique()
+# Build apiary id list
+apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
 
 # get fft bin names and amplitude values
 fft_bins = hp.get_fft_bins(hivekeepers_data)
@@ -91,8 +88,10 @@ fig2 = go.Figure()
 fig3 = go.Figure()
 fig4 = go.Figure()
 
-days = [date for numd,date in zip([x for x in range(len(hivekeepers_data['timestamp'].unique()))], hivekeepers_data['timestamp'].dt.date.unique())]
+days = [date for numd,date in zip(list(range(len(hivekeepers_data['timestamp'].unique()))),
+                                  hivekeepers_data['timestamp'].dt.date.unique())]
 
+list(range(len(hivekeepers_data['timestamp'].unique())))
 app.layout = html.Div(
                 children=[
                     #dcc.Store(id='memory-apiary'),
@@ -123,12 +122,13 @@ app.layout = html.Div(
                     ]),
 
                     # drop down apiary selector for all graphs
-                     html.Div([dcc.Dropdown(
-                                id='apiary-selector',
-                                options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
-                                placeholder="Select an apiaryID",
-                                clearable=False,
-                                style = {'width': '200px'})]),
+                    html.Div([
+                        dcc.Dropdown(
+                            id='apiary-selector',
+                            options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
+                            placeholder="Select an apiaryID",
+                            clearable=False,
+                            style = {'width': '200px'})]),
 
                     # graph 1 div
                     html.Div([dcc.Graph(id='graph1', figure=fig1)]),
@@ -137,17 +137,18 @@ app.layout = html.Div(
                     html.Div([dcc.Graph(id='graph2', figure=fig2)]),
 
                     # drop down bin selector for fft graphs 3 and 4
-                    html.Div([dcc.Dropdown(
-                                id='bin-selector',
-                                options=[{'label':'fft bins: 0-16',  'value':1},
-                                         {'label':'fft bins: 16-32', 'value':2},
-                                         {'label':'fft bins: 32-48', 'value':3},
-                                         {'label':'fft bins: 48-64', 'value':4},
-                                         {'label':'fft bins: all',   'value':5}],
-                                value=5,
-                                placeholder="Select an FFT bin group",
-                                clearable=False,
-                                style = {'width': '200px'})]),
+                    html.Div([
+                        dcc.Dropdown(
+                            id='bin-selector',
+                            options=[{'label':'fft bins: 0-16',  'value':1},
+                                        {'label':'fft bins: 16-32', 'value':2},
+                                        {'label':'fft bins: 32-48', 'value':3},
+                                        {'label':'fft bins: 48-64', 'value':4},
+                                        {'label':'fft bins: all',   'value':5}],
+                            value=5,
+                            placeholder="Select an FFT bin group",
+                            clearable=False,
+                            style = {'width': '200px'})]),
 
                     # graph 3 div
                     html.Div([dcc.Graph(id='graph3', figure=fig3)]),
@@ -193,7 +194,7 @@ def get_data_options(apiaryID):
 ## dash health-check
 @app.server.route("/ping")
 def ping():
-  return "{status: ok}"
+    return "{status: ok}"
 
 ## date range selector
 @app.callback(
@@ -369,7 +370,7 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
     ## ===============================================
 
     # get fft bin names and amplitude values
-    fft_bins = hp.get_fft_bins(filtered_hivekeepers_data)
+    #fft_bins = hp.get_fft_bins(filtered_hivekeepers_data)
 
     # get bins from drop down selection
     bins = hp.get_bin_group(bin_group, fft_bins)

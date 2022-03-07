@@ -1,7 +1,8 @@
 # pandas vers==1.4.0
-import pandas as pd
 import sqlite3
 import copy
+
+import pandas as pd
 
 def convert_csv_to_df(csv_file):
 
@@ -88,17 +89,17 @@ def get_bin_group(bin_group, fft_bins):
     ## takes int value representing a selected grouping
     ## returns list of selected fft_bin names
     if bin_group == 1:
-        bin_set = fft_bins[0:16]
+        return fft_bins[0:16]
     elif bin_group == 2:
-        bin_set = fft_bins[16:32]
+        return fft_bins[16:32]
     elif bin_group == 3:
-        bin_set = fft_bins[32:48]
+        return fft_bins[32:48]
     elif bin_group == 4:
-        bin_set = fft_bins[48:64]
-    elif bin_group == 5:
+        return fft_bins[48:64]
+    else:
         return fft_bins
     
-    return bin_set
+
 
 def get_4d_data(dataframe, bins, amplitudes):
     ## --------------------------------
@@ -156,8 +157,7 @@ def get_4d_data(dataframe, bins, amplitudes):
 def convert_timestamp(dataframe, column):
     return pd.to_datetime(dataframe[column], unit='s')
 
-def get_fft_bins(dataframe):
-    bin_list = []
+def get_fft_bins(dataframe):    
     return [col for col in dataframe if col.startswith('fft_bin')]
 
 def get_2d_xrangeslider():

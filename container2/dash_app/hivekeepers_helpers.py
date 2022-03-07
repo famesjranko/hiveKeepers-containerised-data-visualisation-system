@@ -15,6 +15,15 @@ def convert_csv_to_df(csv_file):
     
     return hivekeepers_data
     
+def get_db_data(db_path):
+    # working dir: /home/hivekeeper/dash_app/
+    # Create your connection.
+    connect_db = sqlite3.connect(db_path)
+    df = pd.read_sql_query("SELECT * FROM hivedata", connect_db)
+    connect_db.close()
+
+    return df
+
 def clean_data(dataframe):
     # drop unnecessary columns
     dataframe.drop(dataframe.columns[[1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,22,23,24,25,90,91]], axis=1, inplace=True)
@@ -87,7 +96,7 @@ def get_bin_group(bin_group, fft_bins):
     elif bin_group == 4:
         bin_set = fft_bins[48:64]
     elif bin_group == 5:
-        bin_set = fft_bins
+        return fft_bins
     
     return bin_set
 
@@ -154,14 +163,14 @@ def get_fft_bins(dataframe):
 def get_2d_xrangeslider():
 
     hr = dict(count=1,
-              label="1h",
-              step="hour",
-              stepmode="backward")
+                label="1h",
+                step="hour",
+                stepmode="backward")
         
     day = dict(count=1,
-               label="1d",
-               step="day",
-               stepmode="backward")
+                label="1d",
+                step="day",
+                stepmode="backward")
     
     week = dict(count=7,
                 label="1w",
@@ -169,20 +178,20 @@ def get_2d_xrangeslider():
                 stepmode="backward")
                 
     month = dict(count=1,
-                 label="1m",
-                 step="month",
-                 stepmode="backward")
+                label="1m",
+                step="month",
+                stepmode="backward")
     
     half_yr = dict(count=6,
-                   label="6m",
-                   step="month",
-                   stepmode="backward")
+                label="6m",
+                step="month",
+                stepmode="backward")
     
     ytd = dict(count=1,
-               label="YTD",
-               step="year",
-               stepmode="todate")
-               
+                label="YTD",
+                step="year",
+                stepmode="todate")
+          
     year = dict(count=1,
                 label="1y",
                 step="year",
@@ -199,6 +208,7 @@ def test(text):
 
 if __name__ == '__main__':
     convert_csv_to_df()
+    get_db_data()
     clean_data()
     get_last_index_df()
     update_sql_db()

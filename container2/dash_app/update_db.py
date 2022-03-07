@@ -5,8 +5,9 @@ import sqlite3
 data_file = 'data.csv'
 hivekeepers_data = pd.read_csv(data_file)
 
-hivekeepers_data = hp.clean_data(hivekeepers_data)
+#hivekeepers_data = hp.clean_data(hivekeepers_data)
 
+# working dir: /home/hivekeeper/dash_app/
 # open connection to db - experienced permission issues in container!!!
 connection = sqlite3.connect('hivekeepers.db')
 

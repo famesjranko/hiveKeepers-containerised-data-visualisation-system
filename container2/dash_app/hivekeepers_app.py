@@ -35,13 +35,23 @@ from datetime import date, timedelta
 
 import copy
 
+from pathlib import PurePath, Path
 
 ## ===========================
 ## Get data from database/file
 ## ===========================
 
-data_file = 'data.csv'
-hivekeepers_data = hp.convert_csv_to_df(data_file)
+#data_file = 'data.csv'
+#hivekeepers_data = hp.convert_csv_to_df(data_file)
+
+# set database path
+db_path = Path(PurePath('hivekeepers.db'))
+
+# check database is available, and convert to df
+if db_path.exists() and db_path.stat().st_size > 0:
+    hivekeepers_data = hp.get_db_data(db_path)
+else:
+    raise RuntimeError("database not available")
 
 ## ========================
 ## Wrangle Hivekeepers Data

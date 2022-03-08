@@ -72,7 +72,7 @@ fft_amplitudes = hivekeepers_data[fft_bins].values
 ## build new dataframe for 4d chart
 hivekeepers_data_3d = hp.get_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
 
-## colours for charts
+## colours for charts - see fft callback section for full list of colour choices
 colorscales = px.colors.named_colorscales()
 
 ## ====================================
@@ -470,7 +470,7 @@ def run_script_onClick(n_clicks):
     # else:
     #    do nothing
     #    return "update status message"
-    
+
     # convert bytes to string
     result = result.decode()
 

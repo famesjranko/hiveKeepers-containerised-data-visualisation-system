@@ -85,7 +85,7 @@ def get_uniques_in_column(dataframe, column):
 
     return unique_list
 
-def get_bin_group(bin_group, fft_bins):
+def get_bin_range(bin_group, fft_bins):
     ## takes int value representing a selected grouping
     ## returns list of selected fft_bin names
     if bin_group == 1:
@@ -99,9 +99,7 @@ def get_bin_group(bin_group, fft_bins):
     else:
         return fft_bins
     
-
-
-def get_4d_data(dataframe, bins, amplitudes):
+def get_3d_data(dataframe, bins, amplitudes):
     ## --------------------------------
     ## build new dataframe for 4d chart 
     ## takes hivekeepers dataframe, a list of the fft_bins and a list of the fft_amplitude values
@@ -214,8 +212,8 @@ if __name__ == '__main__':
     update_sql_db()
     get_last_index_db()
     get_uniques_in_column()
-    get_bin_group()
-    get_4d_data()
+    get_bin_range()
+    get_3d_data()
     convert_timestamp()
     get_2d_xrangeslider()
     get_fft_bins()

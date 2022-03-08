@@ -70,7 +70,10 @@ fft_bins = hp.get_fft_bins(hivekeepers_data)
 fft_amplitudes = hivekeepers_data[fft_bins].values
 
 ## build new dataframe for 4d chart
-hivekeepers_data_4d = hp.get_4d_data(hivekeepers_data, fft_bins, fft_amplitudes)
+hivekeepers_data_3d = hp.get_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
+
+## colours for charts
+colorscales = px.colors.named_colorscales()
 
 ## ====================================
 ## Dash Section server & layout section
@@ -100,9 +103,9 @@ app.layout = html.Div(
                     html.Div(
                         children='HiveKeepers Dash App',
                         style = {'font-size': '48px',
-                                 'color': '#413F38',
-                                 'backgroundColor': '#F0D466',
-                                 'font-family': 'Bahnschrift'},),
+                                'color': '#413F38',
+                                'backgroundColor': '#F0D466',
+                                'font-family': 'Bahnschrift'},),
 
                     # database update button
                     html.Div([
@@ -136,19 +139,29 @@ app.layout = html.Div(
                     # graph 2 div
                     html.Div([dcc.Graph(id='graph2', figure=fig2)]),
 
-                    # drop down bin selector for fft graphs 3 and 4
+                    # drop downs selectors for fft graphs 3 and 4
                     html.Div([
+                        # bin selector
                         dcc.Dropdown(
                             id='bin-selector',
-                            options=[{'label':'fft bins: 0-16',  'value':1},
-                                        {'label':'fft bins: 16-32', 'value':2},
-                                        {'label':'fft bins: 32-48', 'value':3},
-                                        {'label':'fft bins: 48-64', 'value':4},
-                                        {'label':'fft bins: all',   'value':5}],
+                            options=[{'label':'fft bins: 0-16', 'value':1},
+                                    {'label':'fft bins: 16-32', 'value':2},
+                                    {'label':'fft bins: 32-48', 'value':3},
+                                    {'label':'fft bins: 48-64', 'value':4},
+                                    {'label':'fft bins: all',   'value':5}],
                             value=5,
-                            placeholder="Select an FFT bin group",
+                            placeholder="Select FFT bin group",
                             clearable=False,
-                            style = {'width': '200px'})]),
+                            style = {'width': '200px'}),
+                        # colour selector
+                        dcc.Dropdown(
+                            id='colorscale', 
+                            options=[{"value": x, "label": x} for x in colorscales],
+                            value='viridis',
+                            placeholder="Select FFT colour scale",
+                            clearable=False,
+                            style = {'width': '200px'},)
+                    ]),
 
                     # graph 3 div
                     html.Div([dcc.Graph(id='graph3', figure=fig3)]),
@@ -160,6 +173,7 @@ app.layout = html.Div(
 ## Callback Section
 ## ================
 
+## date range selector
 @app.callback(
     Output(component_id='date-picker-range', component_property='min_date_allowed'),
     Output(component_id='date-picker-range', component_property='max_date_allowed'),
@@ -191,12 +205,7 @@ def get_data_options(apiaryID):
     else:
         return None, None, None, None
 
-## dash health-check
-@app.server.route("/ping")
-def ping():
-    return "{status: ok}"
-
-## date range selector
+## date range selector text output
 @app.callback(
     Output('output-date-picker-range', 'children'),
     Input('date-picker-range', 'start_date'),
@@ -220,28 +229,6 @@ def update_output(start_date, end_date):
     else:
         return string_prefix
 
-## database update button
-@app.callback(
-    dash.dependencies.Output('output-container-button', 'children'),
-    [dash.dependencies.Input('update-button', 'n_clicks')])
-def run_script_onClick(n_clicks):
-    #print('[DEBUG] n_clicks:', n_clicks)
-
-    if not n_clicks:
-        raise dash.exceptions.PreventUpdate
-        #return dash.no_update
-
-    # without `shell` it needs list ['/full/path/python', 'script.py']
-    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )
-
-    # with `shell` it needs string 'python script.py'
-    result = subprocess.check_output('python update_db.py', shell=True)
-
-    # convert bytes to string
-    result = result.decode()
-
-    return result
-
 ## all graphs, using: date range selector,
 ##                    apiaryID selector,
 ##                    & bin selector,
@@ -253,8 +240,9 @@ def run_script_onClick(n_clicks):
     [Input('apiary-selector', 'value'),
      Input('date-picker-range', 'start_date'),
      Input('date-picker-range', 'end_date'),
-     Input("bin-selector", "value")])
-def render_graphs(apiaryID, start_date, end_date, bin_group):
+     Input("bin-selector", "value"),
+     Input("colorscale", "value")])
+def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # PreventUpdate prevents ALL outputs updating
     if apiaryID is None or start_date is None or end_date is None or bin_group is None:
@@ -366,59 +354,81 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
     ## fig3 = X-Axis Time,
     ##        Y-Axis FFT Bins,
     ##        Z-Axis Amplitude
-    ## 3D FFT chart - Surface Plot
+    ## 3D FFT chart - Scatter Plot
     ## ===============================================
 
-    # get fft bin names and amplitude values
-    #fft_bins = hp.get_fft_bins(filtered_hivekeepers_data)
+    ## ==== plotly colourscale options: default = viridis
+    # aggrnyl     agsunset    blackbody   bluered     blues       blugrn      bluyl       brwnyl
+    # bugn        bupu        burg        burgyl      cividis     darkmint    electric    emrld
+    # gnbu        greens      greys       hot         inferno     jet         magenta     magma
+    # mint        orrd        oranges     oryel       peach       pinkyl      plasma      plotly3
+    # pubu        pubugn      purd        purp        purples     purpor      rainbow     rdbu
+    # rdpu        redor       reds        sunset      sunsetdark  teal        tealgrn     turbo
+    # viridis     ylgn        ylgnbu      ylorbr      ylorrd      algae       amp         deep
+    # dense       gray        haline      ice         matter      solar       speed       tempo
+    # thermal     turbid      armyrose    brbg        earth       fall        geyser      prgn
+    # piyg        picnic      portland    puor        rdgy        rdylbu      rdylgn      spectral
+    # tealrose    temps       tropic      balance     curl        delta       oxy         edge
+    # hsv         icefire     phase       twilight    mrybm       mygbm
 
     # get bins from drop down selection
-    bins = hp.get_bin_group(bin_group, fft_bins)
+    bins = hp.get_bin_range(bin_group, fft_bins)
 
-    # build chart
-    fig3 = go.Figure(data=[go.Surface(x=filtered_hivekeepers_data['timestamp'],
-                                      z=filtered_hivekeepers_data[bins].values,
-                                      y=bins,
-                                      colorbar=dict(title='amplitude'))])
+  # grab 4d data within selected date range
+    date_range_df_3d = hivekeepers_data_3d.loc[(hivekeepers_data_3d['timestamp'] >= start_date_string) & (hivekeepers_data_3d['timestamp'] < end_date_string)]
 
-    # set chart title and size
-    fig3.update_layout(title='3D FFT chart - Surface Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude)',
-                    autosize=True,
-                    height=900)
+    # grab data for selected bin group
+    filtered_hivekeepers_data_3d = date_range_df_3d.loc[date_range_df_3d['fft_band'].isin(bins)]
+
+    # set chart data config
+    trace_3d = go.Scatter3d(x = filtered_hivekeepers_data_3d['timestamp'],
+                           y = filtered_hivekeepers_data_3d['fft_band'],
+                           z = filtered_hivekeepers_data_3d['fft_amplitude'],
+                           mode='markers',
+                           marker=dict(size=12,
+                                color=filtered_hivekeepers_data_3d['fft_amplitude'],
+                                colorscale=scale,
+                                opacity=0.8,
+                                showscale=True,
+                                colorbar=dict(title='amplitude'),))
+
+    data_3d = [trace_3d]
 
     # set chart axis labels
-    fig3.update_layout(scene = dict(
-                    xaxis_title = 'timestamp',
-                    yaxis_title = 'fft_bands',
-                    zaxis_title = 'amplitude'))
+    layout_3d = go.Layout(
+        scene = dict(xaxis = dict(title='timestamp'),
+                     yaxis = dict(title='fft_bands'),
+                     zaxis = dict(title='amplitude'),),)
+
+    # build chart
+    fig3 = go.Figure(data=data_3d, layout=layout_3d)
+
+    # set chart title and size
+    fig3.update_layout(title='3D FFT chart - Scatter Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude, C-Axis Internal Temp)',
+                        autosize=True,
+                        height=900)
 
     ## ===============================================
     ## fig4 = X-Axis Time,
     ##        Y-Axis FFT Bins,
     ##        Z-Axis Amplitude,
     ##        C-Axis Internal Temp
-    ## 3D FFT chart - Surface Plot
+    ## 3D FFT chart - Scatter Plot
     ## ===============================================
 
-    # grab 4d data within selected date range
-    date_range_df_4d = hivekeepers_data_4d.loc[(hivekeepers_data_4d['timestamp'] >= start_date_string) & (hivekeepers_data_4d['timestamp'] < end_date_string)]
-
-    # grab data for selected bin group
-    filtered_hivekeepers_data_4d = date_range_df_4d.loc[date_range_df_4d['fft_band'].isin(bins)]
-
     # set chart data config
-    trace1 = go.Scatter3d(x = filtered_hivekeepers_data_4d['timestamp'],
-                          y = filtered_hivekeepers_data_4d['fft_band'],
-                          z = filtered_hivekeepers_data_4d['fft_amplitude'],
-                          mode='markers',
-                          marker=dict(size=12,
-                                      color=filtered_hivekeepers_data_4d['internal_temperature'],
-                                      colorscale='Viridis',
-                                      opacity=0.8,
-                                      showscale=True,
-                                      colorbar=dict(title='internal temp (C)'),))
+    trace4d = go.Scatter3d(x = filtered_hivekeepers_data_3d['timestamp'],
+                           y = filtered_hivekeepers_data_3d['fft_band'],
+                           z = filtered_hivekeepers_data_3d['fft_amplitude'],
+                           mode='markers',
+                           marker=dict(size=12,
+                                color=filtered_hivekeepers_data_3d['internal_temperature'],
+                                colorscale=scale,
+                                opacity=0.8,
+                                showscale=True,
+                                colorbar=dict(title='internal temp (C)'),))
 
-    data_4d = [trace1]
+    data_4d = [trace4d]
 
     # set chart axis labels
     layout_4d = go.Layout(
@@ -436,11 +446,47 @@ def render_graphs(apiaryID, start_date, end_date, bin_group):
 
     return fig1, fig2, fig3, fig4
 
+## database update button - returns prints from update_db script
+@app.callback(
+    dash.dependencies.Output('output-container-button', 'children'),
+    [dash.dependencies.Input('update-button', 'n_clicks')])
+def run_script_onClick(n_clicks):
+    #print('[DEBUG] n_clicks:', n_clicks)
+
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+        #return dash.no_update
+
+    # without `shell` it needs list ['/full/path/python', 'script.py']
+    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )
+
+    # with `shell` it needs string 'python script.py'
+    result = subprocess.check_output('python update_db.py', shell=True)
+
+    # idea: if result is 1 == new data in db, 0 == no change
+    # if result == 1: update the base data df
+    #    hivekeepers_data = hp.get_db_data(db_path)
+    #    return "update status message"
+    # else:
+    #    do nothing
+    #    return "update status message"
+    
+    # convert bytes to string
+    result = result.decode()
+
+    # return prints from update_db script
+    return result
+
+## dash health-check
+@app.server.route("/ping")
+def ping():
+    return "{status: ok}"
+
 ## =================
 ## Serve Dash server
 ## =================
 
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
-    #app.run_server(host="0.0.0.0", port=8050, debug=True, use_reloader=False)
+    #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)
     app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=True, use_reloader=False)

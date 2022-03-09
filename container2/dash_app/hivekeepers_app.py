@@ -46,7 +46,7 @@ db_path = Path(PurePath('hivekeepers.db'))
 
 # check database is available, and convert to df
 if db_path.exists() and db_path.stat().st_size > 0:
-    hivekeepers_data = hp.get_db_data(db_path)
+    hivekeepers_data = hp.get_db()
 else:
     raise RuntimeError("database not available")
 
@@ -55,7 +55,7 @@ else:
 ## ========================
 
 # drop unneeded columns, and add interna/external temp delta column
-hivekeepers_data = hp.clean_data(hivekeepers_data)
+#hivekeepers_data = hp.clean_data(hivekeepers_data)
 
 # confirm db creation - print current last index value
 #print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
@@ -64,13 +64,13 @@ hivekeepers_data = hp.clean_data(hivekeepers_data)
 apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
 
 # get fft bin names and amplitude values
-fft_bins = hp.get_fft_bins(hivekeepers_data)
+#fft_bins = hp.get_fft_bins(hivekeepers_data)
 
-# get fft bin names and amplitude values
-fft_amplitudes = hivekeepers_data[fft_bins].values
+# get fft amplitude values
+#fft_amplitudes = hivekeepers_data[fft_bins].values
 
 ## build new dataframe for 4d chart
-hivekeepers_data_3d = hp.get_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
+#hivekeepers_data_3d = hp.get_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
 
 ## colours for charts - see fft callback section for full list of colour choices
 colorscales = px.colors.named_colorscales()
@@ -253,10 +253,13 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     end_date_string = date.fromisoformat(end_date).strftime('%Y-%m-%d')
 
     # grab data within selected date range
-    date_range_df = hivekeepers_data.loc[(hivekeepers_data['timestamp'] >= start_date_string) & (hivekeepers_data['timestamp'] < end_date_string)]
+    #date_range_df = hivekeepers_data.loc[(hivekeepers_data['timestamp'] >= start_date_string) & (hivekeepers_data['timestamp'] < end_date_string)]
 
     # grab data for selected apiary
-    filtered_hivekeepers_data = copy.deepcopy(date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)])
+    #filtered_hivekeepers_data = copy.deepcopy(date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)])
+
+    # get data from sql-lite db 
+    filtered_hivekeepers_data = hp.get_data_2d(apiaryID, start_date_string, end_date_string)
 
     ## ===============================================
     ## fig1 = X-Axis Time,
@@ -371,11 +374,17 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     # tealrose    temps       tropic      balance     curl        delta       oxy         edge
     # hsv         icefire     phase       twilight    mrybm       mygbm
 
+    # get fft bin names and amplitude values
+    fft_bins = hp.get_fft_bins(hivekeepers_data)
+
     # get bins from drop down selection
     bins = hp.get_bin_range(bin_group, fft_bins)
 
   # grab 4d data within selected date range
-    date_range_df_3d = hivekeepers_data_3d.loc[(hivekeepers_data_3d['timestamp'] >= start_date_string) & (hivekeepers_data_3d['timestamp'] < end_date_string)]
+    #date_range_df_3d = hivekeepers_data_3d.loc[(hivekeepers_data_3d['timestamp'] >= start_date_string) & (hivekeepers_data_3d['timestamp'] < end_date_string)]
+
+    # get data from sql-lite db
+    date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
 
     # grab data for selected bin group
     filtered_hivekeepers_data_3d = date_range_df_3d.loc[date_range_df_3d['fft_band'].isin(bins)]
@@ -464,9 +473,12 @@ def run_script_onClick(n_clicks):
     result = subprocess.check_output('python update_db.py', shell=True)
 
     # idea: if result is 1 == new data in db, 0 == no change
-    # if result == 1: update the base data df
-    #    hivekeepers_data = hp.get_db_data(db_path)
-    #    return "update status message"
+    # if result == 1: 
+    #   update the db
+    #   database has two tables: hivedata, hivedata_3d
+    #       hivedata     is the cleaned 2d data schemes
+    #       hivedata_3d  is the built 3d/4d data scheme
+    #   return "update status message"
     # else:
     #    do nothing
     #    return "update status message"

@@ -1,5 +1,7 @@
 # pandas vers==1.4.0
 import sqlite3
+import sqlalchemy as db
+from sqlalchemy import func
 import copy
 
 import pandas as pd
@@ -22,6 +24,72 @@ def get_db_data(db_path):
     connect_db = sqlite3.connect(db_path)
     df = pd.read_sql_query("SELECT * FROM hivedata", connect_db)
     connect_db.close()
+
+    return df
+
+def get_db():
+    # working dir: /home/hivekeeper/dash_app/
+    # Create your connection.
+    engine = db.create_engine('sqlite:///hivekeepers.db')
+    connection = engine.connect()
+
+    metadata = db.MetaData()
+    hivedata = db.Table('hivedata', metadata, autoload=True, autoload_with=engine)
+
+    query = db.select([hivedata]) 
+
+    ResultProxy = connection.execute(query)
+    ResultSet = ResultProxy.fetchall()
+    
+    connection.close()
+
+    df = pd.DataFrame(ResultSet)
+
+    return df
+
+def get_data_2d(apiary_id, start_date, end_date):
+    # working dir: /home/hivekeeper/dash_app/
+    # Create connection.
+    engine = db.create_engine('sqlite:///hivekeepers.db')
+    connection = engine.connect()
+    
+    metadata = db.MetaData()
+    hivedata = db.Table('hivedata', metadata, autoload=True, autoload_with=engine)
+    #print(hivedata.columns.keys())
+    #print(repr(metadata.tables['hivedata']))
+
+    query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
+    #query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),hivedata.columns.timestamp.between(start_date, end_date))
+    
+    ResultProxy = connection.execute(query)
+    ResultSet = ResultProxy.fetchall()
+    
+    connection.close()
+
+    df = pd.DataFrame(ResultSet)
+
+    return df
+
+def get_data_3d(apiary_id, start_date, end_date):
+    # working dir: /home/hivekeeper/dash_app/
+    # Create connection.
+    engine = db.create_engine('sqlite:///hivekeepers.db')
+    connection = engine.connect()
+    
+    metadata = db.MetaData()
+    hivedata = db.Table('hivedata_3d', metadata, autoload=True, autoload_with=engine)
+    #print(hivedata.columns.keys())
+    #print(repr(metadata.tables['hivedata']))
+
+    query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
+    #query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),hivedata.columns.timestamp.between(start_date, end_date))
+    
+    ResultProxy = connection.execute(query)
+    ResultSet = ResultProxy.fetchall()
+    
+    connection.close()
+
+    df = pd.DataFrame(ResultSet)
 
     return df
 
@@ -99,7 +167,7 @@ def get_bin_range(bin_group, fft_bins):
     else:
         return fft_bins
     
-def get_3d_data(dataframe, bins, amplitudes):
+def build_3d_data(dataframe, bins, amplitudes):
     ## --------------------------------
     ## build new dataframe for 4d chart 
     ## takes hivekeepers dataframe, a list of the fft_bins and a list of the fft_amplitude values
@@ -207,13 +275,16 @@ def test(text):
 if __name__ == '__main__':
     convert_csv_to_df()
     get_db_data()
+    get_db()
+    get_data_2d()
+    get_data_3d()
     clean_data()
     get_last_index_df()
     update_sql_db()
     get_last_index_db()
     get_uniques_in_column()
     get_bin_range()
-    get_3d_data()
+    build_3d_data()
     convert_timestamp()
     get_2d_xrangeslider()
     get_fft_bins()

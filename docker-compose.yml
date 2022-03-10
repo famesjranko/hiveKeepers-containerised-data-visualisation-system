@@ -16,7 +16,8 @@ services:
     volumes:
       - '${PWD}/container1/nginx/templates:/etc/nginx/templates:ro'
       # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
-      - '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
+      #- '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
+      #- '${PWD}/user_passwords.txt:/user_passwords.txt:ro'
     environment:
       # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
@@ -38,6 +39,10 @@ services:
     container_name: 'dash-app'
     user: 1000:1000
     environment:
+      - MYSQL_USER=dev_hkapps_platform
+      - MYSQL_PASS=R8]NbgN[y-V<L,5X
+      - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
+      - MYSQL_DB=rawdata
       #- GUNICORN_UID=1000
       #- GUNICORN_GID=1000
       - GUNICORN_NAME="HiveKeepers"
@@ -51,10 +56,12 @@ services:
       # dash app files
       - '${PWD}/container2/dash_app/hivekeepers_app.py:/home/hivekeeper/dash_app/app.py:ro'
       - '${PWD}/container2/dash_app/requirements.txt:/home/hivekeeper/dash_app/requirements.txt:ro'
-      - '${PWD}/container2/dash_app/data.csv:/home/hivekeeper/dash_app/data.csv:ro'
+      #- '${PWD}/container2/dash_app/data.csv:/home/hivekeeper/dash_app/data.csv:ro'
       - '${PWD}/container2/dash_app/hivekeepers_helpers.py:/home/hivekeeper/dash_app/hivekeepers_helpers.py:ro'
       #- '${PWD}/container2/dash_app/hivekeepers.db:/dash_app/hivekeepers.db'
+      - '${PWD}/container2/dash_app/startup_update_db.py:/home/hivekeeper/dash_app/startup_update_db.py'
       - '${PWD}/container2/dash_app/update_db.py:/home/hivekeeper/dash_app/update_db.py'
+      - '${PWD}/container2/dash_app/config.py:/home/hivekeeper/dash_app/config.py'
     networks:
       container_net:
         ipv4_address: 172.75.0.3

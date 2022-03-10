@@ -60,6 +60,13 @@ COPY ./nginx/html/background.jpg .
 
 # create dir for basic-auth file .htpasswd
 RUN mkdir -p /etc/nginx/auth
+RUN touch /etc/nginx/auth/.htpasswd
+
+WORKDIR /
+COPY password_script.sh /password_script.sh
+RUN chmod +x password_script.sh
+
+COPY user_passwords.txt /user_passwords.txt
 
 # service healthchecks
 # nginx    -> done

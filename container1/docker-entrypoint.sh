@@ -23,6 +23,22 @@ function setTimeZone {
 echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
+## check if files exist and have content
+if [ -s "/password_script.sh" ]; then
+
+    if [ -s "user_passwords.txt" ]; then
+    echo "[ENTRYPOINT] creating user credentials for proxy..."
+
+    ## run user password create script
+    /bin/bash /password_script.sh user_passwords.txt
+
+    echo "[ENTRYPOINT] deleting user password file..."
+
+    ## delete plain-text user passwords file
+    rm user_passwords.txt
+    fi
+fi
+
 ## setup fail2ban
 echo "[ENTRYPOINT] setting up fail2ban server and starting..."
 service fail2ban status > /dev/null && service fail2ban stop
@@ -35,6 +51,10 @@ echo "[ENTRYPOINT] running nginx envsubstitution template script..."
 ## run nginx and tail log
 echo "[ENTRYPOINT] starting nginx..."
 nginx
+
+# delete user plain text passwords when script finished
+echo "[ENTRYPOINT] deleting user password file..."
+rm user_passwords.txt
 
 echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
 exec tail -f /nginx-logs/access.log /var/log/fail2ban.log

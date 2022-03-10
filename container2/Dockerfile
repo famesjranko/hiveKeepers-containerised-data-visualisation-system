@@ -21,6 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3-venv \
     util-linux \
     sqlite3 \
+	python3-pymysql \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
@@ -37,16 +38,6 @@ WORKDIR /home/hivekeeper
 # create app & logging directories
 RUN mkdir -p /home/hivekeeper/dash_app
 RUN mkdir -p /home/hivekeeper/gunicorn-logs
-#    && chmod 777 /dash_app
-
-# create empty files for binding to
-#RUN touch /dash_app/hivekeepers_helpers.py
-#RUN touch /dash_app/data.csv
-#RUN touch dash_app/hivekeepers.db
-#RUN chown 1000:1000 /dash_app/hivekeepers.db
-
-#RUN chown 1000:1000 -R /dash_app/
-#RUN chmod 774 -R /dash_app/
 
 # change user to root 
 USER root

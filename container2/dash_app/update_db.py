@@ -1,65 +1,97 @@
 import pandas as pd
 import hivekeepers_helpers as hp
-import sqlite3
 
-## this section needs to be converted to connecting to remote MySQL server
-## note: use connection pooling
-## =======================================================================
+import sqlalchemy as db
+from sqlalchemy import func
 
-data_file = 'data.csv'
-hivekeepers_data = pd.read_csv(data_file)
+import config
 
-## =======================================================================
+# MYSQL REMOTE SERVER CREDENTIALS
+credentials = {
+    'username': config.MYSQL_USER,
+    'password': config.MYSQL_PASS ,
+    'host': config.MYSQL_HOST,
+    'database': config.MYSQL_DB,
+}
 
-# remove unneeded columns, 
-# convert timestamp to human-readable,
-# and add temp_delta column
-hivekeepers_data = hp.clean_data(hivekeepers_data)
+# build database connection url
+connect_url = db.engine.url.URL.create(
+    drivername='mysql+pymysql',
+    username=credentials['username'],
+    password=credentials['password'],
+    host=credentials['host'],
+    database=credentials['database']
+)
 
-# working dir: /home/hivekeeper/dash_app/
-# database has two tables: hivedata, hivedata_3d
-#       hivedata     is the cleaned 2d data schemes
-#       hivedata_3d  is the built 3d/4d data scheme
+# create MySQL db engine - set pool config
+engine = db.create_engine(connect_url, pool_size=10, max_overflow=10, pool_recycle=3600, pool_pre_ping=True, echo=False)
 
-# open connection to db - experienced permission issues in container!!!
-connection = sqlite3.connect('hivekeepers.db')
+# construct SQL query
+query1 = 'SELECT COUNT(id) FROM sync_data'
 
-# update db with 2d data - options: append, replace
-hivekeepers_data.to_sql('hivedata', connection, if_exists='replace', index = False)
+# open db connection, send query, store in dataframe
+with engine.connect() as conn:
+        result = conn.execute(query1)
+        remote_index_count = result.fetchone()[0]
 
-# build 3d dataset
-#================= start
+# create SQLite db engine
+sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
 
-# get fft bin names and amplitude values
-fft_bins = hp.get_fft_bins(hivekeepers_data)
+query3 =  f'SELECT COUNT(id) FROM {config.SQLite_2d_table_name}'
 
-# get fft bin names and amplitude values
-fft_amplitudes = hivekeepers_data[fft_bins].values
+with sql_lite_engine.connect() as conn:
+    result = conn.execute(query3)
+    local_index_count = result.fetchone()[0]
 
-hivekeepers_data_3d = hp.build_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
 
-#================= end
+if not (remote_index_count > local_index_count):
+    print(f'database is already up to date...')
+else:
+    index_diff = remote_index_count - local_index_count
+    #print('TRUE')
+    #print('number of rows remote has more than local is: ', index_diff)
+    
+    update_count = local_index_count + index_diff
 
-# update db with 3d data - options: append, replace
-hivekeepers_data_3d.to_sql('hivedata_3d', connection, if_exists='replace', index = False)
+    if update_count == remote_index_count:
 
-# open db cursor to make queries
-cursor = connection.cursor()
+        # construct SQL query for database updates
+        query4 = f'select {", ".join(str(column) for column in config.SQLite_default_columns)} from sync_data WHERE id > {local_index_count}'
 
-# get current highest index value for comparing with off-site db for updates
-cursor.execute('''SELECT MAX(id) FROM hivedata''')
-sql_last_index = cursor.fetchall()[0][0]
+        # open db connection, send query, store in dataframe
+        with engine.connect() as conn:
+            update_data = pd.read_sql(query4, conn)
+        
+        # add temp_delta column
+        # convert timestamp to human-readable
+        update_data = hp.clean_data_db(update_data)
 
-cursor.execute('''SELECT COUNT(id) FROM hivedata''')
-sql_total_index = cursor.fetchall()[0][0]
+        # build 3d dataset
+        update_data_3d = hp.build_3d_data(update_data)
+        
+        # create SQLite db engine
+        sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
 
-cursor.execute('''SELECT * FROM hivedata_3d''')
-sql_total_index_3d = len(cursor.fetchall())
+        # update db with 2d data - options: append, replace
+        with sql_lite_engine.connect() as conn:
+            update_data.to_sql(config.SQLite_2d_table_name, conn, if_exists='append', index = False)
 
-# close db cursor and connection
-cursor.close()
-connection.close()
+        # update db with 3d data - options: append, replace
+        with sql_lite_engine.connect() as conn:
+            update_data_3d.to_sql(config.SQLite_3d_table_name, conn, if_exists='append', index = False)
+        
+        print(f'database has been updated with {index_diff} new rows!')
+        
+        # construct SQLite queries
+        #sql_lite_queries = [['2D', f'SELECT COUNT(id) FROM {config.SQLite_2d_table_name}'],
+        #                    ['3D', f'SELECT COUNT(timestamp) FROM {config.SQLite_3d_table_name}']]
 
-print('last index: ', sql_last_index)
-print('total index: ', sql_total_index)
-print('total index 3d: ', sql_total_index_3d)
+        #print('update_count: ', update_count)
+        #print('remote_index_count: ', remote_index_count)
+        #print('remote_index_max: ', remote_index_max)
+        # for label,query in sql_lite_queries:
+        #     with sql_lite_engine.connect() as conn:
+        #         result = conn.execute(query)
+                #for row in result:
+                #    print(row)
+                #print(f'number of rows in {label} table: ', result.fetchone()[0])

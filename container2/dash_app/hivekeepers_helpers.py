@@ -5,6 +5,7 @@ from sqlalchemy import func
 import copy
 
 import pandas as pd
+import config
 
 def convert_csv_to_df(csv_file):
 
@@ -22,7 +23,7 @@ def get_db_data(db_path):
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
     connect_db = sqlite3.connect(db_path)
-    df = pd.read_sql_query("SELECT * FROM hivedata", connect_db)
+    df = pd.read_sql_query(f"SELECT * FROM {config.SQLite_2d_table_name}", connect_db)
     connect_db.close()
 
     return df
@@ -30,11 +31,11 @@ def get_db_data(db_path):
 def get_db():
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
-    engine = db.create_engine('sqlite:///hivekeepers.db')
-    connection = engine.connect()
+    sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
+    connection = sql_lite_engine.connect()
 
     metadata = db.MetaData()
-    hivedata = db.Table('hivedata', metadata, autoload=True, autoload_with=engine)
+    hivedata = db.Table(config.SQLite_2d_table_name, metadata, autoload=True, autoload_with=sql_lite_engine)
 
     query = db.select([hivedata]) 
 
@@ -47,19 +48,30 @@ def get_db():
 
     return df
 
+def get_apiarys():
+    # create SQLite db engine
+    sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
+
+    query =  f'SELECT DISTINCT apiary_id FROM {config.SQLite_2d_table_name}'
+
+    with sql_lite_engine.connect() as conn:
+        result = conn.execute(query)
+        #for row in result:
+        #    print(row)
+        apiary_list = result.fetchall()
+
+    return apiary_list
+
 def get_data_2d(apiary_id, start_date, end_date):
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
-    engine = db.create_engine('sqlite:///hivekeepers.db')
+    engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
     connection = engine.connect()
     
     metadata = db.MetaData()
-    hivedata = db.Table('hivedata', metadata, autoload=True, autoload_with=engine)
-    #print(hivedata.columns.keys())
-    #print(repr(metadata.tables['hivedata']))
+    hivedata = db.Table(config.SQLite_2d_table_name, metadata, autoload=True, autoload_with=engine)
 
     query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
-    #query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),hivedata.columns.timestamp.between(start_date, end_date))
     
     ResultProxy = connection.execute(query)
     ResultSet = ResultProxy.fetchall()
@@ -73,16 +85,13 @@ def get_data_2d(apiary_id, start_date, end_date):
 def get_data_3d(apiary_id, start_date, end_date):
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
-    engine = db.create_engine('sqlite:///hivekeepers.db')
+    engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
     connection = engine.connect()
     
     metadata = db.MetaData()
-    hivedata = db.Table('hivedata_3d', metadata, autoload=True, autoload_with=engine)
-    #print(hivedata.columns.keys())
-    #print(repr(metadata.tables['hivedata']))
+    hivedata = db.Table(config.SQLite_3d_table_name, metadata, autoload=True, autoload_with=engine)
 
     query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
-    #query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),hivedata.columns.timestamp.between(start_date, end_date))
     
     ResultProxy = connection.execute(query)
     ResultSet = ResultProxy.fetchall()
@@ -93,22 +102,31 @@ def get_data_3d(apiary_id, start_date, end_date):
 
     return df
 
-def clean_data(dataframe):
+def clean_data_csv(dataframe):
     # drop unnecessary columns
     dataframe.drop(dataframe.columns[[1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,22,23,24,25,90,91]], axis=1, inplace=True)
     
-    # add internal/external temperature delta column - confirm which they want? 
-    # option1: int - ext                <- non-absolute delta of int and delta
-    # option2: abs(int - ext)           <- the absolute delta of and ext
-    # option3: int - abs(int - ext)     <- int - (the absolute difference of int and ext)
-    
-    #hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature']
+    # add internal/external temperature delta column
     dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
-    #hivekkeepers_data['temp_delta'] = hivekkeepers_data['bme680_internal_temperature'] - abs(hivekkeepers_data['bme680_internal_temperature'] - hivekkeepers_data['bme680_external_temperature'])
 
     # convert timestamp From Unix/Epoch time to Readable date format:
     # eg. from 1635249781 to 2021-10-26 12:03:01
     dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
+
+    return dataframe
+
+def clean_data_db(dataframe):
+    # add internal/external temperature delta column
+    dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
+
+    # convert timestamp From Unix/Epoch time to Readable date format:
+    # eg. from 1635249781 to 2021-10-26 12:03:01
+    dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
+
+    return dataframe
+
+def add_delta_column(dataframe):
+    dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
 
     return dataframe
 
@@ -133,7 +151,7 @@ def get_last_index_db(database):
     
     # get current highest index value for comparing with off-site db for updates
     cursor = connection.cursor()
-    cursor.execute('''SELECT MAX(id) FROM hivedata''')
+    cursor.execute('''SELECT COUNT(id) FROM hivedata2d''')
     sql_last_index = cursor.fetchall()[0][0]
     
     # close db cursor and connection
@@ -167,12 +185,18 @@ def get_bin_range(bin_group, fft_bins):
     else:
         return fft_bins
     
-def build_3d_data(dataframe, bins, amplitudes):
+def build_3d_data(dataframe):
     ## --------------------------------
     ## build new dataframe for 4d chart 
     ## takes hivekeepers dataframe, a list of the fft_bins and a list of the fft_amplitude values
     ## returns a dataframe where each index has each fft_bin and fft_amplitude value (total 64 per index)
     ## --------------------------------
+
+    # get fft bin names and amplitude values
+    bins = get_fft_bins(dataframe)
+
+    # get fft bin names and amplitude values
+    fft_amplitudes = dataframe[bins].values
 
     # get timestamp and internal temp data
     internal_temps = copy.deepcopy(dataframe['bme680_internal_temperature'])
@@ -190,7 +214,7 @@ def build_3d_data(dataframe, bins, amplitudes):
     # build lists for converting to dataframe
     amp_list = []
     bin_list = []
-    for i in amplitudes:
+    for i in fft_amplitudes:
         n = 0
         for j in i:
             amp_list.append(j)
@@ -278,9 +302,11 @@ if __name__ == '__main__':
     get_db()
     get_data_2d()
     get_data_3d()
-    clean_data()
+    clean_data_csv()
+    clean_data_db()
     get_last_index_df()
     update_sql_db()
+    add_delta_column()
     get_last_index_db()
     get_uniques_in_column()
     get_bin_range()

@@ -31,32 +31,16 @@ function setTimeZone {
 ## might want to set tz in compose...
 setTimeZone
 
-# cd into app dir
-cd /home/hivekeeper/dash_app/
-
 # set up gunicorn logs and tailing
 #echo "[ENTRYPOINT] setting up gunicorn logging..."
 #touch gunicorn-logs/access.log
 #touch gunicorn-logs/gunicorn.log
 #tail -n 0 -f gunicorn-logs/*.log &
 
-# create sql database file
-#if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
-#  echo "[ENTRYPOINT] found CSV file!"
-#  echo "[ENTRYPOINT] building database..."
-#  python update_db.py
+# cd into app dir
+cd /home/hivekeeper/dash_app/
 
-#  if [ -f hivekeepers.db ]; then
-#    chmod 774 hivekeepers.db
-#    #chown $user:$user hivekeepers.db
-#    #chown 1000:1000 hivekeepers.db
-#    echo "[ENTRYPOINT] database created!"
-#  else
-#    echo "[ENTRYPOINT] [ERROR] database missing!"
-#  fi
-#fi
-
-
+# check if files exist and have content
 if [[ -s requirements.txt && -s app.py ]]
   then
     echo "[ENTRYPOINT] requirements.txt is populated!"
@@ -85,19 +69,23 @@ if [[ -s requirements.txt && -s app.py ]]
     tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
 
     # create sql database file
-    if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
-      echo "[ENTRYPOINT] found CSV file!"
-      echo "[ENTRYPOINT] building database..."
-      python update_db.py
+    # if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
+    #   echo "[ENTRYPOINT] found CSV file!"
+    #   echo "[ENTRYPOINT] building database..."
+    #   python update_db.py
 
+    if [ -f startup_update_db.py ]; then
+      echo "[ENTRYPOINT] found update db script file!"
+      echo "[ENTRYPOINT] building database..."
+      python startup_update_db.py
+      
       if [ -f hivekeepers.db ]; then
-        #chmod 774 hivekeepers.db
-        #chown $user:$user hivekeepers.db
-        #chown 1000:1000 hivekeepers.db
         echo "[ENTRYPOINT] database created!"
       else
         echo "[ENTRYPOINT] [ERROR] database missing!"
       fi
+    else
+      echo "[ENTRYPOINT] [ERROR] startup_update_db.py NOT found!"
     fi
 
     # start dash app via wsgi (gunicorn)
@@ -116,7 +104,7 @@ if [[ -s requirements.txt && -s app.py ]]
     "$@"
 
   else
-    echo "[ENTRYPOINT] requirements.txt NOT populated!"
-    echo "[ENTRYPOINT] app.py NOT populated!"
+    echo "[ENTRYPOINT] requirements.txt NOT found!"
+    echo "[ENTRYPOINT] app.py NOT found!"
     echo "[ENTRYPOINT] NOT running python installation..."
 fi

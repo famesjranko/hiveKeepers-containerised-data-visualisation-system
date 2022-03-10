@@ -15,7 +15,6 @@ import subprocess
 from pathlib import PurePath, Path
 from datetime import date, timedelta
 import copy
-import sqlite3
 
 import numpy as np
 
@@ -33,6 +32,7 @@ from dash import Dash, dcc, html, Input, Output
 import dash_bootstrap_components as dbc
 
 import hivekeepers_helpers as hp
+import config
 
 ## ===========================
 ## Get data from database/file
@@ -42,7 +42,7 @@ import hivekeepers_helpers as hp
 #hivekeepers_data = hp.convert_csv_to_df(data_file)
 
 # set database path
-db_path = Path(PurePath('hivekeepers.db'))
+db_path = Path(PurePath(config.SQLite_db_name))
 
 # check database is available, and convert to df
 if db_path.exists() and db_path.stat().st_size > 0:
@@ -50,27 +50,9 @@ if db_path.exists() and db_path.stat().st_size > 0:
 else:
     raise RuntimeError("database not available")
 
-## ========================
-## Wrangle Hivekeepers Data
-## ========================
-
-# drop unneeded columns, and add interna/external temp delta column
-#hivekeepers_data = hp.clean_data(hivekeepers_data)
-
-# confirm db creation - print current last index value
-#print(hp.get_last_index_db('hivekeepers.db', 'hivedata', 'id'))
-
 # Build apiary id list
 apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
-
-# get fft bin names and amplitude values
-#fft_bins = hp.get_fft_bins(hivekeepers_data)
-
-# get fft amplitude values
-#fft_amplitudes = hivekeepers_data[fft_bins].values
-
-## build new dataframe for 4d chart
-#hivekeepers_data_3d = hp.get_3d_data(hivekeepers_data, fft_bins, fft_amplitudes)
+#apiary_list = hp.get_apiarys()
 
 ## colours for charts - see fft callback section for full list of colour choices
 colorscales = px.colors.named_colorscales()
@@ -97,8 +79,6 @@ days = [date for numd,date in zip(list(range(len(hivekeepers_data['timestamp'].u
 list(range(len(hivekeepers_data['timestamp'].unique())))
 app.layout = html.Div(
                 children=[
-                    #dcc.Store(id='memory-apiary'),
-                    #dcc.Store(id='memory-days'),
                     # web header, title bar
                     html.Div(
                         children='HiveKeepers Dash App',
@@ -472,17 +452,6 @@ def run_script_onClick(n_clicks):
     # with `shell` it needs string 'python script.py'
     result = subprocess.check_output('python update_db.py', shell=True)
 
-    # idea: if result is 1 == new data in db, 0 == no change
-    # if result == 1: 
-    #   update the db
-    #   database has two tables: hivedata, hivedata_3d
-    #       hivedata     is the cleaned 2d data schemes
-    #       hivedata_3d  is the built 3d/4d data scheme
-    #   return "update status message"
-    # else:
-    #    do nothing
-    #    return "update status message"
-
     # convert bytes to string
     result = result.decode()
 
@@ -501,4 +470,4 @@ def ping():
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
     #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)
-    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=True, use_reloader=False)
+    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=False, use_reloader=False)

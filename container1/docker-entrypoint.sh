@@ -23,19 +23,35 @@ function setTimeZone {
 echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
-## check if files exist and have content
-if [ -s "/password_script.sh" ]; then
+## set up nginx reverse proxy access
+if [ -s /password_script.sh ]; then
+    echo "[ENTRYPOINT] found password script."
 
-    if [ -s "user_passwords.txt" ]; then
-    echo "[ENTRYPOINT] creating user credentials for proxy..."
+    if [ -f user_credentials.txt ]; then
+        echo "[ENTRYPOINT] found user credentials text file."
+    
+        if [ -s user_credentials.txt ]; then
+            echo "[ENTRYPOINT] user credentials text file is populated!"
+            echo "[ENTRYPOINT] creating user credentials for proxy..."
 
-    ## run user password create script
-    /bin/bash /password_script.sh user_passwords.txt
+            ## run user password create script
+            /bin/bash /password_script.sh user_credentials.txt
 
-    echo "[ENTRYPOINT] deleting user password file..."
+            echo "[ENTRYPOINT] deleting user credentials text file..."
 
-    ## delete plain-text user passwords file
-    rm user_passwords.txt
+            ## delete plain-text user passwords file
+            rm user_credentials.txt
+
+            if [ ! -f user_credentials.txt ]; then
+                echo "[ENTRYPOINT] user credentials text file deleted"
+            else
+                echo "[ENTRYPOINT] [EEOR] user credentials text file not deleted!"
+            fi
+        else
+            echo "[ENTRYPOINT] user credentials text file is empty"
+        fi
+    else
+        echo "[ENTRYPOINT] [WARNING] user credentials text file missing!"
     fi
 fi
 
@@ -51,10 +67,6 @@ echo "[ENTRYPOINT] running nginx envsubstitution template script..."
 ## run nginx and tail log
 echo "[ENTRYPOINT] starting nginx..."
 nginx
-
-# delete user plain text passwords when script finished
-echo "[ENTRYPOINT] deleting user password file..."
-rm user_passwords.txt
 
 echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
 exec tail -f /nginx-logs/access.log /var/log/fail2ban.log

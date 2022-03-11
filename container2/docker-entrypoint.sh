@@ -41,70 +41,73 @@ setTimeZone
 cd /home/hivekeeper/dash_app/
 
 # check if files exist and have content
-if [[ -s requirements.txt && -s app.py ]]
+if [ -s hivekeepers_app.py ]
   then
-    echo "[ENTRYPOINT] requirements.txt is populated!"
-    echo "[ENTRYPOINT] app.py is populated!"
-    echo "[ENTRYPOINT] starting python installation..."
+    echo "[ENTRYPOINT] hivekeepers_app.py is populated!"
 
-    # setup virtual env
-    echo "[ENTRYPOINT] installing venv..."
-    python3 -m venv dash-venv
+    if [ -s requirements.txt ]
+      then
+        echo "[ENTRYPOINT] requirements.txt is populated!"
+        echo "[ENTRYPOINT] starting python installation..."
 
-    echo "[ENTRYPOINT] activating venv..."
-    source dash-venv/bin/activate
+        # setup virtual env
+        echo "[ENTRYPOINT] installing venv..."
+        python3 -m venv dash-venv
 
-    # update pip
-    echo "[ENTRYPOINT] upgrading pip..."
-    python -m pip install --upgrade pip setuptools wheel
+        echo "[ENTRYPOINT] activating venv..."
+        source dash-venv/bin/activate
 
-    # install python requirements
-    echo "[ENTRYPOINT] installing requirements..."
-    pip install -r requirements.txt
+        # update pip
+        echo "[ENTRYPOINT] upgrading pip..."
+        python -m pip install --upgrade pip setuptools wheel
 
-    # set up gunicorn logs and tailing
-    echo "[ENTRYPOINT] setting up gunicorn logging..."
-    touch /home/hivekeeper/gunicorn-logs/access.log
-    touch /home/hivekeeper/gunicorn-logs/gunicorn.log
-    tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
+        # install python requirements
+        echo "[ENTRYPOINT] installing requirements..."
+        pip install -r requirements.txt
 
-    # create sql database file
-    # if [[ -f data.csv ]] && [[ -f update_db.py ]]; then
-    #   echo "[ENTRYPOINT] found CSV file!"
-    #   echo "[ENTRYPOINT] building database..."
-    #   python update_db.py
+        # set up gunicorn logs and tailing
+        echo "[ENTRYPOINT] setting up gunicorn logging..."
+        touch /home/hivekeeper/gunicorn-logs/access.log
+        touch /home/hivekeeper/gunicorn-logs/gunicorn.log
+        tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
 
-    if [ -f startup_update_db.py ]; then
-      echo "[ENTRYPOINT] found update db script file!"
-      echo "[ENTRYPOINT] building database..."
-      python startup_update_db.py
-      
-      if [ -f hivekeepers.db ]; then
-        echo "[ENTRYPOINT] database created!"
+        if [ -s startup_update_db.py ]
+          then
+            echo "[ENTRYPOINT] found update db script file!"
+            echo "[ENTRYPOINT] building database..."
+          
+            # build local db from remote source
+            python startup_update_db.py
+            
+            if [ -s hivekeepers.db ]
+              then
+                echo "[ENTRYPOINT] database created!"
+              else
+                echo "[ENTRYPOINT] [ERROR] database missing!"
+            fi
+          else
+            echo "[ENTRYPOINT] [ERROR] startup_update_db.py NOT found!"
+        fi
+
+        # start dash app via wsgi (gunicorn)
+        echo "[ENTRYPOINT] starting application dashboard..."
+        exec gunicorn hivekeepers_app:server \
+        --user $user \
+        --group $group \
+        --name "$name" \
+        --bind 0.0.0.0:$port \
+        --workers $workers \
+        --worker-tmp-dir /dev/shm \
+        --threads $threads \
+        --log-level="$log_level" \
+        --log-file=/home/hivekeeper/gunicorn-logs/gunicorn.log \
+        --access-logfile=/home/hivekeeper/gunicorn-logs/access.log \
+        "$@"
+
       else
-        echo "[ENTRYPOINT] [ERROR] database missing!"
-      fi
-    else
-      echo "[ENTRYPOINT] [ERROR] startup_update_db.py NOT found!"
+        echo "[ENTRYPOINT] [ERROR] requirements.txt is not populated!"
     fi
-
-    # start dash app via wsgi (gunicorn)
-    echo "[ENTRYPOINT] starting application dashboard..."
-    exec gunicorn app:server \
-    --user $user \
-    --group $group \
-    --name "$name" \
-    --bind 0.0.0.0:$port \
-    --workers $workers \
-    --worker-tmp-dir /dev/shm \
-    --threads $threads \
-    --log-level="$log_level" \
-    --log-file=/home/hivekeeper/gunicorn-logs/gunicorn.log \
-    --access-logfile=/home/hivekeeper/gunicorn-logs/access.log \
-    "$@"
-
   else
-    echo "[ENTRYPOINT] requirements.txt NOT found!"
-    echo "[ENTRYPOINT] app.py NOT found!"
+    echo "[ENTRYPOINT] [ERROR] hivekeepers_app.py is not unpopulated!"
     echo "[ENTRYPOINT] NOT running python installation..."
 fi

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 FS=":"
-FILE="user_passwords.txt"
-while read line
+FILE=$1
+while read line || [ -n "$line" ];
 do
         # store field 1
         NAME=$(echo $line|cut -d$FS -f1)

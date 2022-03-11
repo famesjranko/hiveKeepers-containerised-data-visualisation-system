@@ -4,15 +4,22 @@ import hivekeepers_helpers as hp
 import sqlalchemy as db
 from sqlalchemy import func
 
-import config
+import hivekeepers_config as hc
 
-# MYSQL REMOTE SERVER CREDENTIALS
+## ===============================
+## MYSQL REMOTE SERVER CREDENTIALS
+## ===============================
+
 credentials = {
-    'username': config.MYSQL_USER,
-    'password': config.MYSQL_PASS ,
-    'host': config.MYSQL_HOST,
-    'database': config.MYSQL_DB,
+    'username': hc.MYSQL_USER,
+    'password': hc.MYSQL_PASS ,
+    'host': hc.MYSQL_HOST,
+    'database': hc.MYSQL_DB,
 }
+
+## =============================
+## get remote MySQL INDEX length
+## =============================
 
 # build database connection url
 connect_url = db.engine.url.URL.create(
@@ -29,69 +36,92 @@ engine = db.create_engine(connect_url, pool_size=10, max_overflow=10, pool_recyc
 # construct SQL query
 query1 = 'SELECT COUNT(id) FROM sync_data'
 
-# open db connection, send query, store in dataframe
+# open db connection, send query
 with engine.connect() as conn:
         result = conn.execute(query1)
         remote_index_count = result.fetchone()[0]
 
+#print('remote index = ', remote_index_count)
+
+## =============================
+## get local SQLite INDEX length
+## =============================
+
 # create SQLite db engine
-sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
+sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
 
-query3 =  f'SELECT COUNT(id) FROM {config.SQLite_2d_table_name}'
+# construct SQL query
+query3 =  f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}'
 
+# open db connection, send query
 with sql_lite_engine.connect() as conn:
     result = conn.execute(query3)
     local_index_count = result.fetchone()[0]
 
+#print('local index = ', local_index_count)
 
 if not (remote_index_count > local_index_count):
+
+    ## =====================================
+    ## print status to be shown in Dashboard
+    ## =====================================
+
     print(f'database is already up to date...')
+
 else:
+
+    # calc the the number of remote changes local doesn't have
     index_diff = remote_index_count - local_index_count
-    #print('TRUE')
-    #print('number of rows remote has more than local is: ', index_diff)
-    
+
+    #print('index difference = ', index_diff)
+   
+    # calc the final expected local database index count after update
     update_count = local_index_count + index_diff
 
-    if update_count == remote_index_count:
+    if not (update_count == remote_index_count):
+
+        ## ===========
+        ## sanity test
+        ## ===========
+
+        ## the final index count after update should match between remote and local databases.
+        ## possible fix would be to simply reset the local database from the remote source.
+        print(f'remote and local database counts do not match!')
+    
+    else: 
+        ## ==========================================
+        ## get MySQL rows where INDEXES not on local 
+        ## ==========================================
 
         # construct SQL query for database updates
-        query4 = f'select {", ".join(str(column) for column in config.SQLite_default_columns)} from sync_data WHERE id > {local_index_count}'
+        query4 = f'select {", ".join(str(column) for column in hc.SQLite_default_columns)} from sync_data WHERE id > {local_index_count}'
 
         # open db connection, send query, store in dataframe
         with engine.connect() as conn:
             update_data = pd.read_sql(query4, conn)
         
-        # add temp_delta column
-        # convert timestamp to human-readable
+        # clean update data:
+        #   1. add temp_delta column
+        #   2. convert timestamp to human-readable
         update_data = hp.clean_data_db(update_data)
 
-        # build 3d dataset
+        # translate update data to 3d data scheme 
         update_data_3d = hp.build_3d_data(update_data)
         
-        # create SQLite db engine
-        sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
+        ## ======================================
+        ## append update datasets to local SQLite
+        ## ======================================
 
-        # update db with 2d data - options: append, replace
+        # update SQLite with 2d data - options: append, replace
         with sql_lite_engine.connect() as conn:
-            update_data.to_sql(config.SQLite_2d_table_name, conn, if_exists='append', index = False)
+            update_data.to_sql(hc.SQLite_2d_table_name, conn, if_exists='append', index = False)
 
-        # update db with 3d data - options: append, replace
+        # update SQLite with 3d data - options: append, replace
         with sql_lite_engine.connect() as conn:
-            update_data_3d.to_sql(config.SQLite_3d_table_name, conn, if_exists='append', index = False)
+            update_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='append', index = False)
         
-        print(f'database has been updated with {index_diff} new rows!')
-        
-        # construct SQLite queries
-        #sql_lite_queries = [['2D', f'SELECT COUNT(id) FROM {config.SQLite_2d_table_name}'],
-        #                    ['3D', f'SELECT COUNT(timestamp) FROM {config.SQLite_3d_table_name}']]
+        ## =====================================
+        ## print status to be shown in Dashboard
+        ## =====================================
 
-        #print('update_count: ', update_count)
-        #print('remote_index_count: ', remote_index_count)
-        #print('remote_index_max: ', remote_index_max)
-        # for label,query in sql_lite_queries:
-        #     with sql_lite_engine.connect() as conn:
-        #         result = conn.execute(query)
-                #for row in result:
-                #    print(row)
-                #print(f'number of rows in {label} table: ', result.fetchone()[0])
+        print(f'database has been updated! News rows added: {index_diff}')

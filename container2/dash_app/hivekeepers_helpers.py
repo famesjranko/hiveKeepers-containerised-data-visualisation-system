@@ -5,7 +5,7 @@ from sqlalchemy import func
 import copy
 
 import pandas as pd
-import config
+import hivekeepers_config as hc
 
 def convert_csv_to_df(csv_file):
 
@@ -23,7 +23,7 @@ def get_db_data(db_path):
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
     connect_db = sqlite3.connect(db_path)
-    df = pd.read_sql_query(f"SELECT * FROM {config.SQLite_2d_table_name}", connect_db)
+    df = pd.read_sql_query(f"SELECT * FROM {hc.SQLite_2d_table_name}", connect_db)
     connect_db.close()
 
     return df
@@ -31,11 +31,11 @@ def get_db_data(db_path):
 def get_db():
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
-    sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
     connection = sql_lite_engine.connect()
 
     metadata = db.MetaData()
-    hivedata = db.Table(config.SQLite_2d_table_name, metadata, autoload=True, autoload_with=sql_lite_engine)
+    hivedata = db.Table(hc.SQLite_2d_table_name, metadata, autoload=True, autoload_with=sql_lite_engine)
 
     query = db.select([hivedata]) 
 
@@ -50,26 +50,55 @@ def get_db():
 
 def get_apiarys():
     # create SQLite db engine
-    sql_lite_engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
 
-    query =  f'SELECT DISTINCT apiary_id FROM {config.SQLite_2d_table_name}'
+    query =  f'SELECT DISTINCT apiary_id FROM {hc.SQLite_2d_table_name}'
+
+    apiary_list = []
 
     with sql_lite_engine.connect() as conn:
         result = conn.execute(query)
-        #for row in result:
-        #    print(row)
-        apiary_list = result.fetchall()
+        for row in result:
+            apiary_list.append(row[0])
 
     return apiary_list
+
+def get_apiary_timestamps(apiary_id):
+    # create SQLite db engine
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+
+    query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id}'
+
+    with sql_lite_engine.connect() as conn:
+        apiary_df = pd.read_sql_query(query, conn)
+
+    return apiary_df
+
+def get_timestamps():
+    # create SQLite db engine
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+
+    query =  f'SELECT DISTINCT timestamp FROM {hc.SQLite_2d_table_name}'
+
+    timestamp_list = []
+
+    with sql_lite_engine.connect() as conn:
+        result = conn.execute(query)
+        for row in result:
+            timestamp_list.append(row[0])
+
+    timestamp_df = pd.DataFrame(timestamp_list, columns=['timestamp'])
+
+    return timestamp_df
 
 def get_data_2d(apiary_id, start_date, end_date):
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
-    engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=False)
+    engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
     connection = engine.connect()
     
     metadata = db.MetaData()
-    hivedata = db.Table(config.SQLite_2d_table_name, metadata, autoload=True, autoload_with=engine)
+    hivedata = db.Table(hc.SQLite_2d_table_name, metadata, autoload=True, autoload_with=engine)
 
     query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
     
@@ -85,11 +114,11 @@ def get_data_2d(apiary_id, start_date, end_date):
 def get_data_3d(apiary_id, start_date, end_date):
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
-    engine = db.create_engine(f'sqlite:///{config.SQLite_db_name}', echo=True)
+    engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
     connection = engine.connect()
     
     metadata = db.MetaData()
-    hivedata = db.Table(config.SQLite_3d_table_name, metadata, autoload=True, autoload_with=engine)
+    hivedata = db.Table(hc.SQLite_3d_table_name, metadata, autoload=True, autoload_with=engine)
 
     query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
     
@@ -295,24 +324,4 @@ def get_2d_xrangeslider():
 
 def test(text):
     return text
-
-if __name__ == '__main__':
-    convert_csv_to_df()
-    get_db_data()
-    get_db()
-    get_data_2d()
-    get_data_3d()
-    clean_data_csv()
-    clean_data_db()
-    get_last_index_df()
-    update_sql_db()
-    add_delta_column()
-    get_last_index_db()
-    get_uniques_in_column()
-    get_bin_range()
-    build_3d_data()
-    convert_timestamp()
-    get_2d_xrangeslider()
-    get_fft_bins()
-    test()
     

@@ -12,11 +12,9 @@
 
 import os
 import subprocess
-from pathlib import PurePath, Path
 from datetime import date, timedelta
-import copy
 
-import numpy as np
+#import numpy as np
 
 # pandas vers==1.4.0
 import pandas as pd
@@ -29,10 +27,10 @@ import plotly.express as px
 
 import dash
 from dash import Dash, dcc, html, Input, Output
-import dash_bootstrap_components as dbc
+#import dash_bootstrap_components as dbc
 
 import hivekeepers_helpers as hp
-import config
+#import hivekeepers_config as hc
 
 ## ===========================
 ## Get data from database/file
@@ -42,17 +40,17 @@ import config
 #hivekeepers_data = hp.convert_csv_to_df(data_file)
 
 # set database path
-db_path = Path(PurePath(config.SQLite_db_name))
+#db_path = Path(PurePath(config.SQLite_db_name))
 
 # check database is available, and convert to df
-if db_path.exists() and db_path.stat().st_size > 0:
-    hivekeepers_data = hp.get_db()
-else:
-    raise RuntimeError("database not available")
+#if db_path.exists() and db_path.stat().st_size > 0:
+#    hivekeepers_data = hp.get_db()
+#else:
+#    raise RuntimeError("database not available")
 
 # Build apiary id list
-apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
-#apiary_list = hp.get_apiarys()
+#apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
+apiary_list = hp.get_apiarys()
 
 ## colours for charts - see fft callback section for full list of colour choices
 colorscales = px.colors.named_colorscales()
@@ -64,7 +62,7 @@ colorscales = px.colors.named_colorscales()
 ## Create dash app and set url basen pathame
 app = dash.Dash(__name__, url_base_pathname='/app/')
 
-# server var for gunicorn - not used
+# server var for gunicorn
 server = app.server
 
 # initialise figures
@@ -73,10 +71,13 @@ fig2 = go.Figure()
 fig3 = go.Figure()
 fig4 = go.Figure()
 
-days = [date for numd,date in zip(list(range(len(hivekeepers_data['timestamp'].unique()))),
-                                  hivekeepers_data['timestamp'].dt.date.unique())]
+#timestamps = hp.get_timestamps()
+#timestamps['timestamp'] = pd.to_datetime(timestamps['timestamp'])
 
-list(range(len(hivekeepers_data['timestamp'].unique())))
+#days = [date for numd,date in zip(list(range(len(hivekeepers_data['timestamp'].unique()))), hivekeepers_data['timestamp'].dt.date.unique())]
+
+#days = [date for numd,date in zip(list(range(len(timestamps['timestamp'].unique()))), timestamps['timestamp'].dt.date.unique())]
+
 app.layout = html.Div(
                 children=[
                     # web header, title bar
@@ -165,9 +166,14 @@ def get_data_options(apiaryID):
     if apiaryID is None:
         raise dash.exceptions.PreventUpdate
 
-    # grab data for selected apiary
-    apiary_data = copy.deepcopy(hivekeepers_data.loc[hivekeepers_data["apiary_id"] == int(apiaryID)])
-    apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_data['timestamp'].unique()))], apiary_data['timestamp'].dt.date.unique())]
+    # grab timestamps for selected apiary
+    apiary_timestamps = hp.get_apiary_timestamps(apiaryID)
+
+    # convert timestamps to datetime objects
+    apiary_timestamps['timestamp'] = pd.to_datetime(apiary_timestamps['timestamp'])
+
+    # build apiary data date range (days)
+    apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_timestamps['timestamp'].unique()))], apiary_timestamps['timestamp'].dt.date.unique())]
     
     # default to showing the most recent single day of data
     if len(apiary_days_range) > 1:
@@ -231,12 +237,6 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     # convert date objects to formatted date strings
     start_date_string = date.fromisoformat(start_date).strftime('%Y-%m-%d')
     end_date_string = date.fromisoformat(end_date).strftime('%Y-%m-%d')
-
-    # grab data within selected date range
-    #date_range_df = hivekeepers_data.loc[(hivekeepers_data['timestamp'] >= start_date_string) & (hivekeepers_data['timestamp'] < end_date_string)]
-
-    # grab data for selected apiary
-    #filtered_hivekeepers_data = copy.deepcopy(date_range_df.loc[date_range_df["apiary_id"] == int(apiaryID)])
 
     # get data from sql-lite db 
     filtered_hivekeepers_data = hp.get_data_2d(apiaryID, start_date_string, end_date_string)
@@ -355,15 +355,12 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     # hsv         icefire     phase       twilight    mrybm       mygbm
 
     # get fft bin names and amplitude values
-    fft_bins = hp.get_fft_bins(hivekeepers_data)
+    fft_bins = hp.get_fft_bins(filtered_hivekeepers_data)
 
     # get bins from drop down selection
     bins = hp.get_bin_range(bin_group, fft_bins)
 
-  # grab 4d data within selected date range
-    #date_range_df_3d = hivekeepers_data_3d.loc[(hivekeepers_data_3d['timestamp'] >= start_date_string) & (hivekeepers_data_3d['timestamp'] < end_date_string)]
-
-    # get data from sql-lite db
+    # get 3d data from sql-lite db
     date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
 
     # grab data for selected bin group
@@ -440,11 +437,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     dash.dependencies.Output('output-container-button', 'children'),
     [dash.dependencies.Input('update-button', 'n_clicks')])
 def run_script_onClick(n_clicks):
-    #print('[DEBUG] n_clicks:', n_clicks)
 
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
-        #return dash.no_update
 
     # without `shell` it needs list ['/full/path/python', 'script.py']
     #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )

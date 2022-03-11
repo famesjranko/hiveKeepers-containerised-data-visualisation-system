@@ -47,6 +47,7 @@ COPY ./nginx/nginx.conf .
 # copy fixed nginx-docker ENV substition template script
 COPY fixed_envsubst-on-templates.sh /docker-entrypoint.d/20-envsubst-on-templates.sh
 RUN chmod +x /docker-entrypoint.d/20-envsubst-on-templates.sh
+COPY ./nginx/templates /etc/nginx/templates
 
 # setup nginx logging for fail2ban access
 RUN mkdir /nginx-logs
@@ -63,10 +64,13 @@ RUN mkdir -p /etc/nginx/auth
 RUN touch /etc/nginx/auth/.htpasswd
 
 WORKDIR /
+
+# copy password script
 COPY password_script.sh /password_script.sh
 RUN chmod +x password_script.sh
 
-COPY user_passwords.txt /user_passwords.txt
+# copy user credentials file for access
+COPY user_credentials.txt /user_credentials.txt
 
 # service healthchecks
 # nginx    -> done

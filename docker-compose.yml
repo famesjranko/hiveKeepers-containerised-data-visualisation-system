@@ -13,11 +13,10 @@ services:
       context: container1
       dockerfile: Dockerfile
     container_name: 'reverse-proxy'
-    volumes:
-      - '${PWD}/container1/nginx/templates:/etc/nginx/templates:ro'
+    #volumes:
+      #- '${PWD}/container1/nginx/templates:/etc/nginx/templates:ro'
       # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
       #- '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
-      #- '${PWD}/user_passwords.txt:/user_passwords.txt:ro'
     environment:
       # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
@@ -30,7 +29,6 @@ services:
       - CAP_NET_RAW
     ports:
       - '80:80'
-      #- '443:443'
 
   container2:
     build:
@@ -50,18 +48,6 @@ services:
       # GUNICORN_PORT must match in both containers
       - GUNICORN_PORT=8050
       - GUNICORN_LOG_LEVEL="info"
-    volumes:
-      # [ NEED TO ATTACH STORAGE FOR OFFLINE CACHING OF TIMESERIES DATA    ]
-      # [ TIMESERIES DATA WILL BE STORED IN PYTHON SHELVE OR SQLITE DB FILE ]
-      # dash app files
-      - '${PWD}/container2/dash_app/hivekeepers_app.py:/home/hivekeeper/dash_app/app.py:ro'
-      - '${PWD}/container2/dash_app/requirements.txt:/home/hivekeeper/dash_app/requirements.txt:ro'
-      #- '${PWD}/container2/dash_app/data.csv:/home/hivekeeper/dash_app/data.csv:ro'
-      - '${PWD}/container2/dash_app/hivekeepers_helpers.py:/home/hivekeeper/dash_app/hivekeepers_helpers.py:ro'
-      #- '${PWD}/container2/dash_app/hivekeepers.db:/dash_app/hivekeepers.db'
-      - '${PWD}/container2/dash_app/startup_update_db.py:/home/hivekeeper/dash_app/startup_update_db.py'
-      - '${PWD}/container2/dash_app/update_db.py:/home/hivekeeper/dash_app/update_db.py'
-      - '${PWD}/container2/dash_app/config.py:/home/hivekeeper/dash_app/config.py'
     networks:
       container_net:
         ipv4_address: 172.75.0.3

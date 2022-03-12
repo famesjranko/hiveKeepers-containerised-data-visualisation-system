@@ -60,11 +60,12 @@ if [ -s /scripts/password_script.sh ]
 fi
 
 ## setup fail2ban ip banning service
-echo "[ENTRYPOINT] setting up fail2ban server and starting..."
+echo "[ENTRYPOINT] setting up fail2ban service..."
 service fail2ban status > /dev/null && service fail2ban stop
 rm -f /var/run/fail2ban/* 
 
 ## start fail2ban
+echo "[ENTRYPOINT] starting fail2ban service..."
 sudo service fail2ban start #--chuid hivekeeper
 
 ## run nginx env setup script
@@ -72,9 +73,9 @@ echo "[ENTRYPOINT] running nginx envsubstitution template script..."
 /bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
 
 ## start nginx reverse proxy service
-echo "[ENTRYPOINT] starting nginx..."
+echo "[ENTRYPOINT] starting nginx proxy service..."
 nginx
 
 ## start tail of service logs
-echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
+echo "[ENTRYPOINT] tailing nginx and fail2ban service logs..."
 exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log

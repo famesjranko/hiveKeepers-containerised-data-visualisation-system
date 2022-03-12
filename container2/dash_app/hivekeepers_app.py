@@ -364,7 +364,8 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # get 3d data from sql-lite db
     try:
-        date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
+        #date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
+        date_range_df_3d = hp.build_3d_data(filtered_hivekeepers_data)
     except Exception as e:
         print(e)
 

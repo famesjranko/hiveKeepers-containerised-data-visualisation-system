@@ -57,7 +57,7 @@ with engine.connect() as conn:
 hivekeepers_data = hp.clean_data_db(hivekeepers_data)
 
 # translate data to 3d data scheme 
-hivekeepers_data_3d = hp.build_3d_data(hivekeepers_data)
+#hivekeepers_data_3d = hp.build_3d_data(hivekeepers_data)
 
 ## ================================================
 ## store data in local SQLite DB
@@ -79,12 +79,12 @@ with sql_lite_engine.connect() as conn:
     hivekeepers_data.to_sql(hc.SQLite_2d_table_name, conn, if_exists='replace', index = False)
 
 # update db with 3d data - options: append, replace
-with sql_lite_engine.connect() as conn:
-    hivekeepers_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='replace', index = False)
+#with sql_lite_engine.connect() as conn:
+#    hivekeepers_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='replace', index = False)
 
 # construct SQLite queries
-sql_lite_queries = [['2D', f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}'],
-                    ['3D', f'SELECT COUNT(timestamp) FROM {hc.SQLite_3d_table_name}']]
+sql_lite_queries = ['2D', f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}']
+                    #['3D', f'SELECT COUNT(timestamp) FROM {hc.SQLite_3d_table_name}']]
 
 for label,query in sql_lite_queries:
     with sql_lite_engine.connect() as conn:

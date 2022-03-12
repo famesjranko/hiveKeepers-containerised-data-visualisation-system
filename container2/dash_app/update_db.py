@@ -106,7 +106,7 @@ else:
         update_data = hp.clean_data_db(update_data)
 
         # translate update data to 3d data scheme 
-        update_data_3d = hp.build_3d_data(update_data)
+        #update_data_3d = hp.build_3d_data(update_data)
         
         ## ======================================
         ## append update datasets to local SQLite
@@ -117,8 +117,8 @@ else:
             update_data.to_sql(hc.SQLite_2d_table_name, conn, if_exists='append', index = False)
 
         # update SQLite with 3d data - options: append, replace
-        with sql_lite_engine.connect() as conn:
-            update_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='append', index = False)
+        #with sql_lite_engine.connect() as conn:
+        #    update_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='append', index = False)
         
         ## =====================================
         ## print status to be shown in Dashboard

@@ -24,23 +24,23 @@ echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
 ## set up nginx reverse proxy access
-if [ -s /password_script.sh ]; then
+if [ -s /scripts/password_script.sh ]; then
     echo "[ENTRYPOINT] found password script."
 
-    if [ -f user_credentials.txt ]; then
+    if [ -f /scripts/user_credentials.txt ]; then
         echo "[ENTRYPOINT] found user credentials text file."
     
-        if [ -s user_credentials.txt ]; then
+        if [ -s /scripts/user_credentials.txt ]; then
             echo "[ENTRYPOINT] user credentials text file is populated!"
             echo "[ENTRYPOINT] creating user credentials for proxy..."
 
             ## run user password create script
-            /bin/bash /password_script.sh user_credentials.txt
+            /bin/bash /scripts/password_script.sh /scripts/user_credentials.txt
 
             echo "[ENTRYPOINT] deleting user credentials text file..."
 
             ## delete plain-text user passwords file
-            rm user_credentials.txt
+            rm /scripts/user_credentials.txt
 
             if [ ! -f user_credentials.txt ]; then
                 echo "[ENTRYPOINT] user credentials text file deleted"
@@ -51,15 +51,15 @@ if [ -s /password_script.sh ]; then
             echo "[ENTRYPOINT] user credentials text file is empty"
         fi
     else
-        echo "[ENTRYPOINT] [WARNING] user credentials text file missing!"
+        echo "[ENTRYPOINT] user credentials text file not found!"
     fi
 fi
 
 ## setup fail2ban
 echo "[ENTRYPOINT] setting up fail2ban server and starting..."
 service fail2ban status > /dev/null && service fail2ban stop
-rm -f /var/run/fail2ban/*
-service fail2ban start
+rm -f /var/run/fail2ban/* 
+sudo service fail2ban start #--chuid hivekeeper
 
 echo "[ENTRYPOINT] running nginx envsubstitution template script..."
 /bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
@@ -69,4 +69,4 @@ echo "[ENTRYPOINT] starting nginx..."
 nginx
 
 echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
-exec tail -f /nginx-logs/access.log /var/log/fail2ban.log
+exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log

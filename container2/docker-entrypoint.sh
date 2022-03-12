@@ -7,12 +7,12 @@
 # version: 0.81
 
 # get relevant environment variables, otherwise use defaults
-user="${GUNICORN_UID:-1000}" # 1005 default from gunicorn docs
-group="${GUNICORN_GID:-1000}" # 205 default from gunicorn docs
-name="${GUNICORN_NAME:-hivekeepers_app}"
-workers="${GUNICORN_WORKERS:-1}"
-port="${GUNICORN_PORT:-8050}"
-log_level="${GUNICORN_LOGLEVEL:-info}"
+#user="${GUNICORN_UID:-1000}" # 1005 default from gunicorn docs
+#group="${GUNICORN_GID:-1000}" # 205 default from gunicorn docs
+#name="${GUNICORN_NAME:-hivekeepers_app}"
+workers="${APP_WORKERS:-1}"
+port="${APP_PORT:-8050}"
+log_level="${APP_LOG_LEVEL:-info}"
 threads=$((2*$workers)) # set threads to twice the workers
 
 function setTimeZone {
@@ -38,7 +38,13 @@ setTimeZone
 #tail -n 0 -f gunicorn-logs/*.log &
 
 # cd into app dir
-cd /home/hivekeeper/dash_app/
+if [ -d /home/hivekeeper/dash_app/ ]
+  then
+    echo "[ENTRYPOINT] changing to dir: /home/hivekeeper/dash_app"
+    cd /home/hivekeeper/dash_app/
+  else
+    echo "[ENTRYPOINT] [ERROR] /home/hivekeeper/dash_app not found!"
+fi
 
 # check if files exist and have content
 if [ -s hivekeepers_app.py ]
@@ -92,9 +98,6 @@ if [ -s hivekeepers_app.py ]
         # start dash app via wsgi (gunicorn)
         echo "[ENTRYPOINT] starting application dashboard..."
         exec gunicorn hivekeepers_app:server \
-        --user $user \
-        --group $group \
-        --name "$name" \
         --bind 0.0.0.0:$port \
         --workers $workers \
         --worker-tmp-dir /dev/shm \

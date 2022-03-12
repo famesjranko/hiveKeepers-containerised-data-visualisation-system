@@ -13,14 +13,11 @@ services:
       context: container1
       dockerfile: Dockerfile
     container_name: 'reverse-proxy'
-    #volumes:
-      #- '${PWD}/container1/nginx/templates:/etc/nginx/templates:ro'
-      # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
-      #- '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
+    # volumes:
+    #   # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
+    #   - '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
-      # GUNICORN_PORT must match in both containers
-      - GUNICORN_PORT=8050
-    #restart: "unless-stopped"
+      - APP_PORT=8050 # DASH web port must match in both containers
     networks:
       container_net:
         ipv4_address: 172.75.0.2
@@ -29,37 +26,33 @@ services:
       - CAP_NET_RAW
     ports:
       - '80:80'
+    #restart: "unless-stopped"
 
   container2:
     build:
       context: container2
       dockerfile: Dockerfile
     container_name: 'dash-app'
-    user: 1000:1000
     environment:
       - MYSQL_USER=dev_hkapps_platform
       - MYSQL_PASS=R8]NbgN[y-V<L,5X
       - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
       - MYSQL_DB=rawdata
-      #- GUNICORN_UID=1000
-      #- GUNICORN_GID=1000
-      - GUNICORN_NAME="HiveKeepers"
-      - GUNICORN_WORKERS=2
-      # GUNICORN_PORT must match in both containers
-      - GUNICORN_PORT=8050
-      - GUNICORN_LOG_LEVEL="info"
+      - APP_WORKERS=2
+      - APP_PORT=8050 # DASH web port must match in both containers
+      - APP_LOG_LEVEL="info"
     networks:
       container_net:
         ipv4_address: 172.75.0.3
-    mem_limit: 6000m
+    #mem_limit: 6000m
     #restart: "unless-stopped"
 
 # build container network to control access to containers
 networks:
-    container_net:
-      name: container_net
-      driver: bridge
-      ipam:
-        driver: default
-        config:
-          - subnet: 172.75.0.0/16
+  container_net:
+    name: container_net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.75.0.0/16

@@ -12,14 +12,10 @@
 
 import os
 import subprocess
-from datetime import date, timedelta
-
-#import numpy as np
+from datetime import date
 
 # pandas vers==1.4.0
 import pandas as pd
-
-from sqlalchemy import create_engine # database connection
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -27,30 +23,15 @@ import plotly.express as px
 
 import dash
 from dash import Dash, dcc, html, Input, Output
-#import dash_bootstrap_components as dbc
 
 import hivekeepers_helpers as hp
-#import hivekeepers_config as hc
 
-## ===========================
-## Get data from database/file
-## ===========================
-
-#data_file = 'data.csv'
-#hivekeepers_data = hp.convert_csv_to_df(data_file)
-
-# set database path
-#db_path = Path(PurePath(config.SQLite_db_name))
-
-# check database is available, and convert to df
-#if db_path.exists() and db_path.stat().st_size > 0:
-#    hivekeepers_data = hp.get_db()
-#else:
-#    raise RuntimeError("database not available")
 
 # Build apiary id list
-#apiary_list = np.sort(hivekeepers_data['apiary_id'].unique())
-apiary_list = hp.get_apiarys()
+try:
+    apiary_list = hp.get_apiarys()
+except Exception as e:
+    print(e)
 
 ## colours for charts - see fft callback section for full list of colour choices
 colorscales = px.colors.named_colorscales()
@@ -60,7 +41,7 @@ colorscales = px.colors.named_colorscales()
 ## ====================================
 
 ## Create dash app and set url basen pathame
-app = dash.Dash(__name__, url_base_pathname='/app/')
+app = Dash(__name__, url_base_pathname='/app/')
 
 # server var for gunicorn
 server = app.server
@@ -70,13 +51,6 @@ fig1 = go.Figure()
 fig2 = go.Figure()
 fig3 = go.Figure()
 fig4 = go.Figure()
-
-#timestamps = hp.get_timestamps()
-#timestamps['timestamp'] = pd.to_datetime(timestamps['timestamp'])
-
-#days = [date for numd,date in zip(list(range(len(hivekeepers_data['timestamp'].unique()))), hivekeepers_data['timestamp'].dt.date.unique())]
-
-#days = [date for numd,date in zip(list(range(len(timestamps['timestamp'].unique()))), timestamps['timestamp'].dt.date.unique())]
 
 app.layout = html.Div(
                 children=[
@@ -167,7 +141,10 @@ def get_data_options(apiaryID):
         raise dash.exceptions.PreventUpdate
 
     # grab timestamps for selected apiary
-    apiary_timestamps = hp.get_apiary_timestamps(apiaryID)
+    try:
+        apiary_timestamps = hp.get_apiary_timestamps(apiaryID)
+    except Exception as e:
+        print(e)
 
     # convert timestamps to datetime objects
     apiary_timestamps['timestamp'] = pd.to_datetime(apiary_timestamps['timestamp'])
@@ -176,19 +153,21 @@ def get_data_options(apiaryID):
     apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_timestamps['timestamp'].unique()))], apiary_timestamps['timestamp'].dt.date.unique())]
     
     # default to showing the most recent single day of data
-    if len(apiary_days_range) > 1:
+    if len(apiary_days_range) > 1:          # data > 1 day
         min_date = apiary_days_range[0]
-        max_date =  apiary_days_range[-1] + timedelta(days=1)
-        start_date = apiary_days_range[-2]
+        max_date =  apiary_days_range[-1]
+        start_date = apiary_days_range[-1]
         end_date =  apiary_days_range[-1]
+
         return min_date, max_date, start_date, end_date
-    elif len(apiary_days_range) == 1:
+    elif len(apiary_days_range) == 1:       # data <= 1 day
         min_date = apiary_days_range[0]
-        max_date =  apiary_days_range[0] + timedelta(days=1)
+        max_date =  apiary_days_range[0]
         start_date = min_date
         end_date =  max_date
+        
         return min_date, max_date, start_date, max_date
-    else:
+    else:                                   # data == zero days
         return None, None, None, None
 
 ## date range selector text output
@@ -239,7 +218,30 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     end_date_string = date.fromisoformat(end_date).strftime('%Y-%m-%d')
 
     # get data from sql-lite db 
-    filtered_hivekeepers_data = hp.get_data_2d(apiaryID, start_date_string, end_date_string)
+    try:
+        filtered_hivekeepers_data = hp.get_data_2d(apiaryID, start_date_string, end_date_string)
+    except Exception as e:
+        print(e)
+    
+    # if dataframe is empty, update fig titles and return empty graphs
+    if filtered_hivekeepers_data.empty:
+        # empty fig 1
+        fig1 = go.Figure(data=[go.Scatter(x=[], y=[])])
+        fig1.update_layout(title_text='No data available')
+
+        # empty fig 2
+        fig2 = go.Figure(data=[go.Scatter(x=[], y=[])])
+        fig2.update_layout(title_text='No data available')
+
+        # empty fig 3
+        fig3 = go.Figure(data=[go.Scatter(x=[], y=[])])
+        fig3.update_layout(title='No data available')
+        
+        # empty fig 4
+        fig4 = go.Figure(data=[go.Scatter(x=[], y=[])])
+        fig4.update_layout(title='No data available')
+
+        return fig1, fig2, fig3, fig4
 
     ## ===============================================
     ## fig1 = X-Axis Time,
@@ -253,15 +255,15 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # add internal temp trace
     fig1.add_trace(
-        go.Scatter(x=list(filtered_hivekeepers_data.timestamp),
-                   y=list(filtered_hivekeepers_data.bme680_internal_temperature),
+        go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
+                   y=filtered_hivekeepers_data['bme680_internal_temperature'],  #y=list(filtered_hivekeepers_data.bme680_internal_temperature),
                    name="internal_temperature"),
                    secondary_y=False)
 
     # add external temp trace
     fig1.add_trace(
-        go.Scatter(x=list(filtered_hivekeepers_data.timestamp),
-                   y=list(filtered_hivekeepers_data.bme680_external_temperature),
+        go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
+                   y=filtered_hivekeepers_data['bme680_external_temperature'],  #y=list(filtered_hivekeepers_data.bme680_external_temperature),
                    name="external_temperature"),
                    secondary_y=True)
 
@@ -361,7 +363,10 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     bins = hp.get_bin_range(bin_group, fft_bins)
 
     # get 3d data from sql-lite db
-    date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
+    try:
+        date_range_df_3d = hp.get_data_3d(apiaryID, start_date_string, end_date_string)
+    except Exception as e:
+        print(e)
 
     # grab data for selected bin group
     filtered_hivekeepers_data_3d = date_range_df_3d.loc[date_range_df_3d['fft_band'].isin(bins)]
@@ -391,8 +396,8 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # set chart title and size
     fig3.update_layout(title='3D FFT chart - Scatter Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude, C-Axis Internal Temp)',
-                        autosize=True,
-                        height=900)
+                       autosize=True,
+                       height=900)
 
     ## ===============================================
     ## fig4 = X-Axis Time,
@@ -427,8 +432,8 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # set chart title and size
     fig4.update_layout(title='3D FFT chart - Scatter Plot (X-Axis Time, Y-Axis FFT Bins, Z-Axis Amplitude, C-Axis Internal Temp)',
-                        autosize=True,
-                        height=900)
+                       autosize=True,
+                       height=900)
 
     return fig1, fig2, fig3, fig4
 
@@ -445,7 +450,10 @@ def run_script_onClick(n_clicks):
     #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )
 
     # with `shell` it needs string 'python script.py'
-    result = subprocess.check_output('python update_db.py', shell=True)
+    try:
+        result = subprocess.check_output('python update_db.py', shell=True)
+    except Exception as e:
+        print(e)
 
     # convert bytes to string
     result = result.decode()
@@ -453,7 +461,7 @@ def run_script_onClick(n_clicks):
     # return prints from update_db script
     return result
 
-## dash health-check
+## CONTAINER health-check
 @app.server.route("/ping")
 def ping():
     return "{status: ok}"
@@ -465,4 +473,4 @@ def ping():
 if __name__ == "__main__":
     # set gunincorn through system env var - see docker-compose file
     #app.run_server(host="0.0.0.0", port=8050, debug=False, use_reloader=False)
-    app.run_server(host="0.0.0.0", port=os.environ['GUNICORN_PORT'], debug=False, use_reloader=False)
+    app.run_server(host="0.0.0.0", port=os.environ['APP_PORT'], debug=False, use_reloader=False)

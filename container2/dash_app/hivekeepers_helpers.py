@@ -63,6 +63,21 @@ def get_apiarys():
 
     return apiary_list
 
+def check_apiary_timestamps(apiary_id, start_date, end_date):
+    # working dir: /home/hivekeeper/dash_app/
+    # Create connection.
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
+
+    query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id} AND timestamp BETWEEN {start_date} AND {end_date}'
+
+    with sql_lite_engine.connect() as conn:
+        result = conn.execute(query)
+
+    if int(result.rowcount) == 0:
+        return False
+    else:
+        return True
+
 def get_apiary_timestamps(apiary_id):
     # create SQLite db engine
     sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)

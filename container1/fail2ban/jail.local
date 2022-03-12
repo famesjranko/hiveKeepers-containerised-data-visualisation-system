@@ -267,7 +267,6 @@ action_abuseipdb = abuseipdb
 # globally (section [DEFAULT]) or per specific section
 action = %(action_)s
 
-
 #
 # JAILS
 #

@@ -7,16 +7,18 @@
 # version: 0.7
 
 function setTimeZone {
-    if [ -f "/etc/timezone.host" ]; then
-        CLIENT_TIMEZONE=$(cat /etc/timezone)
-        HOST_TIMEZONE=$(cat /etc/timezone.host)
+  if [ -f "/etc/timezone.host" ]
+    then
+      CLIENT_TIMEZONE=$(cat /etc/timezone)
+      HOST_TIMEZONE=$(cat /etc/timezone.host)
 
-        if [ "${CLIENT_TIMEZONE}" != "${HOST_TIMEZONE}" ]; then
-            echo "Reconfigure timezone to "${HOST_TIMEZONE}
-            echo ${HOST_TIMEZONE} > /etc/timezone
-            dpkg-reconfigure -f noninteractive tzdata
-        fi
-    fi
+      if [ "${CLIENT_TIMEZONE}" != "${HOST_TIMEZONE}" ]
+        then
+          echo "Reconfigure timezone to "${HOST_TIMEZONE}
+          echo ${HOST_TIMEZONE} > /etc/timezone
+          dpkg-reconfigure -f noninteractive tzdata
+      fi
+  fi
 }
 
 ## might want to set tz in compose...
@@ -24,13 +26,16 @@ echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
 ## set up nginx reverse proxy access
-if [ -s /scripts/password_script.sh ]; then
+if [ -s /scripts/password_script.sh ]
+  then
     echo "[ENTRYPOINT] found password script."
 
-    if [ -f /scripts/user_credentials.txt ]; then
+    if [ -f /scripts/user_credentials.txt ]
+      then
         echo "[ENTRYPOINT] found user credentials text file."
     
-        if [ -s /scripts/user_credentials.txt ]; then
+        if [ -s /scripts/user_credentials.txt ]
+          then
             echo "[ENTRYPOINT] user credentials text file is populated!"
             echo "[ENTRYPOINT] creating user credentials for proxy..."
 
@@ -42,31 +47,34 @@ if [ -s /scripts/password_script.sh ]; then
             ## delete plain-text user passwords file
             rm /scripts/user_credentials.txt
 
-            if [ ! -f user_credentials.txt ]; then
+            if [ ! -f user_credentials.txt ]
+              then
                 echo "[ENTRYPOINT] user credentials text file deleted"
-            else
+              else
                 echo "[ENTRYPOINT] [EEOR] user credentials text file not deleted!"
             fi
-        else
+          else
             echo "[ENTRYPOINT] user credentials text file is empty"
         fi
-    else
-        echo "[ENTRYPOINT] user credentials text file not found!"
     fi
 fi
 
-## setup fail2ban
+## setup fail2ban ip banning service
 echo "[ENTRYPOINT] setting up fail2ban server and starting..."
 service fail2ban status > /dev/null && service fail2ban stop
 rm -f /var/run/fail2ban/* 
+
+## start fail2ban
 sudo service fail2ban start #--chuid hivekeeper
 
+## run nginx env setup script
 echo "[ENTRYPOINT] running nginx envsubstitution template script..."
 /bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
 
-## run nginx and tail log
+## start nginx reverse proxy service
 echo "[ENTRYPOINT] starting nginx..."
 nginx
 
+## start tail of service logs
 echo "[ENTRYPOINT] tailing nginx and fail2ban logs..."
 exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log

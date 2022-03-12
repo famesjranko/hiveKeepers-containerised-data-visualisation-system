@@ -15,7 +15,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     python3 \
     python3-pip \
     sqlite3 \
-	python3-pymysql \
+    python3-pymysql \
     gunicorn3 \
     nano \
     && rm -rf /var/lib/apt/lists/*

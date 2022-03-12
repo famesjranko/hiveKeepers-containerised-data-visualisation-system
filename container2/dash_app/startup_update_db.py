@@ -59,17 +59,17 @@ hivekeepers_data = hp.clean_data_db(hivekeepers_data)
 # translate data to 3d data scheme 
 #hivekeepers_data_3d = hp.build_3d_data(hivekeepers_data)
 
-## ================================================
+## ==========================================================
 ## store data in local SQLite DB
-## ================================================
+## ==========================================================
 #
 # build SQLite database for local storage
 #
 #   working dir: /home/hivekeeper/dash_app/
 #   database has two tables: hivedata, hivedata_3d
 #       hivedata     is the cleaned 2d data schemes
-#       hivedata_3d  is the built 3d/4d data scheme
-## ================================================
+#       hivedata_3d  is the built 3d/4d data scheme (removed)
+## ==========================================================
 
 # create SQLite db engine
 sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
@@ -82,15 +82,15 @@ with sql_lite_engine.connect() as conn:
 #with sql_lite_engine.connect() as conn:
 #    hivekeepers_data_3d.to_sql(hc.SQLite_3d_table_name, conn, if_exists='replace', index = False)
 
-# construct SQLite queries
-sql_lite_queries = ['2D', f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}']
-                    #['3D', f'SELECT COUNT(timestamp) FROM {hc.SQLite_3d_table_name}']]
+# construct SQLite queries 
+sql_lite_query = f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}'
 
-for label,query in sql_lite_queries:
-    with sql_lite_engine.connect() as conn:
-        result = conn.execute(query)
-        #for row in result:
-        #    print(row)
-        print(f'number of rows in {label} table: ', result.fetchone()[0])
+# open db connection, send query
+with sql_lite_engine.connect() as conn:
+    result = conn.execute(sql_lite_query)
+    local_index_count = result.fetchone()[0]
+
+# print database size status
+print(f'number of rows in local database: ', local_index_count)
 
 time.sleep(1)

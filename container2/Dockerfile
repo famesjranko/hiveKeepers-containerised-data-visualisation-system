@@ -12,22 +12,13 @@ LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update -y && \
     apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
     python3 \
-    python3-dev \
     python3-pip \
-    python3-venv \
-    util-linux \
     sqlite3 \
 	python3-pymysql \
+    gunicorn3 \
     nano \
     && rm -rf /var/lib/apt/lists/*
-
-# create default group and user
-#RUN groupadd -g 1000 hivekeeper
-#RUN useradd --create-home --gid 1000 --uid 1000 --shell /bin/bash hivekeeper
 
 # create non-root user
 RUN addgroup --system hivekeeper && adduser --system --group hivekeeper
@@ -53,6 +44,9 @@ WORKDIR /home/hivekeeper
 RUN mkdir -p /home/hivekeeper/dash_app && \
     mkdir -p /home/hivekeeper/gunicorn-logs
 
+RUN touch /home/hivekeeper/gunicorn-logs/access.log && \
+    touch /home/hivekeeper/gunicorn-logs/gunicorn.log
+
 # copy Dash application folder
 COPY dash_app /home/hivekeeper/dash_app
 
@@ -60,8 +54,18 @@ COPY dash_app /home/hivekeeper/dash_app
 RUN touch /home/hivekeeper/dash_app/hivekeepers.db && \
     chown -R hivekeeper:hivekeeper /home/hivekeeper
 
+# add local user bin to PATH
+RUN PATH="'/home/hivekeeper/.local/bin:$PATH"
+
 # change to non-root user
 USER hivekeeper
+
+# set working directory
+WORKDIR /home/hivekeeper/dash_app
+
+# update pip,etc and install python app requirements
+RUN python3 -m pip install --upgrade pip setuptools wheel --no-warn-script-location && \
+    pip3 install -r requirements.txt --no-warn-script-location
 
 # set app healthcheck
 HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  

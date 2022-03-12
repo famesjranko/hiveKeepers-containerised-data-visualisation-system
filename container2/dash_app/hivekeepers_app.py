@@ -452,7 +452,7 @@ def run_script_onClick(n_clicks):
 
     # with `shell` it needs string 'python script.py'
     try:
-        result = subprocess.check_output('python update_db.py', shell=True)
+        result = subprocess.check_output('python3 update_db.py', shell=True)
     except Exception as e:
         print(e)
 

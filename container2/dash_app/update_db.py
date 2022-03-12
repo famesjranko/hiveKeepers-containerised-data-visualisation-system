@@ -124,4 +124,4 @@ else:
         ## print status to be shown in Dashboard
         ## =====================================
 
-        print(f'database has been updated! News rows added: {index_diff}')
+        print(f'database has been updated! New rows added: {index_diff}')

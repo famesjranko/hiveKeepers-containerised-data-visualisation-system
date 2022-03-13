@@ -17,7 +17,9 @@ services:
     #   # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
     #   - '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
-      - APP_PORT=8050 # DASH web port must match in both containers
+      - APP_PORT=8050                   # port must match in both containers
+      - PROXY_LOG_LEVEL=detailed          # options: simple (no nginx access logging), detailed (with nginx access logging)
+      - NGINX_ERROR_LOG_LEVEL=info    # options: defug, info, notice, warn , error, crit, alert, emerg 
     networks:
       container_net:
         ipv4_address: 172.75.0.2
@@ -39,8 +41,8 @@ services:
       - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
       - MYSQL_DB=rawdata
       - APP_WORKERS=2
-      - APP_PORT=8050 # DASH web port must match in both containers
-      - APP_LOG_LEVEL="info"
+      - APP_PORT=8050             # port must match in both containers
+      - APP_LOG_LEVEL=debug       # options: defug, info, warning, error, critical
     networks:
       container_net:
         ipv4_address: 172.75.0.3

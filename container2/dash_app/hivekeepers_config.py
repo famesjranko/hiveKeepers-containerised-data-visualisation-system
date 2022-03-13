@@ -1,5 +1,8 @@
 import os
 
+# App logging level
+APP_LOG_LEVEL = os.environ['APP_LOG_LEVEL'].upper()
+
 # MySQL credentials
 MYSQL_USER = os.environ['MYSQL_USER']
 MYSQL_PASS = os.environ['MYSQL_PASS']

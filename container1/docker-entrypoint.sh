@@ -6,6 +6,14 @@
 # current: 04/02/22
 # version: 0.7
 
+set -e
+
+# get relevant environment variables, otherwise use defaults
+log_level=${PROXY_LOG_LEVEL:-simple}
+log_level_lower=${log_level,,}
+
+echo '[ENTRYPOINT] log level is: ' $log_level_lower
+
 function setTimeZone {
   if [ -f "/etc/timezone.host" ]
     then
@@ -78,4 +86,12 @@ nginx
 
 ## start tail of service logs
 echo "[ENTRYPOINT] tailing nginx and fail2ban service logs..."
-exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log
+if [ "$log_level_lower" == "simple" ]
+  then
+    exec tail -f /nginx-logs/error.log /var/log/fail2ban.log
+elif [ "$log_level_lower" == "detailed" ]
+  then
+    exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log
+else
+  exec tail -f /nginx-logs/error.log /var/log/fail2ban.log
+fi

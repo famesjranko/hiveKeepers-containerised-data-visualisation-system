@@ -7,8 +7,20 @@ import copy
 import pandas as pd
 import hivekeepers_config as hc
 
-def convert_csv_to_df(csv_file):
+import logging
 
+## =================
+## Configure Logging 
+## =================
+
+logger = logging.getLogger()
+
+## ====================
+## APP helper functions
+## ====================
+
+def convert_csv_to_df(csv_file):
+    logger.info('converting csv file to dataframe')
     # read file into dataframe
     try :
         hivekeepers_data = pd.read_csv(csv_file)
@@ -20,6 +32,7 @@ def convert_csv_to_df(csv_file):
     return hivekeepers_data
     
 def get_db_data(db_path):
+    logger.info('getting all data from local SQLite database')
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
     connect_db = sqlite3.connect(db_path)
@@ -29,9 +42,10 @@ def get_db_data(db_path):
     return df
 
 def get_db():
+    logger.info('getting all data from local SQLite database')
     # working dir: /home/hivekeeper/dash_app/
     # Create your connection.
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
     connection = sql_lite_engine.connect()
 
     metadata = db.MetaData()
@@ -49,8 +63,9 @@ def get_db():
     return df
 
 def get_apiarys():
+    logger.info('getting apiary id list from local SQLite server...')
     # create SQLite db engine
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
 
     query =  f'SELECT DISTINCT apiary_id FROM {hc.SQLite_2d_table_name}'
 
@@ -61,9 +76,15 @@ def get_apiarys():
         for row in result:
             apiary_list.append(row[0])
 
+    if apiary_list:
+        logger.info('successfully got apiary id list from local SQLite server')
+    else:
+        logger.info('returned apiary id list from local SQLite server is empty')
+
     return apiary_list
 
 def check_apiary_timestamps(apiary_id, start_date, end_date):
+    logger.info('checking that user selected apiaryid and date range has data in SQLite database')
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
     sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
@@ -74,13 +95,16 @@ def check_apiary_timestamps(apiary_id, start_date, end_date):
         result = conn.execute(query)
 
     if int(result.rowcount) == 0:
+        logger.info('No data found for user selected apiaryid and date range in SQLite database')
         return False
     else:
+        logger.info('Data found for user selected apiaryid and date range in SQLite database')
         return True
 
 def get_apiary_timestamps(apiary_id):
+    logger.info('getting apiary id timestampes from SQLite server')
     # create SQLite db engine
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
 
     query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id}'
 
@@ -90,8 +114,9 @@ def get_apiary_timestamps(apiary_id):
     return apiary_df
 
 def get_timestamps():
+    logger.info('getting all timestampes from SQLite server')
     # create SQLite db engine
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
 
     query =  f'SELECT DISTINCT timestamp FROM {hc.SQLite_2d_table_name}'
 
@@ -107,6 +132,7 @@ def get_timestamps():
     return timestamp_df
 
 def get_data_2d(apiary_id, start_date, end_date):
+    logger.info('getting all data for apiary between start_date, end_date from SQLite server')
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
     engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
@@ -127,9 +153,10 @@ def get_data_2d(apiary_id, start_date, end_date):
     return df
 
 def get_data_3d(apiary_id, start_date, end_date):
+    logger.info('getting all 3d data for apiary between start_date, end_date from SQLite server')
     # working dir: /home/hivekeeper/dash_app/
     # Create connection.
-    engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=True)
+    engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=False)
     connection = engine.connect()
     
     metadata = db.MetaData()
@@ -147,6 +174,7 @@ def get_data_3d(apiary_id, start_date, end_date):
     return df
 
 def clean_data_csv(dataframe):
+    logger.info('cleaning data before insert into SQLite server')
     # drop unnecessary columns
     dataframe.drop(dataframe.columns[[1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,22,23,24,25,90,91]], axis=1, inplace=True)
     
@@ -160,9 +188,12 @@ def clean_data_csv(dataframe):
     return dataframe
 
 def clean_data_db(dataframe):
+    logger.info('cleaning data before insert into SQLite server')
+    logger.info('adding temperature delta column to data')
     # add internal/external temperature delta column
     dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
 
+    logger.info('converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01')
     # convert timestamp From Unix/Epoch time to Readable date format:
     # eg. from 1635249781 to 2021-10-26 12:03:01
     dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
@@ -170,14 +201,17 @@ def clean_data_db(dataframe):
     return dataframe
 
 def add_delta_column(dataframe):
+    logger.info('adding delta temperate column to dataframe')
     dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
 
     return dataframe
 
 def get_last_index_df(dataframe):
+    logger.info('getting last index value from dataframe')
     return dataframe['id'].iloc[-1]
 
 def update_sql_db(dataframe, database, table):
+    logger.info('inserting dataframe into local SQLite databse')
     # open connection to db - experienced permission issues in container!!!
     connection = sqlite3.connect(database)
 
@@ -190,6 +224,7 @@ def update_sql_db(dataframe, database, table):
     return None
 
 def get_last_index_db(database):
+    logger.info('getting last index value from local SQLite databse')
     # open connection to db - experienced permission issues in container!!!
     connection = sqlite3.connect(database)
     
@@ -205,7 +240,7 @@ def get_last_index_db(database):
     return sql_last_index
 
 def get_uniques_in_column(dataframe, column):
-
+    logger.info('building list of unique values from a dataframe column')
     unique_list = []
     
     for item in dataframe[column]:
@@ -216,6 +251,7 @@ def get_uniques_in_column(dataframe, column):
     return unique_list
 
 def get_bin_range(bin_group, fft_bins):
+    logger.info('setting the fft_bin range from user selection')
     ## takes int value representing a selected grouping
     ## returns list of selected fft_bin names
     if bin_group == 1:
@@ -230,6 +266,7 @@ def get_bin_range(bin_group, fft_bins):
         return fft_bins
     
 def build_3d_data(dataframe):
+    logger.info('building dataframe for 3d charts...')
     ## --------------------------------
     ## build new dataframe for 4d chart 
     ## takes hivekeepers dataframe, a list of the fft_bins and a list of the fft_amplitude values
@@ -289,13 +326,15 @@ def build_3d_data(dataframe):
     return dataframe_4d
 
 def convert_timestamp(dataframe, column):
+    logger.info('converting dataframe timestampe column data from unix to human-readable format')
     return pd.to_datetime(dataframe[column], unit='s')
 
-def get_fft_bins(dataframe):    
+def get_fft_bins(dataframe):
+    logger.info('building list of fft_bin column headers from dataframe')
     return [col for col in dataframe if col.startswith('fft_bin')]
 
 def get_2d_xrangeslider():
-
+    logger.info('getting 2d chart rangeslider')
     hr = dict(count=1,
                 label="1h",
                 step="hour",
@@ -336,7 +375,4 @@ def get_2d_xrangeslider():
     buttons_list = list([hr, day, week, month, half_yr, ytd, year, all]) 
 
     return dict(buttons=buttons_list)
-
-def test(text):
-    return text
     

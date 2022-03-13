@@ -6,11 +6,16 @@
 # current: 25/02/22
 # version: 0.81
 
+set -e
+
 # get relevant environment variables, otherwise use defaults
 workers="${APP_WORKERS:-1}"
 port="${APP_PORT:-8050}"
-log_level="${APP_LOG_LEVEL:-info}"
+log_level=${APP_LOG_LEVEL:-info}
+log_level_lower=${log_level,,}
 threads=$((2*$workers)) # set threads to twice the workers
+
+echo '[ENTRYPOINT] log level is: ' $log_level_lower
 
 function setTimeZone {
   if [ -f "/etc/timezone.host" ]
@@ -54,8 +59,8 @@ if [ -d /home/hivekeeper/dash_app/ ]
                 echo "[ENTRYPOINT] database created!"
                 
                 # tail app logging
-                echo "[ENTRYPOINT] setup tailing of app log"
-                tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
+                #echo "[ENTRYPOINT] setup tailing of app log"
+                #tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &
 
                 # start dash app via wsgi (gunicorn)
                 echo "[ENTRYPOINT] starting application dashboard..."
@@ -64,10 +69,13 @@ if [ -d /home/hivekeeper/dash_app/ ]
                 --workers $workers \
                 --worker-tmp-dir /dev/shm \
                 --threads $threads \
-                --log-level="$log_level" \
-                --log-file=/home/hivekeeper/gunicorn-logs/gunicorn.log \
-                --access-logfile=/home/hivekeeper/gunicorn-logs/access.log \
-                "$@"
+                --log-level=$log_level_lower \
+                --log-file=- \
+                --error-logfile=- \
+                #--access-logfile=- \
+                #--log-file=/home/hivekeeper/gunicorn-logs/gunicorn.log \
+                #--error-logfile=/home/hivekeeper/gunicorn-logs/error.log \
+                #--access-logfile=/home/hivekeeper/gunicorn-logs/access.log \
               else
                 echo "[ENTRYPOINT] [ERROR] database missing!"
             fi

@@ -25,7 +25,48 @@ import dash
 from dash import Dash, dcc, html, Input, Output
 
 import hivekeepers_helpers as hp
+import hivekeepers_config as hc
 
+import logging
+
+## =================
+## Configure Logging 
+## =================
+
+# build logger
+logger = logging.getLogger()
+
+# set stdout as log output
+handler = logging.StreamHandler()
+
+# set log format
+formatter = logging.Formatter('%(asctime)s [PYTHON] %(filename)s %(levelname)s %(message)s')
+
+# add formatter
+handler.setFormatter(formatter)
+
+# add handler
+logger.addHandler(handler)
+
+# get logging level from system environment variable
+log_level = hc.APP_LOG_LEVEL
+#print('log level env: ', log_level)
+
+# set logging level from system environment variable
+if log_level == 'DEBUG':
+  logger.setLevel(logging.DEBUG)
+elif log_level == 'INFO':
+  logger.setLevel(logging.INFO)
+elif log_level == 'WARNING':
+  logger.setLevel(logging.WARNING)
+elif log_level == 'ERROR':
+  logger.setLevel(logging.ERROR)
+elif log_level == 'CRITICAL':
+  logger.setLevel(logging.CRITICAL)
+
+## =================
+## MAIN APP SETTINGS
+## =================
 
 # Build apiary id list
 try:
@@ -136,8 +177,10 @@ app.layout = html.Div(
     Output(component_id='date-picker-range', component_property='end_date'),
     Input('apiary-selector', 'value'))
 def get_data_options(apiaryID):
+    logger.info('running date range selector callback')
 
     if apiaryID is None:
+        logger.info('apiaryID is empty')
         raise dash.exceptions.PreventUpdate
 
     # grab timestamps for selected apiary
@@ -176,6 +219,7 @@ def get_data_options(apiaryID):
     Input('date-picker-range', 'start_date'),
     Input('date-picker-range', 'end_date'))
 def update_output(start_date, end_date):
+    logger.info('running date range selector text output callback')
 
     string_prefix = 'You have selected: '
 
@@ -208,6 +252,7 @@ def update_output(start_date, end_date):
      Input("bin-selector", "value"),
      Input("colorscale", "value")])
 def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
+    logger.info('running graph rendering callback')
 
     # PreventUpdate prevents ALL outputs updating
     if apiaryID is None or start_date is None or end_date is None or bin_group is None:
@@ -225,6 +270,7 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     
     # if dataframe is empty, update fig titles and return empty graphs
     if filtered_hivekeepers_data.empty:
+        logger.info('No data found for graphs')
         # empty fig 1
         fig1 = go.Figure(data=[go.Scatter(x=[], y=[])])
         fig1.update_layout(title_text='No data available')
@@ -443,6 +489,7 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     dash.dependencies.Output('output-container-button', 'children'),
     [dash.dependencies.Input('update-button', 'n_clicks')])
 def run_script_onClick(n_clicks):
+    logger.info('Running database update button callback')
 
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
@@ -465,6 +512,7 @@ def run_script_onClick(n_clicks):
 ## CONTAINER health-check
 @app.server.route("/ping")
 def ping():
+    logger.info('Running healtheck callback')
     return "{status: ok}"
 
 ## =================

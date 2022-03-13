@@ -6,6 +6,43 @@ from sqlalchemy import func
 
 import hivekeepers_config as hc
 
+import logging
+
+## =================
+## Configure Logging 
+## =================
+
+# build logger
+logger = logging.getLogger()
+
+# set stdout as log output
+handler = logging.StreamHandler()
+
+# set log format
+formatter = logging.Formatter('%(asctime)s [PYTHON] %(filename)s %(levelname)s %(message)s')
+
+# add formatter
+handler.setFormatter(formatter)
+
+# add handler
+logger.addHandler(handler)
+
+# get logging level from system environment variable
+log_level = hc.APP_LOG_LEVEL
+#print('log level env: ', log_level)
+
+# set logging level from system environment variable
+if log_level == 'DEBUG':
+  logger.setLevel(logging.DEBUG)
+elif log_level == 'INFO':
+  logger.setLevel(logging.INFO)
+elif log_level == 'WARNING':
+  logger.setLevel(logging.WARNING)
+elif log_level == 'ERROR':
+  logger.setLevel(logging.ERROR)
+elif log_level == 'CRITICAL':
+  logger.setLevel(logging.CRITICAL)
+
 ## ===============================
 ## MYSQL REMOTE SERVER CREDENTIALS
 ## ===============================
@@ -38,8 +75,9 @@ query1 = 'SELECT COUNT(id) FROM sync_data'
 
 # open db connection, send query
 with engine.connect() as conn:
-        result = conn.execute(query1)
-        remote_index_count = result.fetchone()[0]
+    logger.info('get index length of remote MySQL database')
+    result = conn.execute(query1)
+    remote_index_count = result.fetchone()[0]
 
 #print('remote index = ', remote_index_count)
 
@@ -55,13 +93,14 @@ query3 =  f'SELECT COUNT(id) FROM {hc.SQLite_2d_table_name}'
 
 # open db connection, send query
 with sql_lite_engine.connect() as conn:
+    logger.info('get index length of local SQLite database')
     result = conn.execute(query3)
     local_index_count = result.fetchone()[0]
 
 #print('local index = ', local_index_count)
 
 if not (remote_index_count > local_index_count):
-
+    logger.info('No update necessary as both remote and local indexers match')
     ## =====================================
     ## print status to be shown in Dashboard
     ## =====================================
@@ -69,7 +108,7 @@ if not (remote_index_count > local_index_count):
     print(f'database is already up to date...')
 
 else:
-
+    logger.info('remote and local indexers do not match')
     # calc the the number of remote changes local doesn't have
     index_diff = remote_index_count - local_index_count
 
@@ -79,7 +118,7 @@ else:
     update_count = local_index_count + index_diff
 
     if not (update_count == remote_index_count):
-
+        logger.warn('update aborted! Database update sanity test failed... expected local database length does not match remote database length')
         ## ===========
         ## sanity test
         ## ===========
@@ -88,7 +127,8 @@ else:
         ## possible fix would be to simply reset the local database from the remote source.
         print(f'remote and local database counts do not match!')
     
-    else: 
+    else:
+        logger.info('starting update...')
         ## ==========================================
         ## get MySQL rows where INDEXES not on local 
         ## ==========================================
@@ -98,6 +138,7 @@ else:
 
         # open db connection, send query, store in dataframe
         with engine.connect() as conn:
+            logger.info('getting new data from remote MySQL database')
             update_data = pd.read_sql(query4, conn)
         
         # clean update data:
@@ -114,6 +155,7 @@ else:
 
         # update SQLite with 2d data - options: append, replace
         with sql_lite_engine.connect() as conn:
+            logger.info('appending new data from remote MySQL database to local SQLite database')
             update_data.to_sql(hc.SQLite_2d_table_name, conn, if_exists='append', index = False)
 
         # update SQLite with 3d data - options: append, replace
@@ -123,5 +165,5 @@ else:
         ## =====================================
         ## print status to be shown in Dashboard
         ## =====================================
-
+        logger.info('database update completed.')
         print(f'database has been updated! New rows added: {index_diff}')

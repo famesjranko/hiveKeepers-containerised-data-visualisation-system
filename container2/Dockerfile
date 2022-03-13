@@ -45,6 +45,7 @@ RUN mkdir -p /home/hivekeeper/dash_app && \
     mkdir -p /home/hivekeeper/gunicorn-logs
 
 RUN touch /home/hivekeeper/gunicorn-logs/access.log && \
+    touch /home/hivekeeper/gunicorn-logs/error.log && \
     touch /home/hivekeeper/gunicorn-logs/gunicorn.log
 
 # copy Dash application folder

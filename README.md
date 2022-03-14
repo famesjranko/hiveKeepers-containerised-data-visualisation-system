@@ -17,8 +17,6 @@ container2 ip: 172.75.0.3
 #### directory structure
 ```bash
 ├── container1
-│   ├── auth
-│   │   └── .htpasswd
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
 │   ├── fail2ban
@@ -30,23 +28,34 @@ container2 ip: 172.75.0.3
 │   │   ├── jail.d
 │   │   │   └── nginx.conf
 │   │   └── jail.local
+│   ├── fixed_envsubst-on-templates.sh
+│   ├── healthcheck.sh
 │   ├── nginx
 │   │   ├── auth
-│   │   ├── default
+│   │   ├── default.old
 │   │   ├── html
 │   │   │   ├── background.jpg
 │   │   │   └── index.html
-│   │   └── nginx.conf
-│   └── readme
+│   │   ├── nginx.conf
+│   │   └── templates
+│   │       └── default.conf.template
+│   ├── password_script.sh
+│   ├── readme
+│   └── user_credentials.txt
 ├── container2
 │   ├── dash_app
-│   │   ├── gunicorn-logs
 │   │   ├── hivekeepers_app.py
+│   │   ├── hivekeepers_config.py
+│   │   ├── hivekeepers_helpers.py
 │   │   ├── requirements.txt
-│   │   └── sync_data_202201231041.csv
+│   │   ├── startup_update_db.py
+│   │   └── update_db.py
 │   ├── docker-entrypoint.sh
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── healthcheck.sh
 ├── docker-compose.yml
+├── htpasswd
+├── password_script.sh
 └── README.md
 ```
 

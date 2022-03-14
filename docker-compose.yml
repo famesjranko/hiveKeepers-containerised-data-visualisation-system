@@ -16,7 +16,7 @@ services:
     volumes:
       # nginx basic_auth cred file
       # need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
-      - '${PWD}/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
+      - '${PWD}/htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
       - APP_PORT=8090                 # port must match in both containers
       - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
@@ -29,7 +29,7 @@ services:
       - CAP_NET_RAW
     ports:
       - '80:80'                     # port binding - 'external:internal'
-    restart: "unless-stopped"
+    restart: 'unless-stopped'
 
   container2:
     build:
@@ -50,7 +50,7 @@ services:
       container_net:
         ipv4_address: 172.75.0.3
     #mem_limit: 6000m
-    restart: "unless-stopped"
+    restart: 'unless-stopped'
 
 # build container network to control access to containers
 networks:

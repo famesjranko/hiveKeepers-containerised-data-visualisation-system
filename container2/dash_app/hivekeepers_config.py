@@ -1,10 +1,12 @@
-import os
-import logging
+## ====================================================
+## Hivekeepers app system environment variables storage
+## ====================================================
 
-# get log level from user input
+import os
+
+# set log level from user input - default INFO if non given
 app_log_level = os.environ.get('APP_LOG_LEVEL', 'INFO').upper()
 
-# set SYSTEM ENV app logging level
 if app_log_level == 'DEBUG':
     APP_LOG_LEVEL = 'DEBUG'
 elif app_log_level == 'INFO':
@@ -18,71 +20,26 @@ elif app_log_level == 'CRITICAL':
 else:
     APP_LOG_LEVEL = 'INFO'
 
-## =================
-## Configure Logging
-## =================
-
-# build logger
-logger = logging.getLogger()
-
-# set stdout as log output
-#handler = logging.StreamHandler()
-
-# set log format
-#formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
-
-# add formatter
-#handler.setFormatter(formatter)
-
-# add handler
-#logger.addHandler(handler)
-
-# set logging level from system environment variable
-#if APP_LOG_LEVEL == 'DEBUG':
-#    logger.setLevel(logging.DEBUG)
-#elif APP_LOG_LEVEL == 'INFO':
-#    logger.setLevel(logging.INFO)
-#elif APP_LOG_LEVEL == 'WARNING':
-#    logger.setLevel(logging.WARNING)
-#elif APP_LOG_LEVEL == 'ERROR':
-#    logger.setLevel(logging.ERROR)
-#elif APP_LOG_LEVEL == 'CRITICAL':
-#    logger.setLevel(logging.CRITICAL)
-#else:
-#    logger.setLevel(logging.INFO)
-
-
-# get/set Dash app port from user input
+# get/set Dash app port from user input - default 8050 if none given
 APP_PORT = os.environ.get('APP_PORT', 8050)
 
 # get sql verbosity from user input
 sql_logging = os.environ.get('SQL_VERBOSE', 'NO').upper()
 
-# set sql verbosity bool
 if sql_logging == 'YES':
     SQL_VERBOSE = True
 else:
     SQL_VERBOSE = False
 
-logger.debug(f'SQL_LOGGING: {SQL_VERBOSE}')
-
-# get/set MySQL credentials from user
+# get/set MySQL credentials from user - default 'missing' if none given
 MYSQL_USER = os.environ.get('MYSQL_USER', 'missing')
 MYSQL_PASS = os.environ.get('MYSQL_PASS', 'missing')
 MYSQL_HOST = os.environ.get('MYSQL_HOST', 'missing')
 MYSQL_DB = os.environ.get('MYSQL_DB', 'missing')
 
-logger.debug(f'MYSQL_USER: {MYSQL_USER}')
-logger.debug(f'MYSQL_USER: {MYSQL_PASS}')
-logger.debug(f'MYSQL_USER: {MYSQL_HOST}')
-logger.debug(f'MYSQL_USER: {MYSQL_DB}')
-
 # set SQLite database name, table names
 SQLite_db_name = 'hivekeepers.db'
 SQLite_2d_table_name = 'hivedata2d'
-
-logger.debug(f'SQLite_db_name: {SQLite_db_name}')
-logger.debug(f'SQLite_2d_table_name: {SQLite_2d_table_name}')
 
 # set local SQLite database headers
 SQLite_default_columns = ['id', 'apiary_id', 'timestamp', 'bme680_internal_temperature',
@@ -99,5 +56,3 @@ SQLite_default_columns = ['id', 'apiary_id', 'timestamp', 'bme680_internal_tempe
                         'fft_bin50', 'fft_bin51', 'fft_bin52', 'fft_bin53', 'fft_bin54',
                         'fft_bin55', 'fft_bin56', 'fft_bin57', 'fft_bin58', 'fft_bin59',
                         'fft_bin60', 'fft_bin61', 'fft_bin62', 'fft_bin63', 'fft_bin64']
-
-logger.debug(f'SQLite_default_columns: {SQLite_default_columns}')

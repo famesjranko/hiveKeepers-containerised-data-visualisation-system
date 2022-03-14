@@ -11,8 +11,14 @@ set -e
 # get relevant environment variables, otherwise use defaults
 log_level=${PROXY_LOG_LEVEL:-simple}
 log_level_lower=${log_level,,}
+echo '[ENTRYPOINT] user passed proxy logging level: ' $log_level_lower
 
-echo '[ENTRYPOINT] log level is: ' $log_level_lower
+nginx_error_log=${NGINX_ERROR_LOG_LEVEL}
+nginx_error_log_lower=${nginx_error_log,,}
+echo '[ENTRYPOINT] user passed nginx error logging level: ' $nginx_error_log
+
+app_proxy_port=${APP_PORT:-8050}
+echo '[ENTRYPOINT] user passed app port: ' $app_proxy_port
 
 function setTimeZone {
   if [ -f "/etc/timezone.host" ]
@@ -30,7 +36,6 @@ function setTimeZone {
 }
 
 ## might want to set tz in compose...
-echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
 ## set up nginx reverse proxy access
@@ -77,7 +82,7 @@ done < /etc/nginx/auth/.htpasswd
 ## setup fail2ban ip banning service
 echo "[ENTRYPOINT] setting up fail2ban service..."
 service fail2ban status > /dev/null && service fail2ban stop
-rm -f /var/run/fail2ban/* 
+rm -f /var/run/fail2ban/*
 
 ## start fail2ban
 echo "[ENTRYPOINT] starting fail2ban service..."
@@ -95,10 +100,13 @@ nginx
 echo "[ENTRYPOINT] tailing nginx and fail2ban service logs..."
 if [ "$log_level_lower" == "simple" ]
   then
+    echo "[ENTRYPOINT] setting service logs tail verbosity to: simple"
     exec tail -f /nginx-logs/error.log /var/log/fail2ban.log
 elif [ "$log_level_lower" == "detailed" ]
   then
+    echo "[ENTRYPOINT] setting service logs tail verbosity to: detailed"
     exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log
 else # set simple by default
+  echo "[ENTRYPOINT] setting service logs tail verbosity to default: simple"
   exec tail -f /nginx-logs/error.log /var/log/fail2ban.log
 fi

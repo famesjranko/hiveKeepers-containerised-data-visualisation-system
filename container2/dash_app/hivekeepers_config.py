@@ -19,39 +19,39 @@ else:
     APP_LOG_LEVEL = 'INFO'
 
 ## =================
-## Configure Logging 
+## Configure Logging
 ## =================
 
 # build logger
 logger = logging.getLogger()
 
 # set stdout as log output
-handler = logging.StreamHandler()
+#handler = logging.StreamHandler()
 
 # set log format
-formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
+#formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
 
 # add formatter
-handler.setFormatter(formatter)
+#handler.setFormatter(formatter)
 
 # add handler
-logger.addHandler(handler)
+#logger.addHandler(handler)
 
 # set logging level from system environment variable
-if APP_LOG_LEVEL == 'DEBUG':
-    logger.setLevel(logging.DEBUG)
-elif APP_LOG_LEVEL == 'INFO':
-    logger.setLevel(logging.INFO)
-elif APP_LOG_LEVEL == 'WARNING':
-    logger.setLevel(logging.WARNING)
-elif APP_LOG_LEVEL == 'ERROR':
-    logger.setLevel(logging.ERROR)
-elif APP_LOG_LEVEL == 'CRITICAL':
-    logger.setLevel(logging.CRITICAL)
-else:
-    logger.setLevel(logging.INFO)
+#if APP_LOG_LEVEL == 'DEBUG':
+#    logger.setLevel(logging.DEBUG)
+#elif APP_LOG_LEVEL == 'INFO':
+#    logger.setLevel(logging.INFO)
+#elif APP_LOG_LEVEL == 'WARNING':
+#    logger.setLevel(logging.WARNING)
+#elif APP_LOG_LEVEL == 'ERROR':
+#    logger.setLevel(logging.ERROR)
+#elif APP_LOG_LEVEL == 'CRITICAL':
+#    logger.setLevel(logging.CRITICAL)
+#else:
+#    logger.setLevel(logging.INFO)
 
- 
+
 # get/set Dash app port from user input
 APP_PORT = os.environ.get('APP_PORT', 8050)
 

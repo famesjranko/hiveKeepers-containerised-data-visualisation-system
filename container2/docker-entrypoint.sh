@@ -8,14 +8,33 @@
 
 set -e
 
+# get the CPU core count
+cores=$(echo "Threads/core: $(nproc --all)" | awk '{ print $2 }')
+echo "[ENTRYPOINT] number of cores found: " $cores
+
+# set Gunicorn number of workers - default to nummber of cores
+workers="${APP_WORKERS:-$cores}"
+echo "[ENTRYPOINT] setting gunicorn workers: " $workers
+
+# set Gunicorn number of threads - default to number of cores - 1
+threads_default=$(($cores - 1))
+threads="${APP_THREADS:-$threads_default}"
+echo "[ENTRYPOINT] setting gunicorn threads: " $threads
+
 # get relevant environment variables, otherwise use defaults
-workers="${APP_WORKERS:-1}"
+#workers="${APP_WORKERS:-4}"
+
+# get Gunicorn/Dash bind port
 port="${APP_PORT:-8050}"
+echo "[ENTRYPOINT] setting gunicorn listening port: " $port
+
+# get App logging level
 log_level=${APP_LOG_LEVEL:-info}
 log_level_lower=${log_level,,}
-threads=$((2*$workers)) # set threads to twice the workers
 
-echo '[ENTRYPOINT] log level is: ' $log_level_lower
+echo "[ENTRYPOINT] setting application logging level: " $log_level_lower
+
+#threads=1 # setting single thread
 
 function setTimeZone {
   if [ -f "/etc/timezone.host" ]
@@ -50,14 +69,14 @@ if [ -d /home/hivekeeper/dash_app/ ]
           then
             echo "[ENTRYPOINT] found update db script file!"
             echo "[ENTRYPOINT] building database..."
-            
+
             # build local db from remote source
             python3 startup_update_db.py
-            
+
             if [ -s hivekeepers.db ]
               then
                 echo "[ENTRYPOINT] database created!"
-                
+
                 # tail app logging
                 #echo "[ENTRYPOINT] setup tailing of app log"
                 #tail -n 0 -f /home/hivekeeper/gunicorn-logs/*.log &

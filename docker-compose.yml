@@ -18,9 +18,9 @@ services:
       # need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
       - '${PWD}/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
-      - APP_PORT=8050               # port must match in both containers
-      - PROXY_LOG_LEVEL=detailed    # options: simple (no nginx access logging), detailed (with nginx access logging)
-      - NGINX_ERROR_LOG_LEVEL=info  # options: defug, info, notice, warn , error, crit, alert, emerg
+      - APP_PORT=8090                 # port must match in both containers
+      - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
+      - NGINX_ERROR_LOG_LEVEL=warn    # options: info, notice, warn, error, crit, alert, emerg (case sensitive)
     networks:
       container_net:
         ipv4_address: 172.75.0.2
@@ -41,8 +41,9 @@ services:
       - MYSQL_PASS=R8]NbgN[y-V<L,5X
       - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
       - MYSQL_DB=rawdata
-      - APP_WORKERS=2
-      - APP_PORT=8050               # port must match in both containers
+      - APP_WORKERS=4               # gunicorn workers - defaults to number of cores
+      - APP_THREADS=2               # gunicorn threads - defaults to number of cores - 1
+      - APP_PORT=8090               # port must match in both containers
       - APP_LOG_LEVEL=info          # options: defug, info, warning, error, critical
       - SQL_VERBOSE=no              # show SQL queries/responses. options: yes,no
     networks:

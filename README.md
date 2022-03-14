@@ -83,7 +83,26 @@ Debian example: in the project directory, run (-c to create file):
 ```bash
 sudo htpasswd -c container1/auth/.htpasswd username
 ```
-To create more than 1 user, simply run the command again for a new username.
+To create more than 1 user, simply run the command again with -b flag instead of -c   
+
+Or use the password_script.sh file to automatically make the password file from a text file of user:passwords   
+to use, create a text file with one user:password text pair per line:   
+for example:   
+```bash
+user1:password1
+user2:password2
+user3:password3
+```
+
+to run script, simply pass the text file in as argument when running:   
+```bash
+./password_script.sh user_pass.txt
+```
+
+Once finished, a hidden file with encrypted user:password file is created in the cwd:   
+```bash
+.htpasswd
+```
 
 Once user:password created, run docker compose in base directory (-d to daemonise):
 ```bash
@@ -93,5 +112,7 @@ docker-compose up
 Once both containers have initialised, web access via http://localhost/app/
 
 ### default user
-username: hivekeepers
+```bash
+username: hivekeepers   
 password: hivekeepers
+```

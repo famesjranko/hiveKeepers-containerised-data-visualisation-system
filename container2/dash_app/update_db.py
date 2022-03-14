@@ -123,6 +123,15 @@ else:
         ## sanity test
         ## ===========
 
+        ## ========================================================================
+        ## Could simply replace all data in local database here as working solution
+        ## solution: call startup_update_db.py
+        ##    all data will be pulled from remote MySQL database and local database
+        ##    will be re instantiated with remote data.
+        ##
+        ## - very unlikely this situation will arise, but possible.
+        ## ========================================================================
+
         ## the final index count after update should match between remote and local databases.
         ## possible fix would be to simply reset the local database from the remote source.
         print(f'remote and local database counts do not match!')

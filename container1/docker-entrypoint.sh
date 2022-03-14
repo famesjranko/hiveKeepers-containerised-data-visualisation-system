@@ -34,16 +34,12 @@ echo "[ENTRYPOINT] setting system time..."
 setTimeZone
 
 ## set up nginx reverse proxy access
-if [ -s /scripts/password_script.sh ]
-  then
-    echo "[ENTRYPOINT] found password script."
-
-    if [ -f /scripts/user_credentials.txt ]
-      then
-        echo "[ENTRYPOINT] found user credentials text file."
-    
+if [ -s /scripts/password_script.sh ]; then
+    if [ -f /scripts/user_credentials.txt ]; then
         if [ -s /scripts/user_credentials.txt ]
           then
+            echo "[ENTRYPOINT] found password script."
+            echo "[ENTRYPOINT] found user credentials text file."
             echo "[ENTRYPOINT] user credentials text file is populated!"
             echo "[ENTRYPOINT] creating user credentials for proxy..."
 
@@ -59,13 +55,24 @@ if [ -s /scripts/password_script.sh ]
               then
                 echo "[ENTRYPOINT] user credentials text file deleted"
               else
-                echo "[ENTRYPOINT] [EEOR] user credentials text file not deleted!"
+                echo "[ENTRYPOINT] [ERROR] user credentials text file not deleted!"
             fi
           else
             echo "[ENTRYPOINT] user credentials text file is empty"
         fi
     fi
 fi
+
+# set password:username delimter, :
+FS=":"
+
+# log users with proxy access
+while read line || [ -n "$line" ];
+do
+  # print user log access
+  NAME=$(echo $line|cut -d$FS -f1)
+  echo "[ENTRYPOINT] ACCESS CREDENTIALS FOUND FOR USER: " $NAME
+done < /etc/nginx/auth/.htpasswd
 
 ## setup fail2ban ip banning service
 echo "[ENTRYPOINT] setting up fail2ban service..."
@@ -92,6 +99,6 @@ if [ "$log_level_lower" == "simple" ]
 elif [ "$log_level_lower" == "detailed" ]
   then
     exec tail -f /nginx-logs/access.log nginx-logs/error.log /var/log/fail2ban.log
-else
+else # set simple by default
   exec tail -f /nginx-logs/error.log /var/log/fail2ban.log
 fi

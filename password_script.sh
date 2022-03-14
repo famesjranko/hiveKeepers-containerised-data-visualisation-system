@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # create access file if it deosn't exist
-touch /etc/nginx/auth/.htpasswd
+touch .htpasswd
 
 # set password:username delimter, :
 FS=":"
@@ -17,7 +17,7 @@ do
         PASSWORD=$(echo $line|cut -d$FS -f2)
 
         # add username and encrypted password to access file
-        htpasswd -b /etc/nginx/auth/.htpasswd $NAME $PASSWORD
+        htpasswd -b .htpasswd $NAME $PASSWORD
 done < $FILE
 
 exit

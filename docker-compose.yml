@@ -13,13 +13,14 @@ services:
       context: container1
       dockerfile: Dockerfile
     container_name: 'reverse-proxy'
-    # volumes:
-    #   # nginx basic_auth cred file - need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
-    #   - '${PWD}/container1/nginx/auth/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
+    volumes:
+      # nginx basic_auth cred file
+      # need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
+      - '${PWD}/.htpasswd:/etc/nginx/auth/.htpasswd:ro'
     environment:
-      - APP_PORT=8050                   # port must match in both containers
-      - PROXY_LOG_LEVEL=detailed          # options: simple (no nginx access logging), detailed (with nginx access logging)
-      - NGINX_ERROR_LOG_LEVEL=info    # options: defug, info, notice, warn , error, crit, alert, emerg 
+      - APP_PORT=8050               # port must match in both containers
+      - PROXY_LOG_LEVEL=detailed    # options: simple (no nginx access logging), detailed (with nginx access logging)
+      - NGINX_ERROR_LOG_LEVEL=info  # options: defug, info, notice, warn , error, crit, alert, emerg
     networks:
       container_net:
         ipv4_address: 172.75.0.2
@@ -27,8 +28,8 @@ services:
       - CAP_NET_ADMIN
       - CAP_NET_RAW
     ports:
-      - '80:80'
-    #restart: "unless-stopped"
+      - '80:80'                     # port binding - 'external:internal'
+    restart: "unless-stopped"
 
   container2:
     build:
@@ -41,13 +42,14 @@ services:
       - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
       - MYSQL_DB=rawdata
       - APP_WORKERS=2
-      - APP_PORT=8050             # port must match in both containers
-      - APP_LOG_LEVEL=debug       # options: defug, info, warning, error, critical
+      - APP_PORT=8050               # port must match in both containers
+      - APP_LOG_LEVEL=info          # options: defug, info, warning, error, critical
+      - SQL_VERBOSE=no              # show SQL queries/responses. options: yes,no
     networks:
       container_net:
         ipv4_address: 172.75.0.3
     #mem_limit: 6000m
-    #restart: "unless-stopped"
+    restart: "unless-stopped"
 
 # build container network to control access to containers
 networks:

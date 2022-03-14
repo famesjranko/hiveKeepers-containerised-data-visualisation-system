@@ -27,6 +27,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     && rm -rf /var/lib/apt/lists/*
 
 # create non-root user
+# have to use NOPASSWD:ALL for fail2ban to run.
+# But may be posible to limit this to a specific bin file if fail2ban process tree understood better
 RUN addgroup --system hivekeeper && adduser --system --group hivekeeper && \
     usermod -a -G adm hivekeeper && \
     usermod -a -G sudo hivekeeper && \
@@ -78,8 +80,6 @@ COPY ./fail2ban/jail.d/nginx.conf ./jail.d
 # create log folder for sshd jail - prevents sshd jail log error
 RUN touch /var/log/auth.log 
 
-#RUN chown -R hivekeepers:hivekeepers /hivekeeper_app && chmod -R 755 /hivekeeper_app
-
 # set user permissions and executables for fail2ban
 RUN touch /var/log/auth.log && \
     chown -R hivekeeper:hivekeeper /var/log/auth.log && \
@@ -91,7 +91,6 @@ RUN touch /var/log/auth.log && \
     chown -R hivekeeper:hivekeeper /var/run/fail2ban && \
     chown -R hivekeeper:hivekeeper /etc/init.d/fail2ban && \
     chown -R hivekeeper:hivekeeper /var/lib/fail2ban/
-    
 
 # copy fixed nginx-docker ENV substition template script
 RUN mkdir -p /scripts
@@ -101,7 +100,17 @@ WORKDIR /scripts
 COPY password_script.sh .
 
 # copy user credentials file for access
-COPY user_credentials.txt .
+# make and store this file within container1/ if you want to bake in user password
+# access into the base image created by this Dockerfile.
+# text file structure is: user:password (per line)
+#   eg:
+#       user1:password1
+#       user2:password2
+#       user3:password3
+#       ...
+# NOTE: cannot be used if passing .htpasswd file in via docker-compose.yaml file
+
+#COPY user_credentials.txt .
 
 # set permissions for scripts
 RUN chmod +x password_script.sh && \

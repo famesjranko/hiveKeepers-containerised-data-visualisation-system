@@ -24,7 +24,7 @@
 # See man 5 jail.conf for details.
 #
 # [DEFAULT]
-# bantime = 1h
+# bantime = 10m
 #
 # [sshd]
 # enabled = true
@@ -104,11 +104,11 @@ ignoreip = 127.0.0.1/8 ::1
 ignorecommand =
 
 # "bantime" is the number of seconds that a host is banned.
-bantime  = 1h
+bantime  = 10m
 
 # A host is banned if it has generated "maxretry" during the last "findtime"
 # seconds.
-findtime  = 1h
+findtime  = 10m
 
 # "maxretry" is the number of failures before a host get banned.
 maxretry = 5

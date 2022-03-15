@@ -16,7 +16,7 @@ container2 ip: 172.75.0.3
 
 #### directory structure
 ```bash
-├── container1
+├├── container1
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
 │   ├── fail2ban
@@ -31,7 +31,6 @@ container2 ip: 172.75.0.3
 │   ├── fixed_envsubst-on-templates.sh
 │   ├── healthcheck.sh
 │   ├── nginx
-│   │   ├── auth
 │   │   ├── default.old
 │   │   ├── html
 │   │   │   ├── background.jpg
@@ -55,8 +54,9 @@ container2 ip: 172.75.0.3
 │   └── healthcheck.sh
 ├── docker-compose.yml
 ├── htpasswd
-├── password_script.sh
-└── README.md
+├── README.md
+└── scripts
+    └── password_script.sh
 ```
 
 ### Container1: nginx and fail2ban

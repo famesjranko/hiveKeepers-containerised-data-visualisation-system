@@ -1,8 +1,8 @@
 # HiveKeepers - project - docker-compose.yaml
 # written by: Andrew McDonald
 # initial: 27/01/22
-# current: 06/03/22
-# version: 0.82
+# current: 15/03/22
+# version: 0.9
 
 version: '3.3'
 
@@ -17,6 +17,7 @@ services:
       # nginx basic_auth cred file
       # need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
       - '${PWD}/htpasswd:/etc/nginx/auth/.htpasswd:ro'
+      - '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
     environment:
       - APP_PORT=8090                 # port must match in both containers
       - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
@@ -28,7 +29,7 @@ services:
       - CAP_NET_ADMIN
       - CAP_NET_RAW
     ports:
-      - '80:80'                     # port binding - 'external:internal'
+      - '80:80'                       # port binding - 'external:internal'
     restart: 'unless-stopped'
 
   container2:
@@ -36,6 +37,8 @@ services:
       context: container2
       dockerfile: Dockerfile
     container_name: 'dash-app'
+    volumes:
+      - '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
     environment:
       - MYSQL_USER=dev_hkapps_platform
       - MYSQL_PASS=R8]NbgN[y-V<L,5X

@@ -1,8 +1,8 @@
 # HiveKeepers - container1 - Dockerfile
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 25/02/22
-# version: 0.3
+# current: 15/03/22
+# version: 0.9
 
 #FROM debian:stable-slim
 FROM nginx:1.20.2
@@ -26,14 +26,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# create non-root user
-# have to use NOPASSWD:ALL for fail2ban to run.
-# But may be posible to limit this to a specific bin file if fail2ban process tree understood better
-RUN addgroup --system hivekeeper && adduser --system --group hivekeeper && \
-    usermod -a -G adm hivekeeper && \
-    usermod -a -G sudo hivekeeper && \
-    echo "hivekeeper ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/99_sudo_include_file
-
 # copy nginx configurations
 WORKDIR /etc/nginx
 COPY ./nginx/nginx.conf .
@@ -41,11 +33,11 @@ COPY ./nginx/templates templates/
 
 # copy nginx env substitution script
 COPY fixed_envsubst-on-templates.sh /docker-entrypoint.d/20-envsubst-on-templates.sh
+RUN chmod +x /docker-entrypoint.d/20-envsubst-on-templates.sh
 
 # create dir for basic-auth file .htpasswd and set user access
 RUN mkdir -p auth && \
-    touch auth/.htpasswd && \
-    chown -R hivekeeper:hivekeeper auth/.htpasswd
+    touch auth/.htpasswd
 
 # add basic hivekeeper root web page
 WORKDIR /var/www/html
@@ -54,20 +46,7 @@ COPY ./nginx/html/background.jpg .
 
 # setup nginx logging for fail2ban access
 WORKDIR /
-RUN mkdir -p nginx-logs && \
-    touch nginx-logs/error.log && \
-    touch nginx-logs/access.log
-
-# set user permissions and executables for nginx
-RUN touch /run/nginx.pid && \
-    chown -R hivekeeper:hivekeeper /run/nginx.pid && \
-    chown -R hivekeeper:hivekeeper /etc/nginx && \
-    chown -R hivekeeper:hivekeeper /var/www/html && \
-    chown -R hivekeeper:hivekeeper /nginx-logs && \
-    chown -R hivekeeper:hivekeeper /var/cache/nginx && \
-    chown -R hivekeeper:hivekeeper /etc/logrotate.d && \
-    chmod +x /docker-entrypoint.d/20-envsubst-on-templates.sh && \
-    chown -R hivekeeper:hivekeeper /docker-entrypoint.d
+RUN mkdir -p /home/hivekeeper/logs 
 
 # copy fail2ban local/docker configurations
 WORKDIR /etc/fail2ban
@@ -78,19 +57,9 @@ COPY ./fail2ban/filter.d/nginx-http-auth.conf ./filter.d
 COPY ./fail2ban/jail.d/nginx.conf ./jail.d
 
 # create log folder for sshd jail - prevents sshd jail log error
-RUN touch /var/log/auth.log 
-
-# set user permissions and executables for fail2ban
-RUN touch /var/log/auth.log && \
-    chown -R hivekeeper:hivekeeper /var/log/auth.log && \
-    chown -R hivekeeper:hivekeeper /etc/fail2ban && \
-    chown -R hivekeeper:hivekeeper /var/log && \
+RUN touch /var/log/auth.log  && \
     mkdir -p /var/run/fail2ban && \
-    touch /var/run/fail2ban/fail2ban.pid && \
-    chown -R hivekeeper:hivekeeper /var/run/fail2ban/fail2ban.pid && \
-    chown -R hivekeeper:hivekeeper /var/run/fail2ban && \
-    chown -R hivekeeper:hivekeeper /etc/init.d/fail2ban && \
-    chown -R hivekeeper:hivekeeper /var/lib/fail2ban/
+    touch /var/run/fail2ban/fail2ban.pid
 
 # copy fixed nginx-docker ENV substition template script
 RUN mkdir -p /scripts
@@ -98,6 +67,7 @@ WORKDIR /scripts
 
 # copy password script
 COPY password_script.sh .
+RUN chmod +x password_script.sh 
 
 # copy user credentials file for access
 # make and store this file within container1/ if you want to bake in user password
@@ -109,12 +79,11 @@ COPY password_script.sh .
 #       user3:password3
 #       ...
 # NOTE: cannot be used if passing .htpasswd file in via docker-compose.yaml file
-
+#
 #COPY user_credentials.txt .
-
+#
 # set permissions for scripts
-RUN chmod +x password_script.sh && \
-    chown -R hivekeeper:hivekeeper /scripts
+# RUN chmod +x password_script.sh
 
 # change back to root /
 WORKDIR /
@@ -123,18 +92,12 @@ WORKDIR /
 # nginx    -> done
 # fail2ban -> done
 COPY healthcheck.sh .
+RUN chmod +x healthcheck.sh
 
 # copy init script
 COPY docker-entrypoint.sh entrypoint.sh
 
-# set permissions and make executable
-RUN chmod +x healthcheck.sh && \
-    chown hivekeeper:hivekeeper healthcheck.sh && \
-    chmod +x entrypoint.sh && \
-    chown hivekeeper:hivekeeper entrypoint.sh
-
-# change to non-root user
-USER hivekeeper
+RUN chmod +x entrypoint.sh
 
 # run healthcheck
 HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  

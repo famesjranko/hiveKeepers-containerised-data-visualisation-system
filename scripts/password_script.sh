@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# HiveKeepers - container1 - password_script.sh
+# HiveKeepers - scripts - password_script.sh
 # written by: Andrew McDonald
 # initial: 28/01/22
 # current: 15/03/22
@@ -27,23 +27,24 @@
 ## ===================================================
 
 # create access file if it deosn't exist
-touch /etc/nginx/auth/.htpasswd
+touch .htpasswd
 
 # set password:username delimter, :
 FS=":"
 
 FILE=$1
 
+# empty file contents...
+echo "" > $FILE
+
 while read line || [ -n "$line" ];
 do
-        # store field 1
-        NAME=$(echo $line|cut -d$FS -f1)
+  # store field 1 - username
+  NAME=$(echo $line|cut -d$FS -f1)
 
-        # store field 2
-        PASSWORD=$(echo $line|cut -d$FS -f2)
+  # store field 2 - password
+  PASSWORD=$(echo $line|cut -d$FS -f2)
 
-        # add username and encrypted password to access file
-        htpasswd -b /etc/nginx/auth/.htpasswd $NAME $PASSWORD
+  # add username and encrypted password to access file
+  htpasswd -b .htpasswd $NAME $PASSWORD
 done < $FILE
-
-exit

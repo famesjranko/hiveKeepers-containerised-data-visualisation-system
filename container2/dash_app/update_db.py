@@ -1,3 +1,9 @@
+# HiveKeepers - container2 - dash_app/update_db.py
+# written by: Andrew McDonald
+# initial: 26/01/22
+# current: 15/03/22
+# version: 0.9
+
 import pandas as pd
 import hivekeepers_helpers as hp
 
@@ -15,17 +21,20 @@ import logging
 # build logger
 logger = logging.getLogger()
 
-# set stdout as log output
-handler = logging.StreamHandler()
+# set stdout and file log handlers
+handler_stdout = logging.StreamHandler()
+handler_file = logging.FileHandler('/home/hivekeeper/logs/app.log')
 
 # set log format
 formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
 
-# add formatter
-handler.setFormatter(formatter)
+# add formatters
+handler_stdout.setFormatter(formatter)
+handler_file.setFormatter(formatter)
 
-# add handler
-logger.addHandler(handler)
+# add handlers
+logger.addHandler(handler_stdout)
+logger.addHandler(handler_file)
 
 # get logging level from system environment variable
 log_level = hc.APP_LOG_LEVEL

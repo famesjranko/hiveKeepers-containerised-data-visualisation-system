@@ -1,8 +1,8 @@
-# HiveKeepers - container1 - nginx - default
+# HiveKeepers - container1 - nginx - default.conf.template
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 29/01/22
-# version: 0.1
+# current: 15/03/22
+# version: 0.9
 
 # Default server configuration
 #
@@ -12,8 +12,8 @@ server {
 
     server_name _;
 
-    access_log /nginx-logs/access.log;
-    error_log /nginx-logs/error.log $NGINX_ERROR_LOG_LEVEL;
+    access_log  /home/hivekeeper/logs/nginx-access.log;
+    error_log   /home/hivekeeper/logs/nginx-error.log $NGINX_ERROR_LOG_LEVEL;
 
     # allow container network access; otherwise require creds
     satisfy   any;
@@ -50,9 +50,9 @@ server {
 
     # health check - not affected by basic auth
     location /healthcheck {
-        access_log      off;
-        error_log       off;
-        auth_basic	off;
-        return 200     'ok';
+        access_log       off;
+        error_log        off;
+        auth_basic       off;
+        return 200      'ok';
     }
 }

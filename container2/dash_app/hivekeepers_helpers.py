@@ -1,3 +1,9 @@
+# HiveKeepers - container2 - dash_app/hivekeepers_helpers.py
+# written by: Andrew McDonald
+# initial: 26/01/22
+# current: 15/03/22
+# version: 0.9
+
 # pandas vers==1.4.0
 import sqlite3
 import sqlalchemy as db

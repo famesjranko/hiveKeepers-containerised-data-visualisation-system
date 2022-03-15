@@ -1,8 +1,8 @@
 # HiveKeepers - container1 - Dockerfile
 # written by: Andrew McDonald
 # initial: 28/01/22
-# current: 04/02/22
-# version: 0.4
+# current: 15/03/22
+# version: 0.9
 
 FROM debian:stable-slim
 
@@ -20,46 +20,38 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
-# create non-root user
-RUN addgroup --system hivekeeper && adduser --system --group hivekeeper
-
 # set working directory
 WORKDIR /
 
 # copy script and make executable
 COPY docker-entrypoint.sh entrypoint.sh
-RUN chmod +x entrypoint.sh && \
-    chown hivekeeper:hivekeeper entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 # copy service healthcheck
 # dash    -> done
 COPY healthcheck.sh healthcheck.sh
-RUN chmod +x healthcheck.sh && \
-    chown hivekeeper:hivekeeper healthcheck.sh
+RUN chmod +x healthcheck.sh
+
+# create logging directory
+RUN mkdir -p /home/hivekeeper/logs && \
+    touch /home/hivekeeper/logs/gunicorn-access.log && \
+    touch /home/hivekeeper/logs/gunicorn-error.log && \
+    touch /home/hivekeeper/logs/gunicorn.log && \
+    touch /home/hivekeeper/logs/app.log
 
 # set working directory
 WORKDIR /home/hivekeeper
-
-# create app & logging directories
-RUN mkdir -p /home/hivekeeper/dash_app && \
-    mkdir -p /home/hivekeeper/gunicorn-logs
-
-RUN touch /home/hivekeeper/gunicorn-logs/access.log && \
-    touch /home/hivekeeper/gunicorn-logs/error.log && \
-    touch /home/hivekeeper/gunicorn-logs/gunicorn.log
 
 # copy Dash application folder
 COPY dash_app /home/hivekeeper/dash_app
 
 # update user app file permissions for user
-RUN touch /home/hivekeeper/dash_app/hivekeepers.db && \
-    chown -R hivekeeper:hivekeeper /home/hivekeeper
+RUN touch /home/hivekeeper/dash_app/hivekeepers.db
+
+RUN chmod -R 664 /home/hivekeeper/
 
 # add local user bin to PATH
 RUN PATH="'/home/hivekeeper/.local/bin:$PATH"
-
-# change to non-root user
-USER hivekeeper
 
 # set working directory
 WORKDIR /home/hivekeeper/dash_app

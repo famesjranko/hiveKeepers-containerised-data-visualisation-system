@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# HiveKeepers - container1 - fixed_envsubst-on-template.sh.sh
+# edited by: Andrew McDonald
+# initial: 13/02/22
+# current: 26/02/22
+# version: 0.9
+
 set -e
 
 ME=$(basename $0)

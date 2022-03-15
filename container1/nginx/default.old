@@ -1,8 +1,8 @@
 # HiveKeepers - container1 - nginx - default
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 29/01/22
-# version: 0.1
+# current: 01/03/22
+# version: 0.8
 
 # Default server configuration
 server {

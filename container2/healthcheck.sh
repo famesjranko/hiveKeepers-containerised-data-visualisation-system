@@ -11,7 +11,7 @@
 # returns 0 if healthy, 1 if unhealthy
 
 # check Dash status and return docker health status
-if [[ $(curl -s  /dev/null http://192.168.20.204:8050/ping) == "{status: ok}" ]]
+if [[ $(curl -s http://localhost:$APP_PORT/ping) == "{status: ok}" ]]
   then
     echo 0
   else

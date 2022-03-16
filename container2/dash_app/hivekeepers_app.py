@@ -585,7 +585,7 @@ def run_script_onClick(n_clicks):
 ## CONTAINER health-check
 @app.server.route("/ping")
 def ping():
-    logger.info('Running healtheck callback ping() via .../ping')
+    logger.debug('Running healtheck callback ping() via .../ping')
     return "{status: ok}"
 
 ## =================

@@ -1,0 +1,3 @@
+[2022-03-16T12:57:57+0000] info     : Starting Monit 5.27.2 daemon with http interface at [*]:2812
+[2022-03-16T12:57:57+0000] info     : Monit will delay for 60s on first start after reboot ...
+[2022-03-16T12:58:57+0000] info     : '035fb3259aab' Monit 5.27.2 started

@@ -1,4 +1,4 @@
-# HiveKeepers - container1 - Dockerfile
+# HiveKeepers - container2 - Dockerfile
 # written by: Andrew McDonald
 # initial: 28/01/22
 # current: 15/03/22
@@ -17,6 +17,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     sqlite3 \
     python3-pymysql \
     gunicorn3 \
+    procps \
+    monit \
+    curl \
+    lsof \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,11 +37,17 @@ COPY healthcheck.sh healthcheck.sh
 RUN chmod +x healthcheck.sh
 
 # create logging directory
-RUN mkdir -p /home/hivekeeper/logs && \
-    touch /home/hivekeeper/logs/gunicorn-access.log && \
-    touch /home/hivekeeper/logs/gunicorn-error.log && \
-    touch /home/hivekeeper/logs/gunicorn.log && \
-    touch /home/hivekeeper/logs/app.log
+RUN mkdir -p /home/hivekeeper/logs
+    # touch /home/hivekeeper/logs/gunicorn-access.log && \
+    # touch /home/hivekeeper/logs/gunicorn-error.log && \
+    # touch /home/hivekeeper/logs/gunicorn.log && \
+    # touch /home/hivekeeper/logs/app.log && \
+    # touch /home/hiveleeper/monit-container2.log
+
+WORKDIR /etc/monit
+COPY ./monit/monitrc .
+RUN chmod 700 monitrc
+COPY ./monit/gunicorn3.conf conf.d/gunicorn3.conf
 
 # set working directory
 WORKDIR /home/hivekeeper
@@ -45,13 +55,14 @@ WORKDIR /home/hivekeeper
 # copy Dash application folder
 COPY dash_app /home/hivekeeper/dash_app
 
-# update user app file permissions for user
-RUN touch /home/hivekeeper/dash_app/hivekeepers.db
+# create empty db file
+#RUN touch /home/hivekeeper/dash_app/hivekeepers.db
 
+# update user app file permissions for user
 RUN chmod -R 664 /home/hivekeeper/
 
 # add local user bin to PATH
-RUN PATH="'/home/hivekeeper/.local/bin:$PATH"
+#RUN PATH="'/home/hivekeeper/.local/bin:$PATH"
 
 # set working directory
 WORKDIR /home/hivekeeper/dash_app
@@ -61,7 +72,7 @@ RUN python3 -m pip install --upgrade pip setuptools wheel --no-warn-script-locat
     pip3 install -r requirements.txt --no-warn-script-location
 
 # set app healthcheck
-HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  
+HEALTHCHECK --interval=240s --timeout=10s --start-period=60s \  
     CMD /healthcheck.sh
 
 # run final init script

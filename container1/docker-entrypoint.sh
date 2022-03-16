@@ -22,7 +22,7 @@ echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed proxy logging level:
 
 nginx_error_log=${NGINX_ERROR_LOG_LEVEL}
 nginx_error_log_lower=${nginx_error_log,,}
-echo '(date +"%Y-%m-%d %H:%M:%S)" [CONTAINER1] user passed nginx error logging level: ' $nginx_error_log | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed nginx error logging level: " $nginx_error_log | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 
 app_proxy_port=${APP_PORT:-8050}
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed app port: " $app_proxy_port | tee -a /home/hivekeeper/logs/container1-entrypoint.log
@@ -91,9 +91,11 @@ echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] running nginx envsubstitution te
 /bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
 
 # make sure log files exist
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] making sure log files exist" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 touch /home/hivekeeper/logs/nginx-access.log
 touch /home/hivekeeper/logs/nginx-error.log
 touch /home/hivekeeper/logs/fail2ban.log
+touch /home/hivekeeper/logs/monit-container1.log
 
 ## setup fail2ban ip banning service
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting up fail2ban service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
@@ -102,11 +104,15 @@ rm -f /var/run/fail2ban/*
 
 ## start fail2ban
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting fail2ban service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-service fail2ban start #--chuid hivekeeper
+service fail2ban start
 
 ## start nginx reverse proxy service
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting nginx proxy service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 nginx
+
+## kill any process using port 2812 - monit port
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] killing any process unckecked process on port 2812..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+/bin/kill -9 $(lsof -t -i:2812) > /dev/null 2>&1 &
 
 ## start Monit monitoring service
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
@@ -117,13 +123,13 @@ echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] tailing nginx and fail2ban servi
 if [ "$log_level_lower" == "simple" ]
   then
     echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log
+    exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
 elif [ "$log_level_lower" == "detailed" ]
   then
     echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: detailed" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-access.log /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log
+    exec tail -f /home/hivekeeper/logs/nginx-access.log /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
 else # set simple by default
   echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to default: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-  exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log
+  exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
 fi
 

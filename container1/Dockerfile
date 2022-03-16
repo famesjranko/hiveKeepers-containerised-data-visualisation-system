@@ -24,6 +24,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     util-linux \
     nano \
     monit \
+    lsof \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # copy nginx configurations
@@ -106,7 +108,7 @@ COPY docker-entrypoint.sh entrypoint.sh
 RUN chmod +x entrypoint.sh
 
 # run healthcheck
-HEALTHCHECK --interval=60s --timeout=10s --start-period=10s \  
+HEALTHCHECK --interval=240s --timeout=10s --start-period=30s \  
     CMD /healthcheck.sh
 
 # run final init script

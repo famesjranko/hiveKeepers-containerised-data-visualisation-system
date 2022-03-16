@@ -47,7 +47,7 @@ services:
       - APP_WORKERS=4               # gunicorn workers - defaults to number of cores
       - APP_THREADS=2               # gunicorn threads - defaults to number of cores - 1
       - APP_PORT=8090               # port must match in both containers
-      - APP_LOG_LEVEL=info          # options: defug, info, warning, error, critical
+      - APP_LOG_LEVEL=info          # options: debug, info, warning, error, critical
       - SQL_VERBOSE=no              # show SQL queries/responses. options: yes,no
     networks:
       container_net:

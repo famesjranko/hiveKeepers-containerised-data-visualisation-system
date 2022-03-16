@@ -25,7 +25,7 @@
 ## specify the full path to the log file
 #
   #set log /var/log/monit.log
-  set log /home/hivekeeper/logs/monit-container1.log
+  set log /home/hivekeeper/logs/monit-container2.log
 
 #
 #

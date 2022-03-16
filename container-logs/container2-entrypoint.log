@@ -14,3 +14,34 @@
 2022-03-16 12:57:57 [CONTAINER2] killing any process unckecked process on port 2812...
 2022-03-16 12:57:57 [CONTAINER2] hivekeepers_app.py is populated!
 2022-03-16 12:57:57 [CONTAINER2] starting application dashboard...
+2022-03-16 15:13:02 [CONTAINER2] === STARTING CONTAINER2 ===
+2022-03-16 15:13:02 [CONTAINER2] ----------- USER ID:  uid=0(root) gid=0(root) groups=0(root)
+2022-03-16 15:13:02 [CONTAINER2] number of cores found:  4
+2022-03-16 15:13:02 [CONTAINER2] setting gunicorn workers:  4
+2022-03-16 15:13:02 [CONTAINER2] setting gunicorn threads:  2
+2022-03-16 15:13:02 [CONTAINER2] setting gunicorn listening port:  8090
+2022-03-16 15:13:02 [CONTAINER2] setting application logging level:  info
+2022-03-16 15:13:02 [CONTAINER2] changing to dir: /home/hivekeeper/dash_app
+2022-03-16 15:13:02 [CONTAINER2] building database...
+2022-03-16 15:13:25 [CONTAINER2] database created!
+2022-03-16 15:13:25 [CONTAINER2] making sure log files exist
+2022-03-16 15:13:25 [CONTAINER2] setup tailing of app log
+2022-03-16 15:13:25 [CONTAINER2] killing any process unckecked process on port 2812...
+2022-03-16 15:13:25 [CONTAINER2] hivekeepers_app.py is populated!
+2022-03-16 15:13:25 [CONTAINER2] starting application dashboard...
+2022-03-16 15:22:31 [CONTAINER2] === STARTING CONTAINER2 ===
+2022-03-16 15:22:31 [CONTAINER2] ----------- USER ID:  uid=0(root) gid=0(root) groups=0(root)
+2022-03-16 15:22:31 [CONTAINER2] number of cores found:  4
+2022-03-16 15:22:31 [CONTAINER2] setting gunicorn workers:  4
+2022-03-16 15:22:31 [CONTAINER2] setting gunicorn threads:  2
+2022-03-16 15:22:31 [CONTAINER2] setting gunicorn listening port:  8090
+2022-03-16 15:22:31 [CONTAINER2] setting application logging level:  info
+2022-03-16 15:22:31 [CONTAINER2] changing to dir: /home/hivekeeper/dash_app
+2022-03-16 15:22:31 [CONTAINER2] database found!
+2022-03-16 15:22:31 [CONTAINER2] checking for database updates...
+2022-03-16 15:22:36 [CONTAINER2] database has been updated! New rows added: 2
+2022-03-16 15:22:36 [CONTAINER2] making sure log files exist
+2022-03-16 15:22:36 [CONTAINER2] setup tailing of app log
+2022-03-16 15:22:36 [CONTAINER2] killing any process unckecked process on port 2812...
+2022-03-16 15:22:36 [CONTAINER2] hivekeepers_app.py is populated!
+2022-03-16 15:22:36 [CONTAINER2] starting application dashboard...

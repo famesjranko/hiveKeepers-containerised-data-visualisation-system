@@ -1,7 +1,7 @@
 # HiveKeepers - container2 - dash_app/hivekeepers_app.py
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 15/03/22
+# current: 17/03/22
 # version: 0.9
 
 ## =======================
@@ -51,7 +51,6 @@ logger.addHandler(handler_file)
 
 # get logging level from system environment variable
 log_level = hc.APP_LOG_LEVEL
-#print('log level env: ', log_level)
 
 # set logging level from system environment variable
 if log_level == 'DEBUG':
@@ -337,9 +336,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     try:
         fig1.add_trace(
             go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
-                      y=filtered_hivekeepers_data['bme680_internal_temperature'],  #y=list(filtered_hivekeepers_data.bme680_internal_temperature),
-                      name="internal_temperature"),
-                      secondary_y=False)
+                       y=filtered_hivekeepers_data['bme680_internal_temperature'],  #y=list(filtered_hivekeepers_data.bme680_internal_temperature),
+                       name="internal_temperature"),
+                       secondary_y=False)
     except Exception as e:
         logger.error(f'fig2 1st trace error: {e}')
     
@@ -350,9 +349,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     try:
         fig1.add_trace(
             go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
-                      y=filtered_hivekeepers_data['bme680_external_temperature'],  #y=list(filtered_hivekeepers_data.bme680_external_temperature),
-                      name="external_temperature"),
-                      secondary_y=True)
+                       y=filtered_hivekeepers_data['bme680_external_temperature'],  #y=list(filtered_hivekeepers_data.bme680_external_temperature),
+                       name="external_temperature"),
+                       secondary_y=True)
     except Exception as e:
         logger.error(f'fig1 2nd trace error: {e}')
 
@@ -394,9 +393,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     try:
         fig2.add_trace(
             go.Scatter(x=filtered_hivekeepers_data['timestamp'],
-                      y=filtered_hivekeepers_data['bme680_internal_temperature'],
-                      name="internal_temperature"),
-                      secondary_y=False)
+                       y=filtered_hivekeepers_data['bme680_internal_temperature'],
+                       name="internal_temperature"),
+                       secondary_y=False)
     except Exception as e:
         logger.error(f'fig2 trace1 error: {e}')
 
@@ -407,9 +406,9 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
     try:
         fig2.add_trace(
             go.Scatter(x=filtered_hivekeepers_data['timestamp'],
-                      y=filtered_hivekeepers_data['temp_delta'],
-                      name="temp_delta"),
-                      secondary_y=True)
+                       y=filtered_hivekeepers_data['temp_delta'],
+                       name="temp_delta"),
+                       secondary_y=True)
     except Exception as e:
         logger.error(f'fig2 trace2 error: {e}')
     

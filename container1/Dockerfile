@@ -1,10 +1,10 @@
 # HiveKeepers - container1 - Dockerfile
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 15/03/22
+# current: 17/03/22
 # version: 0.9
 
-#FROM debian:stable-slim
+# get base image
 FROM nginx:1.20.2
 
 # set container maintainer
@@ -16,13 +16,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y \
     fail2ban \
     iptables \
-    exim4 \
-    bsd-mailx \
     whois \
     apache2-utils \
-    wget \
-    util-linux \
-    nano \
     monit \
     lsof \
     procps \

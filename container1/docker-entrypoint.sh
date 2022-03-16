@@ -3,7 +3,7 @@
 # HiveKeepers - container1 - docker-entrypoint.sh
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 15/03/22
+# current: 17/03/22
 # version: 0.9
 
 set -e
@@ -123,13 +123,13 @@ echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] tailing nginx and fail2ban servi
 if [ "$log_level_lower" == "simple" ]
   then
     echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
+    exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
 elif [ "$log_level_lower" == "detailed" ]
   then
     echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: detailed" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-access.log /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
+    exec tail -f /home/hivekeeper/logs/nginx-access.log /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
 else # set simple by default
   echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to default: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-  exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit1.log
+  exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
 fi
 

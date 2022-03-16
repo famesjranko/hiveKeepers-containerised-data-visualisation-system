@@ -3,7 +3,7 @@
 # HiveKeepers - container1 - healthycheck.sh
 # written by: Andrew McDonald
 # initial: 25/02/22
-# current: 04/03/22
+# current: 17/03/22
 # version: 0.9
 
 # this script runs simple health checks on

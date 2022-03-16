@@ -5,3 +5,17 @@
 [2022-03-16 12:57:57 +0000] [83] [INFO] Booting worker with pid: 83
 [2022-03-16 12:57:57 +0000] [90] [INFO] Booting worker with pid: 90
 [2022-03-16 12:57:57 +0000] [94] [INFO] Booting worker with pid: 94
+[2022-03-16 15:13:25 +0000] [78] [INFO] Starting gunicorn 20.1.0
+[2022-03-16 15:13:25 +0000] [78] [INFO] Listening at: http://0.0.0.0:8090 (78)
+[2022-03-16 15:13:25 +0000] [78] [INFO] Using worker: threads
+[2022-03-16 15:13:25 +0000] [79] [INFO] Booting worker with pid: 79
+[2022-03-16 15:13:25 +0000] [83] [INFO] Booting worker with pid: 83
+[2022-03-16 15:13:26 +0000] [87] [INFO] Booting worker with pid: 87
+[2022-03-16 15:13:26 +0000] [88] [INFO] Booting worker with pid: 88
+[2022-03-16 15:22:36 +0000] [83] [INFO] Starting gunicorn 20.1.0
+[2022-03-16 15:22:36 +0000] [83] [INFO] Listening at: http://0.0.0.0:8090 (83)
+[2022-03-16 15:22:36 +0000] [83] [INFO] Using worker: threads
+[2022-03-16 15:22:36 +0000] [84] [INFO] Booting worker with pid: 84
+[2022-03-16 15:22:36 +0000] [88] [INFO] Booting worker with pid: 88
+[2022-03-16 15:22:36 +0000] [92] [INFO] Booting worker with pid: 92
+[2022-03-16 15:22:36 +0000] [96] [INFO] Booting worker with pid: 96

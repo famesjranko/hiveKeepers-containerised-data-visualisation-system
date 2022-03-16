@@ -1,1 +1,9 @@
 [2022-03-16T12:57:53+0000] info     : Monit daemon with PID 106 awakened
+[2022-03-16T15:13:03+0000] info     :  New Monit id: af88a645b560bf3fad5905b90dd2688b
+ Stored in '/var/lib/monit/id'
+[2022-03-16T15:13:03+0000] info     : Starting Monit 5.27.2 daemon with http interface at [*]:2812
+[2022-03-16T15:13:03+0000] info     : Monit will delay for 60s on first start after reboot ...
+[2022-03-16T15:14:03+0000] info     : 'd74d7db2133d' Monit 5.27.2 started
+[2022-03-16T15:22:32+0000] info     : Starting Monit 5.27.2 daemon with http interface at [*]:2812
+[2022-03-16T15:22:32+0000] info     : Monit will delay for 60s on first start after reboot ...
+[2022-03-16T15:23:32+0000] info     : 'd74d7db2133d' Monit 5.27.2 started

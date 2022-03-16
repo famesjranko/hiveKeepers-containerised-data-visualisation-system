@@ -1,7 +1,7 @@
 # HiveKeepers - container2 - dash_app/startup_update_db.py
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 15/03/22
+# current: 17/03/22
 # version: 0.9
 
 import pandas as pd
@@ -69,13 +69,6 @@ if 'missing' in credentials.values():
     logger.critical(f'missing MySQL database credentials')
 
 logger.debug(f'remote MySQL credentials: {credentials}')
-
-# credentials = {
-#     'username': 'dev_hkapps_platform',
-#     'password': 'R8]NbgN[y-V<L,5X',
-#     'host': 'hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com',
-#     'database': 'rawdata',
-# }
 
 ## =====================
 ## get remote MySQL data

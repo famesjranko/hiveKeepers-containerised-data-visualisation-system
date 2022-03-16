@@ -1,11 +1,13 @@
 # HiveKeepers - container2 - Dockerfile
 # written by: Andrew McDonald
 # initial: 28/01/22
-# current: 15/03/22
+# current: 17/03/22
 # version: 0.9
 
+# get base image
 FROM debian:stable-slim
 
+# set container maintainer
 LABEL maintainer="andrew mcdonald <17961040@students.ltu.edu.au>"
 
 # installations and clean up 
@@ -21,7 +23,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     monit \
     curl \
     lsof \
-    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # set working directory
@@ -38,11 +39,6 @@ RUN chmod +x healthcheck.sh
 
 # create logging directory
 RUN mkdir -p /home/hivekeeper/logs
-    # touch /home/hivekeeper/logs/gunicorn-access.log && \
-    # touch /home/hivekeeper/logs/gunicorn-error.log && \
-    # touch /home/hivekeeper/logs/gunicorn.log && \
-    # touch /home/hivekeeper/logs/app.log && \
-    # touch /home/hiveleeper/monit-container2.log
 
 WORKDIR /etc/monit
 COPY ./monit/monitrc .
@@ -55,14 +51,8 @@ WORKDIR /home/hivekeeper
 # copy Dash application folder
 COPY dash_app /home/hivekeeper/dash_app
 
-# create empty db file
-#RUN touch /home/hivekeeper/dash_app/hivekeepers.db
-
 # update user app file permissions for user
 RUN chmod -R 664 /home/hivekeeper/
-
-# add local user bin to PATH
-#RUN PATH="'/home/hivekeeper/.local/bin:$PATH"
 
 # set working directory
 WORKDIR /home/hivekeeper/dash_app

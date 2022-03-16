@@ -8,17 +8,16 @@
 
 set -e
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] ----------- USER ID: " $(id hivekeeper) 
-
 # make sure log file exists
 touch /home/hivekeeper/logs/container2-entrypoint.log
 
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] === STARTING CONTAINER2 ===" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] ----------- USER ID: " $(id hivekeeper) | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+user=$(whoami)
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] ----------- USER ID: " $(id $user) | tee -a /home/hivekeeper/logs/container2-entrypoint.log
 
 # get the CPU core count
-cores=$(date +"%Y-%m-%d %H:%M:%S" "Threads/core: $(nproc --all)" | awk '{ print $2 }')
+cores=$(date +"%Y-%m-%d %H:%M:%S)" "Threads/core: $(nproc --all)" | awk '{ print $2 }')
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] number of cores found: " $cores | tee -a /home/hivekeeper/logs/container2-entrypoint.log
 
 # set Gunicorn number of workers - default to nummber of cores

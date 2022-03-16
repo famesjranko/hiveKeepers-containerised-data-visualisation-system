@@ -8,25 +8,21 @@
 
 set -e
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id hivekeeper) 
-
-echo $(ls -l )
 touch /home/hivekeeper/logs/container1-entrypoint.log
 
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] === STARTING CONTAINER1 ===" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id hivekeeper) | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+user=$(whoami)
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id $user) | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 
 # get relevant environment variables, otherwise use defaults
 log_level=${PROXY_LOG_LEVEL:-simple}
 log_level_lower=${log_level,,}
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed proxy logging level: " $log_level_lower | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id hivekeeper) | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-
 nginx_error_log=${NGINX_ERROR_LOG_LEVEL}
 nginx_error_log_lower=${nginx_error_log,,}
-echo 'date +"%Y-%m-%d %H:%M:%S" [CONTAINER1] user passed nginx error logging level: ' $nginx_error_log | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo '(date +"%Y-%m-%d %H:%M:%S)" [CONTAINER1] user passed nginx error logging level: ' $nginx_error_log | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 
 app_proxy_port=${APP_PORT:-8050}
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed app port: " $app_proxy_port | tee -a /home/hivekeeper/logs/container1-entrypoint.log
@@ -106,11 +102,15 @@ rm -f /var/run/fail2ban/*
 
 ## start fail2ban
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting fail2ban service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-sudo service fail2ban start #--chuid hivekeeper
+service fail2ban start #--chuid hivekeeper
 
 ## start nginx reverse proxy service
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting nginx proxy service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
 nginx
+
+## start Monit monitoring service
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+/etc/init.d/monit start
 
 ## start tail of service logs
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] tailing nginx and fail2ban service logs..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log

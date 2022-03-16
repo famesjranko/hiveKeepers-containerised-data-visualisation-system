@@ -23,7 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     wget \
     util-linux \
     nano \
-    sudo \
+    monit \
     && rm -rf /var/lib/apt/lists/*
 
 # copy nginx configurations
@@ -60,6 +60,12 @@ COPY ./fail2ban/jail.d/nginx.conf ./jail.d
 RUN touch /var/log/auth.log  && \
     mkdir -p /var/run/fail2ban && \
     touch /var/run/fail2ban/fail2ban.pid
+
+# setup service monitoring with Monit
+WORKDIR /etc/monit
+COPY ./monit/monitrc .
+COPY ./monit/nginx.conf conf.d/nginx.conf
+COPY ./monit/fail2ban.conf conf.d/fail2ban.conf
 
 # copy fixed nginx-docker ENV substition template script
 RUN mkdir -p /scripts

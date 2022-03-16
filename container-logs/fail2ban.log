@@ -1,0 +1,197 @@
+2022-03-15 11:09:19,056 fail2ban.server         [83]: INFO    --------------------------------------------------
+2022-03-15 11:09:19,056 fail2ban.server         [83]: INFO    Starting Fail2ban v0.11.2
+2022-03-15 11:09:19,056 fail2ban.server         [83]: INFO    Daemon started
+2022-03-15 11:09:19,057 fail2ban.observer       [83]: INFO    Observer start...
+2022-03-15 11:09:19,451 fail2ban.database       [83]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-15 11:09:19,454 fail2ban.database       [83]: WARNING New database created. Version '4'
+2022-03-15 11:09:19,455 fail2ban.jail           [83]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-15 11:09:19,455 fail2ban.jail           [83]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-15 11:09:19,455 fail2ban.jail           [83]: INFO    Initiated 'polling' backend
+2022-03-15 11:09:19,458 fail2ban.filter         [83]: INFO      maxRetry: 5
+2022-03-15 11:09:19,458 fail2ban.filter         [83]: INFO      findtime: 600
+2022-03-15 11:09:19,458 fail2ban.actions        [83]: INFO      banTime: 600
+2022-03-15 11:09:19,459 fail2ban.filter         [83]: INFO      encoding: UTF-8
+2022-03-15 11:09:19,459 fail2ban.filter         [83]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = da39a3ee5e6b4b0d3255bfef95601890afd80709)
+2022-03-15 11:09:19,460 fail2ban.jail           [83]: INFO    Jail 'nginx-http-auth' started
+2022-03-15 12:06:32,752 fail2ban.server         [81]: INFO    --------------------------------------------------
+2022-03-15 12:06:32,753 fail2ban.server         [81]: INFO    Starting Fail2ban v0.11.2
+2022-03-15 12:06:32,753 fail2ban.server         [81]: INFO    Daemon started
+2022-03-15 12:06:32,753 fail2ban.observer       [81]: INFO    Observer start...
+2022-03-15 12:06:33,150 fail2ban.database       [81]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-15 12:06:33,152 fail2ban.database       [81]: WARNING New database created. Version '4'
+2022-03-15 12:06:33,152 fail2ban.jail           [81]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-15 12:06:33,152 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-15 12:06:33,153 fail2ban.jail           [81]: INFO    Initiated 'polling' backend
+2022-03-15 12:06:33,156 fail2ban.filter         [81]: INFO      maxRetry: 5
+2022-03-15 12:06:33,156 fail2ban.filter         [81]: INFO      findtime: 600
+2022-03-15 12:06:33,156 fail2ban.actions        [81]: INFO      banTime: 600
+2022-03-15 12:06:33,156 fail2ban.filter         [81]: INFO      encoding: UTF-8
+2022-03-15 12:06:33,157 fail2ban.filter         [81]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = da39a3ee5e6b4b0d3255bfef95601890afd80709)
+2022-03-15 12:06:33,157 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' started
+2022-03-15 23:20:20,390 fail2ban.server         [81]: INFO    --------------------------------------------------
+2022-03-15 23:20:20,390 fail2ban.server         [81]: INFO    Starting Fail2ban v0.11.2
+2022-03-15 23:20:20,390 fail2ban.server         [81]: INFO    Daemon started
+2022-03-15 23:20:20,391 fail2ban.observer       [81]: INFO    Observer start...
+2022-03-15 23:20:20,753 fail2ban.database       [81]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-15 23:20:20,756 fail2ban.database       [81]: WARNING New database created. Version '4'
+2022-03-15 23:20:20,756 fail2ban.jail           [81]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-15 23:20:20,757 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-15 23:20:20,757 fail2ban.jail           [81]: INFO    Initiated 'polling' backend
+2022-03-15 23:20:20,760 fail2ban.filter         [81]: INFO      maxRetry: 5
+2022-03-15 23:20:20,760 fail2ban.filter         [81]: INFO      findtime: 600
+2022-03-15 23:20:20,760 fail2ban.actions        [81]: INFO      banTime: 600
+2022-03-15 23:20:20,760 fail2ban.filter         [81]: INFO      encoding: UTF-8
+2022-03-15 23:20:20,761 fail2ban.filter         [81]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = da39a3ee5e6b4b0d3255bfef95601890afd80709)
+2022-03-15 23:20:20,761 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' started
+2022-03-15 23:50:23,836 fail2ban.server         [81]: INFO    --------------------------------------------------
+2022-03-15 23:50:23,836 fail2ban.server         [81]: INFO    Starting Fail2ban v0.11.2
+2022-03-15 23:50:23,836 fail2ban.server         [81]: INFO    Daemon started
+2022-03-15 23:50:23,836 fail2ban.observer       [81]: INFO    Observer start...
+2022-03-15 23:50:23,838 fail2ban.database       [81]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-15 23:50:23,839 fail2ban.database       [81]: WARNING New database created. Version '4'
+2022-03-15 23:50:23,840 fail2ban.jail           [81]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-15 23:50:23,840 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-15 23:50:23,840 fail2ban.jail           [81]: INFO    Initiated 'polling' backend
+2022-03-15 23:50:23,843 fail2ban.filter         [81]: INFO      maxRetry: 5
+2022-03-15 23:50:23,843 fail2ban.filter         [81]: INFO      findtime: 600
+2022-03-15 23:50:23,843 fail2ban.actions        [81]: INFO      banTime: 600
+2022-03-15 23:50:23,844 fail2ban.filter         [81]: INFO      encoding: UTF-8
+2022-03-15 23:50:23,844 fail2ban.filter         [81]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = da39a3ee5e6b4b0d3255bfef95601890afd80709)
+2022-03-15 23:50:23,844 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' started
+2022-03-15 23:56:45,540 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-15 23:56:45
+2022-03-15 23:58:00,837 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-15 23:58:00
+2022-03-15 23:58:04,043 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-15 23:58:03
+2022-03-16 00:01:43,720 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:01:43
+2022-03-16 00:01:51,932 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:01:51
+2022-03-16 00:01:52,665 fail2ban.actions        [81]: NOTICE  [nginx-http-auth] Ban 192.168.20.5
+2022-03-16 00:10:03,122 fail2ban.server         [80]: INFO    --------------------------------------------------
+2022-03-16 00:10:03,122 fail2ban.server         [80]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:10:03,122 fail2ban.server         [80]: INFO    Daemon started
+2022-03-16 00:10:03,122 fail2ban.observer       [80]: INFO    Observer start...
+2022-03-16 00:10:03,518 fail2ban.database       [80]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:10:03,520 fail2ban.database       [80]: WARNING New database created. Version '4'
+2022-03-16 00:10:03,521 fail2ban.jail           [80]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:10:03,521 fail2ban.jail           [80]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:10:03,521 fail2ban.jail           [80]: INFO    Initiated 'polling' backend
+2022-03-16 00:10:03,525 fail2ban.filter         [80]: INFO      maxRetry: 5
+2022-03-16 00:10:03,525 fail2ban.filter         [80]: INFO      findtime: 600
+2022-03-16 00:10:03,525 fail2ban.actions        [80]: INFO      banTime: 600
+2022-03-16 00:10:03,525 fail2ban.filter         [80]: INFO      encoding: UTF-8
+2022-03-16 00:10:03,525 fail2ban.filter         [80]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:10:03,527 fail2ban.jail           [80]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:10:03,533 fail2ban.filter         [80]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:01:43
+2022-03-16 00:10:03,534 fail2ban.filter         [80]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:01:51
+2022-03-16 00:10:36,774 fail2ban.filter         [80]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:10:36,774 fail2ban.filter         [80]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:10:45,387 fail2ban.filter         [80]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:45
+2022-03-16 00:10:45,574 fail2ban.actions        [80]: NOTICE  [nginx-http-auth] Ban 192.168.20.5
+2022-03-16 00:13:14,109 fail2ban.server         [81]: INFO    --------------------------------------------------
+2022-03-16 00:13:14,109 fail2ban.server         [81]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:13:14,109 fail2ban.server         [81]: INFO    Daemon started
+2022-03-16 00:13:14,109 fail2ban.observer       [81]: INFO    Observer start...
+2022-03-16 00:13:14,508 fail2ban.database       [81]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:13:14,510 fail2ban.database       [81]: WARNING New database created. Version '4'
+2022-03-16 00:13:14,510 fail2ban.jail           [81]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:13:14,510 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:13:14,510 fail2ban.jail           [81]: INFO    Initiated 'polling' backend
+2022-03-16 00:13:14,514 fail2ban.filter         [81]: INFO      maxRetry: 5
+2022-03-16 00:13:14,514 fail2ban.filter         [81]: INFO      findtime: 600
+2022-03-16 00:13:14,514 fail2ban.actions        [81]: INFO      banTime: 600
+2022-03-16 00:13:14,514 fail2ban.filter         [81]: INFO      encoding: UTF-8
+2022-03-16 00:13:14,514 fail2ban.filter         [81]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:13:14,516 fail2ban.jail           [81]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:13:14,523 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:13:14,523 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:13:14,523 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:45
+2022-03-16 00:15:33,898 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:15:33,898 fail2ban.filter         [81]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:15:34,698 fail2ban.actions        [81]: NOTICE  [nginx-http-auth] Ban 192.168.20.5
+2022-03-16 00:17:30,591 fail2ban.server         [76]: INFO    --------------------------------------------------
+2022-03-16 00:17:30,591 fail2ban.server         [76]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:17:30,591 fail2ban.server         [76]: INFO    Daemon started
+2022-03-16 00:17:30,591 fail2ban.observer       [76]: INFO    Observer start...
+2022-03-16 00:17:30,986 fail2ban.database       [76]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:17:30,989 fail2ban.database       [76]: WARNING New database created. Version '4'
+2022-03-16 00:17:30,989 fail2ban.jail           [76]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:17:30,990 fail2ban.jail           [76]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:17:30,990 fail2ban.jail           [76]: INFO    Initiated 'polling' backend
+2022-03-16 00:17:30,993 fail2ban.filter         [76]: INFO      maxRetry: 5
+2022-03-16 00:17:30,993 fail2ban.filter         [76]: INFO      findtime: 600
+2022-03-16 00:17:30,993 fail2ban.actions        [76]: INFO      banTime: 600
+2022-03-16 00:17:30,993 fail2ban.filter         [76]: INFO      encoding: UTF-8
+2022-03-16 00:17:30,994 fail2ban.filter         [76]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:17:30,996 fail2ban.jail           [76]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:17:31,002 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:17:31,003 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:17:31,003 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:45
+2022-03-16 00:17:31,003 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:17:31,003 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:17:31,195 fail2ban.actions        [76]: NOTICE  [nginx-http-auth] Ban 192.168.20.5
+2022-03-16 00:18:36,632 fail2ban.server         [76]: INFO    --------------------------------------------------
+2022-03-16 00:18:36,632 fail2ban.server         [76]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:18:36,633 fail2ban.server         [76]: INFO    Daemon started
+2022-03-16 00:18:36,633 fail2ban.observer       [76]: INFO    Observer start...
+2022-03-16 00:18:37,030 fail2ban.database       [76]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:18:37,033 fail2ban.database       [76]: WARNING New database created. Version '4'
+2022-03-16 00:18:37,033 fail2ban.jail           [76]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:18:37,033 fail2ban.jail           [76]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:18:37,033 fail2ban.jail           [76]: INFO    Initiated 'polling' backend
+2022-03-16 00:18:37,037 fail2ban.filter         [76]: INFO      maxRetry: 5
+2022-03-16 00:18:37,037 fail2ban.filter         [76]: INFO      findtime: 600
+2022-03-16 00:18:37,037 fail2ban.actions        [76]: INFO      banTime: 600
+2022-03-16 00:18:37,037 fail2ban.filter         [76]: INFO      encoding: UTF-8
+2022-03-16 00:18:37,037 fail2ban.filter         [76]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:18:37,039 fail2ban.jail           [76]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:18:37,046 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:18:37,046 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:36
+2022-03-16 00:18:37,046 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:10:45
+2022-03-16 00:18:37,046 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:18:37,046 fail2ban.filter         [76]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:15:33
+2022-03-16 00:18:37,238 fail2ban.actions        [76]: NOTICE  [nginx-http-auth] Ban 192.168.20.5
+2022-03-16 00:19:06,064 fail2ban.server         [77]: INFO    --------------------------------------------------
+2022-03-16 00:19:06,064 fail2ban.server         [77]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:19:06,064 fail2ban.server         [77]: INFO    Daemon started
+2022-03-16 00:19:06,065 fail2ban.observer       [77]: INFO    Observer start...
+2022-03-16 00:19:06,464 fail2ban.database       [77]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:19:06,465 fail2ban.jail           [77]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:19:06,465 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:19:06,465 fail2ban.jail           [77]: INFO    Initiated 'polling' backend
+2022-03-16 00:19:06,469 fail2ban.filter         [77]: INFO      maxRetry: 5
+2022-03-16 00:19:06,469 fail2ban.filter         [77]: INFO      findtime: 600
+2022-03-16 00:19:06,469 fail2ban.actions        [77]: INFO      banTime: 600
+2022-03-16 00:19:06,469 fail2ban.filter         [77]: INFO      encoding: UTF-8
+2022-03-16 00:19:06,469 fail2ban.filter         [77]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 2656, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:19:06,476 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:19:06,670 fail2ban.actions        [77]: NOTICE  [nginx-http-auth] Restore Ban 192.168.20.5
+2022-03-16 00:21:04,403 fail2ban.actions        [77]: NOTICE  [nginx-http-auth] Unban 192.168.20.5
+2022-03-16 00:21:08,617 fail2ban.filter         [77]: INFO    [nginx-http-auth] Found 192.168.20.5 - 2022-03-16 00:21:08
+2022-03-16 00:43:30,076 fail2ban.server         [77]: INFO    --------------------------------------------------
+2022-03-16 00:43:30,076 fail2ban.server         [77]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:43:30,076 fail2ban.server         [77]: INFO    Daemon started
+2022-03-16 00:43:30,076 fail2ban.observer       [77]: INFO    Observer start...
+2022-03-16 00:43:30,470 fail2ban.database       [77]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:43:30,472 fail2ban.database       [77]: WARNING New database created. Version '4'
+2022-03-16 00:43:30,472 fail2ban.jail           [77]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:43:30,473 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:43:30,473 fail2ban.jail           [77]: INFO    Initiated 'polling' backend
+2022-03-16 00:43:30,476 fail2ban.filter         [77]: INFO      maxRetry: 5
+2022-03-16 00:43:30,476 fail2ban.filter         [77]: INFO      findtime: 600
+2022-03-16 00:43:30,476 fail2ban.actions        [77]: INFO      banTime: 600
+2022-03-16 00:43:30,477 fail2ban.filter         [77]: INFO      encoding: UTF-8
+2022-03-16 00:43:30,477 fail2ban.filter         [77]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:43:30,479 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' started
+2022-03-16 00:52:33,870 fail2ban.server         [77]: INFO    --------------------------------------------------
+2022-03-16 00:52:33,870 fail2ban.server         [77]: INFO    Starting Fail2ban v0.11.2
+2022-03-16 00:52:33,870 fail2ban.server         [77]: INFO    Daemon started
+2022-03-16 00:52:33,871 fail2ban.observer       [77]: INFO    Observer start...
+2022-03-16 00:52:34,273 fail2ban.database       [77]: INFO    Connected to fail2ban persistent database '/var/lib/fail2ban/fail2ban.sqlite3'
+2022-03-16 00:52:34,276 fail2ban.database       [77]: WARNING New database created. Version '4'
+2022-03-16 00:52:34,277 fail2ban.jail           [77]: INFO    Creating new jail 'nginx-http-auth'
+2022-03-16 00:52:34,277 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' uses poller {}
+2022-03-16 00:52:34,277 fail2ban.jail           [77]: INFO    Initiated 'polling' backend
+2022-03-16 00:52:34,281 fail2ban.filter         [77]: INFO      maxRetry: 5
+2022-03-16 00:52:34,281 fail2ban.filter         [77]: INFO      findtime: 600
+2022-03-16 00:52:34,281 fail2ban.actions        [77]: INFO      banTime: 600
+2022-03-16 00:52:34,281 fail2ban.filter         [77]: INFO      encoding: UTF-8
+2022-03-16 00:52:34,281 fail2ban.filter         [77]: INFO    Added logfile: '/home/hivekeeper/logs/nginx-error.log' (pos = 0, hash = b050a3add818e7fc2a13734d42347f6edde1c20c)
+2022-03-16 00:52:34,283 fail2ban.jail           [77]: INFO    Jail 'nginx-http-auth' started

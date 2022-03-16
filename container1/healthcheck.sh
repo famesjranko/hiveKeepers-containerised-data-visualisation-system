@@ -13,6 +13,7 @@
 # init service status variables
 NGINX_STATUS=-1
 FAIL2BAN_STATUS=-1
+MONIT_STATUS=-1
 
 # check nginx status and update status var
 if [ $(curl -s -o /dev/null -w "%{http_code}" localhost/healthcheck) == 200 ]
@@ -20,6 +21,34 @@ if [ $(curl -s -o /dev/null -w "%{http_code}" localhost/healthcheck) == 200 ]
     NGINX_STATUS=0
   else
     NGINX_STATUS=1
+fi
+
+# get monit service status
+MONIT_NGINX=$(monit summary | grep nginx | awk '{ print $2 }')
+MONIT_FAIL2BAN=$(monit summary | grep fail2ban | awk '{ print $2 }')
+
+# update monit service status
+if [[ "$MONIT_NGINX" == "OK" ]]
+  then
+    MONIT_NGINX=0
+  else
+    MONIT_NGINX=1
+fi
+
+# update monit service status
+if [[ "$MONIT_FAIL2BAN" == "OK" ]]
+  then
+    MONIT_FAIL2BAN=0
+  else
+    MONIT_FAIL2BAN=1
+fi
+
+# get overall monit service status
+if [[ $MONIT_NGINX == 0 && $MONIT_FAIL2BAN == 0 ]]
+  then
+    MONIT_STATUS 0
+  else
+    MONIT_STATUS 1
 fi
 
 # check fail2ban status and update status var
@@ -30,8 +59,8 @@ if [[ $(fail2ban-client ping) == "Server replied: pong" ]]
     FAIL2BAN_STATUS=1
 fi
 
-# check status vars and return docker health status
-if [[ $NGINX_STATUS == 0 && $FAIL2BAN_STATUS == 0 ]]
+# check all status vars and return docker health status
+if [[ $NGINX_STATUS == 0 && $FAIL2BAN_STATUS == 0 && $MONIT_STATUS == 0 ]]
   then
     echo 0
   else

@@ -1,0 +1,456 @@
+2022-03-15 11:09:18,602 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 11:09:21,550 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 11:11:33,784 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 11:11:33,784 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 11:11:33,786 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 11:11:33,851 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 11:11:33,857 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 11:11:39,534 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-15 11:11:41,435 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 11:11:41,435 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 11:11:41,461 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 11:11:41,461 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 11:11:41,462 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 11:11:41,469 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 11:11:41,470 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 11:11:41,481 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 11:11:41,481 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 11:11:41,488 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 11:11:41,488 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 11:11:41,494 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 11:11:41,494 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 11:11:41,506 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 11:11:41,506 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 11:11:41,506 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 11:11:41,513 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 11:11:41,513 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 11:11:41,514 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 11:11:41,515 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 11:11:41,515 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 11:11:41,519 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 11:11:41,519 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 11:11:41,520 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 11:11:41,522 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 11:11:41,522 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 11:11:41,528 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 11:11:41,528 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 12:06:32,397 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 12:06:35,326 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 12:07:16,583 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 12:07:16,583 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 12:07:16,584 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 12:07:16,644 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 12:07:16,650 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 12:07:22,135 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-15 12:07:24,048 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 12:07:24,049 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 12:07:24,062 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 12:07:24,062 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 12:07:24,075 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 12:07:24,075 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 12:07:24,076 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 12:07:24,081 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 12:07:24,081 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 12:07:24,084 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 12:07:24,084 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 12:07:24,088 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 12:07:24,088 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 12:07:24,089 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 12:07:24,097 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 12:07:24,098 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 12:07:24,106 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 12:07:24,106 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 12:07:24,107 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 12:07:24,111 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 12:07:24,111 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 12:07:24,114 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 12:07:24,114 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 12:07:24,134 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 12:07:24,135 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 12:07:24,135 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 12:07:24,142 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 12:07:24,142 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:20:20,283 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 23:20:23,281 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 23:20:35,945 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 23:20:35,945 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 23:20:35,947 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 23:20:36,049 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 23:20:36,062 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 23:20:41,699 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-15 23:20:43,685 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:20:43,685 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:20:43,688 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:20:43,688 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:20:43,691 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:20:43,691 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:20:43,698 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:20:43,699 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:20:43,710 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:20:43,711 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:20:43,711 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:20:43,712 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:20:43,712 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:20:43,713 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:20:43,716 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:20:43,716 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:20:43,717 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:20:43,720 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:20:43,720 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:20:43,721 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:20:43,721 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:20:43,723 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:20:43,724 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:20:43,724 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:20:43,724 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:20:43,725 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:20:43,733 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:20:43,733 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:48:01,220 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 23:48:03,871 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 23:48:16,301 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 23:48:16,301 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 23:48:16,302 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 23:48:16,364 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 23:48:16,370 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 23:48:21,829 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-15 23:48:23,738 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:48:23,738 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:48:23,743 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:48:23,743 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:48:23,763 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:48:23,763 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:48:23,764 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:48:23,767 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:48:23,767 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:48:23,768 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:48:23,772 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:48:23,772 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:48:23,775 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:48:23,776 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:48:23,780 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:48:23,780 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:48:23,781 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:48:23,782 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:48:23,803 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:48:23,803 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:48:23,804 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:48:23,805 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:48:23,805 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:48:23,805 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:48:23,811 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:48:23,811 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:48:23,813 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:48:23,813 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:49:14,052 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 23:49:16,740 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 23:49:29,440 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 23:49:29,441 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 23:49:29,442 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 23:49:29,503 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 23:49:29,508 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 23:49:40,230 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 23:49:42,856 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 23:50:23,352 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-15 23:50:26,064 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-15 23:50:38,813 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-15 23:50:38,813 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-15 23:50:38,814 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-15 23:50:38,875 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-15 23:50:38,880 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-15 23:50:44,354 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-15 23:50:46,215 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:50:46,215 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:50:46,240 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:50:46,240 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:50:46,240 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:50:46,248 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:50:46,248 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:50:46,319 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:50:46,319 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:50:46,342 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:50:46,342 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:50:46,342 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:50:46,350 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:50:46,350 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:50:46,352 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:50:46,352 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:50:46,354 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-15 23:50:46,355 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-15 23:50:46,375 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:50:46,376 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:50:46,376 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:50:46,378 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-15 23:50:46,378 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-15 23:50:46,378 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-15 23:50:46,384 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:50:46,384 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-15 23:50:46,385 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-15 23:50:46,385 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:10:02,760 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:10:05,628 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:10:18,433 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:10:18,434 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:10:18,435 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:10:18,495 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:10:18,501 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:10:23,943 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:10:25,808 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:10:25,808 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:10:25,833 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:10:25,834 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:10:25,835 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:10:25,843 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:10:25,843 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:10:25,905 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:10:25,905 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:10:25,928 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:10:25,928 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:10:25,928 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:10:25,936 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:10:25,936 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:10:25,936 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:10:25,936 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:10:25,939 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:10:25,939 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:10:25,959 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:10:25,959 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:10:25,960 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:10:25,962 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:10:25,962 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:10:25,963 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:10:25,968 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:10:25,968 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:10:25,970 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:10:25,971 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:13:13,664 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:13:16,350 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:13:28,986 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:13:28,986 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:13:28,987 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:13:29,047 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:13:29,053 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:13:35,858 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:13:37,706 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:13:37,706 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:13:37,730 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:13:37,730 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:13:37,730 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:13:37,738 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:13:37,739 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:13:37,812 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:13:37,812 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:13:37,836 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:13:37,836 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:13:37,836 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:13:37,844 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:13:37,844 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:13:37,845 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:13:37,845 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:13:37,866 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:13:37,866 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:13:37,868 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:13:37,868 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:13:37,869 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:13:37,876 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:13:37,876 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:13:37,889 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:13:37,889 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:13:37,889 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:13:37,896 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:13:37,897 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:17:30,191 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:17:32,901 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:17:45,796 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:17:45,796 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:17:45,799 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:17:45,859 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:17:45,864 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:17:51,660 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:17:53,533 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:17:53,533 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:17:53,558 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:17:53,558 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:17:53,559 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:17:53,567 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:17:53,568 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:17:53,624 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:17:53,624 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:17:53,644 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:17:53,644 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:17:53,648 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:17:53,648 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:17:53,649 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:17:53,656 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:17:53,656 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:17:53,667 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:17:53,667 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:17:53,668 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:17:53,669 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:17:53,670 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:17:53,675 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:17:53,675 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:17:53,692 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:17:53,692 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:17:53,693 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:17:53,700 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:17:53,701 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:18:36,275 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:18:38,957 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:18:51,595 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:18:51,595 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:18:51,596 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:18:51,656 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:18:51,662 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:19:05,736 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:19:08,360 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:19:20,882 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:19:20,882 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:19:20,883 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:19:20,943 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:19:20,948 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:19:26,370 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:19:28,248 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:19:28,248 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:19:28,273 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:19:28,273 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:19:28,274 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:19:28,282 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:19:28,282 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:19:28,289 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:19:28,289 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:19:28,295 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:19:28,295 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:19:28,298 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:19:28,298 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:19:28,313 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:19:28,313 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:19:28,313 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:19:28,319 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:19:28,319 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:19:28,320 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:19:28,321 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:19:28,321 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:19:28,322 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:19:28,322 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:19:28,322 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:19:28,327 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:19:28,328 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:19:28,330 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:19:28,330 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:24:28,918 [PYTHON] [INFO] hivekeepers_app.py: Running database update button callback
+2022-03-16 00:24:28,918 [PYTHON] [INFO] hivekeepers_app.py: no data sent to run script onClick callback...
+2022-03-16 00:24:28,918 [PYTHON] [INFO] hivekeepers_app.py: running date range selector callback
+2022-03-16 00:24:28,918 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to date range selector callback...
+2022-03-16 00:24:28,941 [PYTHON] [INFO] hivekeepers_app.py: running graph rendering callback
+2022-03-16 00:24:28,941 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to graph rendering callback...
+2022-03-16 00:26:57,884 [PYTHON] [INFO] hivekeepers_app.py: Running database update button callback
+2022-03-16 00:26:57,884 [PYTHON] [INFO] hivekeepers_app.py: no data sent to run script onClick callback...
+2022-03-16 00:26:57,884 [PYTHON] [INFO] hivekeepers_app.py: running date range selector callback
+2022-03-16 00:26:57,884 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to date range selector callback...
+2022-03-16 00:26:57,920 [PYTHON] [INFO] hivekeepers_app.py: running graph rendering callback
+2022-03-16 00:26:57,920 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to graph rendering callback...
+2022-03-16 00:43:29,763 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:43:32,442 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:43:45,197 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:43:45,197 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:43:45,198 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:43:45,258 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:43:45,263 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:43:50,724 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:43:52,628 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:43:52,628 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:43:52,673 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:43:52,684 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:43:52,684 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:43:52,692 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:43:52,692 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:43:52,694 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:43:52,695 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:43:52,737 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:43:52,737 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:43:52,738 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:43:52,746 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:43:52,746 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:43:52,825 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:43:52,825 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:43:52,847 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:43:52,847 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:43:52,848 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:43:52,848 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:43:52,848 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:43:52,856 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:43:52,856 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:43:52,871 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:43:52,871 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:43:52,872 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:43:52,879 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:43:52,880 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:52:33,436 [PYTHON] [INFO] startup_update_db.py: connecting to remote MySQL server...
+2022-03-16 00:52:36,156 [PYTHON] [INFO] startup_update_db.py: sending query to remote MySQL server
+2022-03-16 00:52:48,640 [PYTHON] [INFO] hivekeepers_helpers.py: cleaning data before insert into SQLite server
+2022-03-16 00:52:48,640 [PYTHON] [INFO] hivekeepers_helpers.py: adding temperature delta column to data
+2022-03-16 00:52:48,641 [PYTHON] [INFO] hivekeepers_helpers.py: converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01
+2022-03-16 00:52:48,700 [PYTHON] [INFO] startup_update_db.py: connecting to local SQLite server...
+2022-03-16 00:52:48,706 [PYTHON] [INFO] startup_update_db.py: updating local SQLite server with response data from MySQL server
+2022-03-16 00:52:54,362 [PYTHON] [INFO] startup_update_db.py: sending count(id) query to local SQLite server
+2022-03-16 00:52:56,231 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:52:56,232 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:52:56,257 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:52:56,257 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:52:56,259 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:52:56,267 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:52:56,268 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:52:56,287 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:52:56,287 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:52:56,311 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:52:56,311 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:52:56,311 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:52:56,319 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:52:56,319 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:52:56,327 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:52:56,327 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:52:56,330 [PYTHON] [INFO] hivekeepers_app.py: building apiary id list for drop down menu
+2022-03-16 00:52:56,330 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id list from local SQLite server...
+2022-03-16 00:52:56,349 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:52:56,350 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:52:56,350 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:52:56,353 [PYTHON] [INFO] hivekeepers_helpers.py: successfully got apiary id list from local SQLite server
+2022-03-16 00:52:56,354 [PYTHON] [INFO] hivekeepers_app.py: getting colour scale list for 3d chart colour drop down menu
+2022-03-16 00:52:56,354 [PYTHON] [INFO] hivekeepers_app.py: init Dash object with url base pathname set: .../app/
+2022-03-16 00:52:56,358 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:52:56,358 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:52:56,362 [PYTHON] [INFO] hivekeepers_app.py: init app server...
+2022-03-16 00:52:56,362 [PYTHON] [INFO] hivekeepers_app.py: init empty figure objects
+2022-03-16 00:54:10,365 [PYTHON] [INFO] hivekeepers_app.py: Running database update button callback
+2022-03-16 00:54:10,365 [PYTHON] [INFO] hivekeepers_app.py: no data sent to run script onClick callback...
+2022-03-16 00:54:10,366 [PYTHON] [INFO] hivekeepers_app.py: running date range selector callback
+2022-03-16 00:54:10,367 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to date range selector callback...
+2022-03-16 00:54:10,408 [PYTHON] [INFO] hivekeepers_app.py: running graph rendering callback
+2022-03-16 00:54:10,408 [PYTHON] [WARNING] hivekeepers_app.py: no data sent to graph rendering callback...
+2022-03-16 00:54:12,630 [PYTHON] [INFO] hivekeepers_app.py: running date range selector callback
+2022-03-16 00:54:12,631 [PYTHON] [INFO] hivekeepers_helpers.py: getting apiary id timestampes from SQLite server
+2022-03-16 00:54:12,710 [PYTHON] [INFO] hivekeepers_app.py: running graph rendering callback
+2022-03-16 00:54:12,710 [PYTHON] [INFO] hivekeepers_app.py: running date range selector text output callback
+2022-03-16 00:54:12,710 [PYTHON] [INFO] hivekeepers_helpers.py: getting all data for apiary between start_date, end_date from SQLite server
+2022-03-16 00:54:12,710 [PYTHON] [INFO] hivekeepers_helpers.py: opening connection to local SQLite database
+2022-03-16 00:54:12,777 [PYTHON] [INFO] hivekeepers_helpers.py: closing connection to local SQLite database...
+2022-03-16 00:54:12,778 [PYTHON] [INFO] hivekeepers_helpers.py: converting SQLite response to 2d dataframe...
+2022-03-16 00:54:12,891 [PYTHON] [INFO] hivekeepers_helpers.py: getting 2d chart rangeslider
+2022-03-16 00:54:12,912 [PYTHON] [INFO] hivekeepers_helpers.py: getting 2d chart rangeslider
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: building list of fft_bin column headers from dataframe
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: setting the fft_bin range from user selection
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: building dataframe for 3d charts...
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: get fft bin name list...
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: building list of fft_bin column headers from dataframe
+2022-03-16 00:54:12,915 [PYTHON] [INFO] hivekeepers_helpers.py: get fft bin values list...
+2022-03-16 00:54:12,916 [PYTHON] [INFO] hivekeepers_helpers.py: get internal temperature values...
+2022-03-16 00:54:12,917 [PYTHON] [INFO] hivekeepers_helpers.py: build first part of 3d data... apiary and timestamps columns...
+2022-03-16 00:54:12,921 [PYTHON] [INFO] hivekeepers_helpers.py: build second part of 3d data... for every timestamp, repeat the current rows 64 fft bins...
+2022-03-16 00:54:12,927 [PYTHON] [INFO] hivekeepers_helpers.py: prepare lists of fftbins and amplitudes for converting to 3d dataframe...
+2022-03-16 00:54:12,928 [PYTHON] [INFO] hivekeepers_helpers.py: convert new amplitude list to dataframe
+2022-03-16 00:54:12,929 [PYTHON] [INFO] hivekeepers_helpers.py: convert new fft bins list to dataframe
+2022-03-16 00:54:12,929 [PYTHON] [INFO] hivekeepers_helpers.py: build final 3d dataframe using timestamp, apiaryid, internaltemp, fftammplitude, fftband
+2022-03-16 00:54:12,929 [PYTHON] [INFO] hivekeepers_helpers.py: define 3d dataframe data
+2022-03-16 00:54:12,929 [PYTHON] [INFO] hivekeepers_helpers.py: define 3d dataframe headers
+2022-03-16 00:54:12,929 [PYTHON] [INFO] hivekeepers_helpers.py: build final 3d dataframe

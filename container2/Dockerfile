@@ -62,7 +62,7 @@ RUN python3 -m pip install --upgrade pip setuptools wheel --no-warn-script-locat
     pip3 install -r requirements.txt --no-warn-script-location
 
 # set app healthcheck
-HEALTHCHECK --interval=240s --timeout=10s --start-period=60s \  
+HEALTHCHECK --interval=120s --timeout=10s --start-period=60s \  
     CMD /healthcheck.sh
 
 # run final init script

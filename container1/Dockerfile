@@ -99,7 +99,7 @@ COPY docker-entrypoint.sh entrypoint.sh
 RUN chmod +x entrypoint.sh
 
 # run healthcheck
-HEALTHCHECK --interval=240s --timeout=10s --start-period=30s \  
+HEALTHCHECK --interval=120s --timeout=10s --start-period=60s \  
     CMD /healthcheck.sh
 
 # run final init script

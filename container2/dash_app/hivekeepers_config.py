@@ -65,7 +65,7 @@ logger.debug(f'SQLite_db_name: {SQLite_db_name}')
 logger.debug(f'SQLite_2d_table_name: {SQLite_2d_table_name}')
 
 # set local SQLite database headers
-SQLite_default_columns = ['id', 'apiary_id', 'timestamp', 'bme680_internal_temperature',
+SQLite_default_columns = ['id', 'apiary_id', 'apiary_name', 'timestamp', 'bme680_internal_temperature',
                         'bme680_external_temperature', 'fft_bin1', 'fft_bin2', 'fft_bin3',
                         'fft_bin4', 'fft_bin5', 'fft_bin6', 'fft_bin7', 'fft_bin8', 'fft_bin9',
                         'fft_bin10', 'fft_bin11', 'fft_bin12', 'fft_bin13', 'fft_bin14',

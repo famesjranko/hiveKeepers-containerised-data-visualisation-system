@@ -1,7 +1,7 @@
 # HiveKeepers - container2 - dash_app/hivekeepers_helpers.py
 # written by: Andrew McDonald
 # initial: 26/01/22
-# current: 15/03/22
+# current: 18/03/22
 # version: 0.9
 
 # pandas vers==1.4.0
@@ -25,57 +25,8 @@ logger = logging.getLogger()
 ## APP helper functions
 ## ====================
 
-def convert_csv_to_df(csv_file):
-    logger.info('converting csv file to dataframe')
-    # read file into dataframe
-    try :
-        hivekeepers_data = pd.read_csv(csv_file)
-    except FileNotFoundError as e:
-        logger.warning(f'{csv_file} File not found!: {e}')
-    except Exception as e:
-        logger.warning(f'{csv_file} unexpected: {e}')
-    
-    logger.debug(f'converted csv to df: {hivekeepers_data.head()}')
-
-    return hivekeepers_data
-    
-def get_db_data(db_path):
-    logger.info('getting all data from local SQLite database')
-    # working dir: /home/hivekeeper/dash_app/
-    # Create your connection.
-    connect_db = sqlite3.connect(db_path)
-    df = pd.read_sql_query(f"SELECT * FROM {hc.SQLite_2d_table_name}", connect_db)
-    connect_db.close()
-
-    logger.debug(f'database df: {df.head()}')
-
-    return df
-
-def get_db():
-    logger.info('getting all data from local SQLite database')
-    # working dir: /home/hivekeeper/dash_app/
-    # Create your connection.
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
-    connection = sql_lite_engine.connect()
-
-    metadata = db.MetaData()
-    hivedata = db.Table(hc.SQLite_2d_table_name, metadata, autoload=True, autoload_with=sql_lite_engine)
-
-    query = db.select([hivedata]) 
-
-    ResultProxy = connection.execute(query)
-    ResultSet = ResultProxy.fetchall()
-    
-    connection.close()
-
-    df = pd.DataFrame(ResultSet)
-
-    logger.debug(f'database df: {df.head()}')
-
-    return df
-
-def get_apiarys():
-    logger.info('getting apiary id list from local SQLite server...')
+def get_apiary_names():
+    logger.info('getting apiary name list from local SQLite server...')
     # create SQLite db engine
 
     try:
@@ -83,88 +34,45 @@ def get_apiarys():
     except Exception as e:
         logger.warning(f'SQLite database exception: {e}')
 
-    query =  f'SELECT DISTINCT apiary_id FROM {hc.SQLite_2d_table_name}'
-    logger.debug(f'get apiary ids query: {query}')
+    query =  f'SELECT DISTINCT apiary_name FROM {hc.SQLite_2d_table_name}'
+    logger.debug(f'get apiary names query: {query}')
 
-    apiary_list = []
+    apiary_list_names = []
 
     try:
         with sql_lite_engine.connect() as conn:
             result = conn.execute(query)
             for row in result:
-                apiary_list.append(row[0])
+                apiary_list_names.append(row[0])
     except Exception as e:
         logger.warning(f'SQLite database exception: {e}')
 
-    logger.debug(f'apiary_list: {apiary_list}')
+    logger.debug(f'apiary_list: {apiary_list_names}')
 
-    if apiary_list:
+    if apiary_list_names:
         logger.info('successfully got apiary id list from local SQLite server')
     else:
         logger.info('returned apiary id list from local SQLite server is empty')
 
-    return apiary_list
+    return apiary_list_names
 
-def check_apiary_timestamps(apiary_id, start_date, end_date):
-    logger.info('checking that user selected apiaryid and date range has data in SQLite database')
-    # working dir: /home/hivekeeper/dash_app/
-    # Create connection.
-    try:
-        sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
-    except Exception as e:
-        logger.warning(f'SQLite database exception: {e}')
 
-    query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id} AND timestamp BETWEEN {start_date} AND {end_date}'
-    logger.debug(f'SQLite query2 = {query}')
-
-    with sql_lite_engine.connect() as conn:
-        result = conn.execute(query)
-
-    logger.debug(f'SQLite query result = {result}')
-    logger.debug(f'int(result.rowcount) == 0: {int(result.rowcount) == 0}')
-    
-    if int(result.rowcount) == 0:
-        logger.info('No data found for user selected apiaryid and date range in SQLite database')
-        return False
-    else:
-        logger.info('Data found for user selected apiaryid and date range in SQLite database')
-        return True
-
-def get_apiary_timestamps(apiary_id):
-    logger.info('getting apiary id timestampes from SQLite server')
+def get_apiary_timestamps_name(apiary_name):
+    logger.info('getting apiary name timestampes from SQLite server')
     # create SQLite db engine
     sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
 
-    query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id}'
+    query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_name = "{apiary_name}"'
 
     with sql_lite_engine.connect() as conn:
-        apiary_df = pd.read_sql_query(query, conn)
+        apiary_timestamp_df = pd.read_sql_query(query, conn)
 
-    logger.debug(f'apiary_df: {apiary_df.head()}')
+    logger.debug(f'apiary_df: {apiary_timestamp_df.head()}')
 
-    return apiary_df
+    return apiary_timestamp_df
 
-def get_timestamps():
-    logger.info('getting all timestampes from SQLite server')
-    # create SQLite db engine
-    sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
 
-    query =  f'SELECT DISTINCT timestamp FROM {hc.SQLite_2d_table_name}'
-
-    timestamp_list = []
-
-    with sql_lite_engine.connect() as conn:
-        result = conn.execute(query)
-        for row in result:
-            timestamp_list.append(row[0])
-
-    timestamp_df = pd.DataFrame(timestamp_list, columns=['timestamp'])
-
-    logger.debug(f'timestamp_list: {timestamp_list}')
-
-    return timestamp_df
-
-def get_data_2d(apiary_id, start_date, end_date):
+def get_data(apiary_name, start_date, end_date):
     logger.info('getting all data for apiary between start_date, end_date from SQLite server')
     # working dir: /home/hivekeeper/dash_app/
     # Create connection
@@ -181,7 +89,7 @@ def get_data_2d(apiary_id, start_date, end_date):
     hivedata = db.Table(hc.SQLite_2d_table_name, metadata, autoload=True, autoload_with=engine)
     logger.debug(f'SQLite tables: {hivedata}')
 
-    query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
+    query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_name == apiary_name),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
     logger.debug(f'SQLite query = {query}')
 
     ResultProxy = connection.execute(query)
@@ -193,58 +101,22 @@ def get_data_2d(apiary_id, start_date, end_date):
     logger.debug(f'SQLite response = {ResultSet}')
 
     logger.info('converting SQLite response to 2d dataframe...')
-    df = pd.DataFrame(ResultSet)
+    apiary_data_df = pd.DataFrame(ResultSet)
 
-    logger.debug(f'2d dataframe: {df.head()}')
+    logger.debug(f'2d dataframe: {apiary_data_df.head()}')
 
-    return df
+    return apiary_data_df
 
-def get_data_3d(apiary_id, start_date, end_date):
-    logger.info('getting all 3d data for apiary between start_date, end_date from SQLite server')
-    # working dir: /home/hivekeeper/dash_app/
-    # Create connection.
-    engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
-    connection = engine.connect()
-    
-    metadata = db.MetaData()
-    hivedata = db.Table(hc.SQLite_3d_table_name, metadata, autoload=True, autoload_with=engine)
-
-    query = db.select([hivedata]).where(db.and_(hivedata.columns.apiary_id == apiary_id),(func.DATE(hivedata.columns.timestamp).between(start_date, end_date)))
-    
-    ResultProxy = connection.execute(query)
-    ResultSet = ResultProxy.fetchall()
-    
-    connection.close()
-
-    df = pd.DataFrame(ResultSet)
-
-    logger.debug(f'dataframe 3d: {df.head()}')
-
-    return df
-
-def clean_data_csv(dataframe):
-    logger.info('cleaning data before insert into SQLite server')
-    # drop unnecessary columns
-    dataframe.drop(dataframe.columns[[1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,22,23,24,25,90,91]], axis=1, inplace=True)
-    
-    # add internal/external temperature delta column
-    dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
-
-    # convert timestamp From Unix/Epoch time to Readable date format:
-    # eg. from 1635249781 to 2021-10-26 12:03:01
-    dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
-
-    logger.debug(f'cleaned_dataframe (from csv): {dataframe.head()}')
-
-    return dataframe
 
 def clean_data_db(dataframe):
     logger.info('cleaning data before insert into SQLite server')
     logger.info('adding temperature delta column to data')
+
     # add internal/external temperature delta column
     dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
 
     logger.info('converting timestamp column to hunan readable format - eg from 1635249781 to 2021-10-26 12:03:01')
+    
     # convert timestamp From Unix/Epoch time to Readable date format:
     # eg. from 1635249781 to 2021-10-26 12:03:01
     dataframe['timestamp'] = pd.to_datetime(dataframe['timestamp'], unit='s')
@@ -253,76 +125,7 @@ def clean_data_db(dataframe):
 
     return dataframe
 
-def add_delta_column(dataframe):
-    logger.info('adding delta temperate column to dataframe')
-    dataframe['temp_delta'] = dataframe['bme680_internal_temperature'] - dataframe['bme680_external_temperature']
 
-    return dataframe
-
-def get_last_index_df(dataframe):
-    logger.info('getting last index value from dataframe')
-    return dataframe['id'].iloc[-1]
-
-def update_sql_db(dataframe, database, table):
-    logger.info('inserting dataframe into local SQLite databse')
-    # open connection to db - experienced permission issues in container!!!
-    connection = sqlite3.connect(database)
-
-    # update db with dataframe data
-    dataframe.to_sql(table, connection, if_exists='replace', index = False)
-    
-    # close db connection
-    connection.close()
-
-    return None
-
-def get_last_index_db(database):
-    logger.info('getting last index value from local SQLite databse')
-    # open connection to db - experienced permission issues in container!!!
-    connection = sqlite3.connect(database)
-    
-    # get current highest index value for comparing with off-site db for updates
-    cursor = connection.cursor()
-    cursor.execute('''SELECT COUNT(id) FROM hivedata2d''')
-    sql_last_index = cursor.fetchall()[0][0]
-    
-    # close db cursor and connection
-    cursor.close()
-    connection.close()
-    
-    return sql_last_index
-
-def get_uniques_in_column(dataframe, column):
-    logger.info('building list of unique values from a dataframe column')
-    unique_list = []
-    
-    for item in dataframe[column]:
-        # check if exists in unique_list or not
-        if item not in unique_list:
-            unique_list.append(item)
-
-    logger.debug(f'unique list: {unique_list}')
-
-    return unique_list
-
-def get_bin_range(bin_group, fft_bins):
-    logger.info('setting the fft_bin range from user selection')
-    logger.debug(f'fft bin_group: {bin_group}')
-    logger.debug(f'fft fft_bins: {fft_bins}')
-    logger.debug(f'fft fft_bins length: {len(fft_bins)}')
-    ## takes int value representing a selected grouping
-    ## returns list of selected fft_bin names
-    if bin_group == 1:
-        return fft_bins[0:16]
-    elif bin_group == 2:
-        return fft_bins[16:32]
-    elif bin_group == 3:
-        return fft_bins[32:48]
-    elif bin_group == 4:
-        return fft_bins[48:64]
-    else:
-        return fft_bins
-    
 def build_3d_data(dataframe):
     logger.info('building dataframe for 3d charts...')
     ## --------------------------------
@@ -348,17 +151,17 @@ def build_3d_data(dataframe):
 
     # build initial df with timestamp and apiary columns
     logger.info('build first part of 3d data... apiary and timestamps columns...')
-    data_4d_1 = [copy.deepcopy(dataframe['timestamp']), copy.deepcopy(dataframe['apiary_id'])]
-    headers_4d_1 = ['timestamp', 'apiary_id']
-    df_4d_1 =  pd.concat(data_4d_1, axis=1, keys=headers_4d_1)
-    logger.debug(f'df_4d_1: {df_4d_1}')
+    data_3d_1 = [copy.deepcopy(dataframe['timestamp']), copy.deepcopy(dataframe['apiary_name'])]
+    headers_3d_1 = ['timestamp', 'apiary_name']
+    df_3d_1 =  pd.concat(data_3d_1, axis=1, keys=headers_3d_1)
+    logger.debug(f'df_3d_1: {df_3d_1}')
 
     # add internal temperate column and data - repeat for each bin per timestamp index
     logger.info('build second part of 3d data... for every timestamp, repeat the current rows 64 fft bins...')
-    df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
-    #df_4d_2 = copy.deepcopy(df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True))
-    #df_4d_2 = df_4d_1.loc[df_4d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
-    logger.debug(f'df_4d_2: {df_4d_2}')
+    df_3d_2 = df_3d_1.loc[df_3d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
+    #df_3d_2 = copy.deepcopy(df_3d_1.loc[df_3d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True))
+    #df_3d_2 = df_3d_1.loc[df_3d_1.index.repeat(len(bins))].assign(internal_temp=internal_temps).reset_index(drop=True)
+    logger.debug(f'df_3d_2: {df_3d_2}')
 
     # build lists for converting to dataframe
     logger.info('prepare lists of fftbins and amplitudes for converting to 3d dataframe...')
@@ -381,38 +184,65 @@ def build_3d_data(dataframe):
     logger.info('convert new fft bins list to dataframe')
     df_fft_band = pd.DataFrame(bin_list, columns=['fft_band'])
 
-    # final 4d dataframe data
-    logger.info('build final 3d dataframe using timestamp, apiaryid, internaltemp, fftammplitude, fftband')
+    # final 3d dataframe data
+    logger.info('build final 3d dataframe using timestamp, apiary_name, internaltemp, fftammplitude, fftband')
 
     logger.info('define 3d dataframe data')
-    data_4d = [df_4d_2['timestamp'],
-               df_4d_2['apiary_id'],
-               df_4d_2['internal_temp'],
+    data_3d = [df_3d_2['timestamp'],
+               df_3d_2['apiary_name'],
+               df_3d_2['internal_temp'],
                df_fft_amplitude['fft_amplitude'],
                df_fft_band['fft_band']]
 
-    # final 4d dataframe headers
+    # final 3d dataframe headers
     logger.info('define 3d dataframe headers')
-    headers_4d = ['timestamp',
-                  'apiary_id',
+    headers_3d = ['timestamp',
+                  'apiary_name',
                   'internal_temperature',
                   'fft_amplitude',
                   'fft_band']
 
-    # build 4d dataframe
+    # build 3d dataframe
     logger.info('build final 3d dataframe')
-    dataframe_4d = pd.concat(data_4d, axis=1, keys=headers_4d)
+    dataframe_3d = pd.concat(data_3d, axis=1, keys=headers_3d)
 
-    logger.debug(f'final 3d dataframe: {dataframe_4d.head()}')
+    logger.debug(f'final 3d dataframe: {dataframe_3d.head()}')
 
-    return dataframe_4d
+    return dataframe_3d
 
-def convert_timestamp(dataframe, column):
-    logger.info('converting dataframe timestampe column data from unix to human-readable format')
-    converted_timestamp_df = pd.to_datetime(dataframe[column], unit='s')
-    logger.debug(f'converted timestampe column: {converted_timestamp_df.head()}')
+
+def get_uniques_in_column(dataframe, column):
+    logger.info('building list of unique values from a dataframe column')
+    unique_list = []
     
-    return converted_timestamp_df
+    for item in dataframe[column]:
+        # check if exists in unique_list or not
+        if item not in unique_list:
+            unique_list.append(item)
+
+    logger.debug(f'unique list: {unique_list}')
+
+    return unique_list
+
+
+def get_bin_range(bin_group, fft_bins):
+    logger.info('setting the fft_bin range from user selection')
+    logger.debug(f'fft bin_group: {bin_group}')
+    logger.debug(f'fft fft_bins: {fft_bins}')
+    logger.debug(f'fft fft_bins length: {len(fft_bins)}')
+    ## takes int value representing a selected grouping
+    ## returns list of selected fft_bin names
+    if bin_group == 1:
+        return fft_bins[0:16]
+    elif bin_group == 2:
+        return fft_bins[16:32]
+    elif bin_group == 3:
+        return fft_bins[32:48]
+    elif bin_group == 4:
+        return fft_bins[48:64]
+    else:
+        return fft_bins
+
 
 def get_fft_bins(dataframe):
     logger.info('building list of fft_bin column headers from dataframe')
@@ -420,6 +250,7 @@ def get_fft_bins(dataframe):
     logger.debug(f'fft_bins list: {fft_bins}')
 
     return fft_bins
+
 
 def get_2d_xrangeslider():
     logger.info('getting 2d chart rangeslider')

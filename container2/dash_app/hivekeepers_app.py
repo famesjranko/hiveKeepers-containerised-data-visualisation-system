@@ -71,9 +71,9 @@ else:
 ## MAIN APP SETTINGS
 ## =================
 
-# Build apiary id list
-logger.info('building apiary id list for drop down menu')
-apiary_list = hp.get_apiarys()
+# Build apiary names list
+# logger.info('building apiary names list for drop down menu')
+apiary_list = hp.get_apiary_names()
 
 ## colours for charts - see fft callback section for full list of colour choices
 logger.info('getting colour scale list for 3d chart colour drop down menu')
@@ -110,18 +110,20 @@ app.layout = html.Div(
 
                     # database update button
                     html.Div([
-                        html.Button('Update Database', id='update-button', n_clicks=0),
+                        html.Button('Update Database',
+                                    id='update-button',
+                                    n_clicks=0,
+                                    style={'font-size': '18px', 'width': '287px', 'height':'35px'}),
                         html.Div(id='output-container-button')]),
 
                     # date range picker
                     html.Div([
                         dcc.DatePickerRange(
                             id='date-picker-range',
-                            start_date_placeholder_text="Set start Period",
-                            end_date_placeholder_text="Set End Period",
+                            start_date_placeholder_text="Start Date",
+                            end_date_placeholder_text="End Date",
                             updatemode='bothdates',
-                            minimum_nights=0,
-                        ),
+                            minimum_nights=0),
                         html.Div(id='output-date-picker-range')
                     ]),
 
@@ -130,9 +132,9 @@ app.layout = html.Div(
                         dcc.Dropdown(
                             id='apiary-selector',
                             options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
-                            placeholder="Select an apiaryID",
+                            placeholder="Select an apiary",
                             clearable=False,
-                            style = {'width': '200px'})]),
+                            style = {'font-size': '18px', 'width': '287px'})]),
 
                     # graph 1 div
                     html.Div([dcc.Graph(id='graph1', figure=fig1)]),
@@ -181,19 +183,19 @@ app.layout = html.Div(
     Output(component_id='date-picker-range', component_property='start_date'),
     Output(component_id='date-picker-range', component_property='end_date'),
     Input('apiary-selector', 'value'))
-def get_data_options(apiaryID):
+def get_data_options(apiary_name):
     logger.info('running date range selector callback')
-    logger.debug(f'apiaryID: {apiaryID}')
+    logger.debug(f'apiary_name: {apiary_name}')
 
-    if apiaryID is None:
+    if apiary_name is None:
         logger.warn('no data sent to date range selector callback...')
         raise dash.exceptions.PreventUpdate
 
     # grab timestamps for selected apiary
     try:
-        apiary_timestamps = hp.get_apiary_timestamps(apiaryID)
+        apiary_timestamps = hp.get_apiary_timestamps_name(apiary_name)
     except Exception as e:
-        print(e)
+        logger.info(f'get timestamps from sql-lite db error: {e}')
 
     # convert timestamps to datetime objects
     apiary_timestamps['timestamp'] = pd.to_datetime(apiary_timestamps['timestamp'])
@@ -273,16 +275,16 @@ def update_output(start_date, end_date):
      Input('date-picker-range', 'end_date'),
      Input("bin-selector", "value"),
      Input("colorscale", "value")])
-def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
+def render_graphs(apiary_name, start_date, end_date, bin_group, scale):
     logger.info('running graph rendering callback')
-    logger.debug(f'apiaryID: {apiaryID}')
+    logger.debug(f'apiary_name: {apiary_name}')
     logger.debug(f'start_date: {start_date}')
     logger.debug(f'end_date: {end_date}')
     logger.debug(f'bin_group: {bin_group}')
     logger.debug(f'scale: {scale}')
 
     # PreventUpdate prevents ALL outputs updating
-    if apiaryID is None or start_date is None or end_date is None or bin_group is None:
+    if apiary_name is None or start_date is None or end_date is None or bin_group is None:
         logger.warn('no data sent to graph rendering callback...')
         raise dash.exceptions.PreventUpdate
 
@@ -293,10 +295,11 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 
     # get data from sql-lite db 
     try:
-        filtered_hivekeepers_data = hp.get_data_2d(apiaryID, start_date_string, end_date_string)
+        filtered_hivekeepers_data = hp.get_data(apiary_name, start_date_string, end_date_string)
     except Exception as e:
         logger.info(f'get data from sql-lite db error: {e}')
-        logger.debug(f'filtered_hivekeepers_data: {filtered_hivekeepers_data}')
+    
+    logger.debug(f'filtered_hivekeepers_data: {filtered_hivekeepers_data}')
     
     # if dataframe is empty, update fig titles and return empty graphs
     if filtered_hivekeepers_data.empty:
@@ -593,11 +596,9 @@ def run_script_onClick(n_clicks):
     result = result.decode()
     logger.debug(f'returned string from update_db.py: {result}')
 
-    #global apiary_list 
-
-    # Build apiary id list
-    logger.info('updating apiary id list for drop down menu')
-    apiary_list = hp.get_apiarys()
+    # build/update apiary name list
+    logger.info('updating apiary name list for drop down menu')
+    apiary_list = hp.get_apiary_names()
 
     # return prints from update_db script
     return result, apiary_list

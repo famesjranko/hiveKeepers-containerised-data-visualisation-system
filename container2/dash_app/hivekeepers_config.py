@@ -58,7 +58,7 @@ logger.debug(f'MYSQL_USER: {MYSQL_HOST}')
 logger.debug(f'MYSQL_USER: {MYSQL_DB}')
 
 # set SQLite database name, table names
-SQLite_db_name = 'hivekeepers.db'
+SQLite_db_name = '/home/hivekeeper/persistent/db/hivekeepers.db'  ## << ----- testing!
 SQLite_2d_table_name = 'hivedata2d'
 
 logger.debug(f'SQLite_db_name: {SQLite_db_name}')

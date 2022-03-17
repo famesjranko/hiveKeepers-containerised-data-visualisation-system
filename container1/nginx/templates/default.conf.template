@@ -12,8 +12,8 @@ server {
 
     server_name _;
 
-    access_log  /home/hivekeeper/logs/nginx-access.log;
-    error_log   /home/hivekeeper/logs/nginx-error.log $NGINX_ERROR_LOG_LEVEL;
+    access_log  /home/hivekeeper/persistent/logs/container1/nginx-access.log;
+    error_log  /home/hivekeeper/persistent/logs/container1/nginx-error.log $NGINX_ERROR_LOG_LEVEL;
 
     # allow container network access; otherwise require creds
     satisfy   any;

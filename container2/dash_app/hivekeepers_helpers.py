@@ -31,9 +31,9 @@ def convert_csv_to_df(csv_file):
     try :
         hivekeepers_data = pd.read_csv(csv_file)
     except FileNotFoundError as e:
-        logger.error(f'{csv_file} File not found!: {e}')
+        logger.warning(f'{csv_file} File not found!: {e}')
     except Exception as e:
-        logger.error(f'{csv_file} unexpected: {e}')
+        logger.warning(f'{csv_file} unexpected: {e}')
     
     logger.debug(f'converted csv to df: {hivekeepers_data.head()}')
 
@@ -81,7 +81,7 @@ def get_apiarys():
     try:
         sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
     except Exception as e:
-        logger.error(f'SQLite database exception: {e}')
+        logger.warning(f'SQLite database exception: {e}')
 
     query =  f'SELECT DISTINCT apiary_id FROM {hc.SQLite_2d_table_name}'
     logger.debug(f'get apiary ids query: {query}')
@@ -94,7 +94,7 @@ def get_apiarys():
             for row in result:
                 apiary_list.append(row[0])
     except Exception as e:
-        logger.error(f'SQLite database exception: {e}')
+        logger.warning(f'SQLite database exception: {e}')
 
     logger.debug(f'apiary_list: {apiary_list}')
 
@@ -112,7 +112,7 @@ def check_apiary_timestamps(apiary_id, start_date, end_date):
     try:
         sql_lite_engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
     except Exception as e:
-        logger.error(f'SQLite database exception: {e}')
+        logger.warning(f'SQLite database exception: {e}')
 
     query =  f'SELECT timestamp FROM {hc.SQLite_2d_table_name} WHERE apiary_id = {apiary_id} AND timestamp BETWEEN {start_date} AND {end_date}'
     logger.debug(f'SQLite query2 = {query}')
@@ -173,7 +173,7 @@ def get_data_2d(apiary_id, start_date, end_date):
         engine = db.create_engine(f'sqlite:///{hc.SQLite_db_name}', echo=hc.SQL_VERBOSE)
         connection = engine.connect()
     except Exception as e:
-        logger.error(f'SQLite database exception: {e}')
+        logger.warning(f'SQLite database exception: {e}')
     
     metadata = db.MetaData()
     logger.debug(f'SQLite metadata: {metadata}')

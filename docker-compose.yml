@@ -17,7 +17,8 @@ services:
       # nginx basic_auth cred file
       # need to create with 'sudo htpasswd -c container1/nginx/auth/.htpasswd USERNAME
       - '${PWD}/htpasswd:/etc/nginx/auth/.htpasswd:ro'
-      - '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
+      #- '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
+      - "container_data:/home/hivekeeper/persistent/"
     environment:
       - APP_PORT=8090                 # port must match in both containers
       - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
@@ -38,7 +39,8 @@ services:
       dockerfile: Dockerfile
     container_name: 'dash-app'
     volumes:
-      - '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
+      #- '${PWD}/container-logs:/home/hivekeeper/persistent/logs'    # persistent host-side logs
+      - "container_data:/home/hivekeeper/persistent/"
     environment:
       - MYSQL_USER=dev_hkapps_platform
       - MYSQL_PASS=R8]NbgN[y-V<L,5X
@@ -49,6 +51,7 @@ services:
       - APP_PORT=8090               # port must match in both containers
       - APP_LOG_LEVEL=info          # options: debug, info, warning, error, critical
       - SQL_VERBOSE=no              # show SQL queries/responses. options: yes,no
+      - START_TYPE=Cold_Start       # Cold_Start, Warm_Start, Init_only
     networks:
       container_net:
         ipv4_address: 172.75.0.3
@@ -64,3 +67,6 @@ networks:
       driver: default
       config:
         - subnet: 172.75.0.0/16
+
+volumes:
+  container_data:

@@ -11,6 +11,7 @@
 import os
 import subprocess
 from datetime import date
+from pathlib import Path
 
 # pandas vers==1.4.0
 import pandas as pd
@@ -36,7 +37,7 @@ logger = logging.getLogger()
 
 # set stdout and file log handlers
 handler_stdout = logging.StreamHandler()
-handler_file = logging.FileHandler('/home/hivekeeper/logs/app.log')
+handler_file = logging.FileHandler('/home/hivekeeper/persistent/logs/container2/app.log')
 
 # set log format
 formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
@@ -557,6 +558,7 @@ def render_graphs(apiaryID, start_date, end_date, bin_group, scale):
 ## database update button - returns prints from update_db script
 @app.callback(
     dash.dependencies.Output('output-container-button', 'children'),
+    dash.dependencies.Output('apiary-selector', 'options'),
     [dash.dependencies.Input('update-button', 'n_clicks')])
 def run_script_onClick(n_clicks):
     logger.info('Running database update button callback')
@@ -566,20 +568,39 @@ def run_script_onClick(n_clicks):
         raise dash.exceptions.PreventUpdate
 
     # without `shell` it needs list ['/full/path/python', 'script.py']
-    #result = subprocess.check_output( ['/usr/bin/python', 'script.py'] )
-
     # with `shell` it needs string 'python script.py'
-    try:
-        result = subprocess.check_output('python3 update_db.py', shell=True)
-    except Exception as e:
-        logger.error(f'database update error: {e}')
+
+    # check if SQLite db is empty or not
+    db_length = Path(hc.SQLite_db_name).stat().st_size
+    logger.debug(f'database length is: {db_length}')
+
+    if db_length < 1:
+        logger.debug(f'database length is: {db_length}, which is less than 1')
+
+        try:
+            # if empty, build from scratch
+            result = subprocess.check_output('python3 startup_update_db.py', shell=True)
+        except Exception as e:
+            logger.error(f'database update error: {e}')
+    else:
+        try:
+            # if not empty, update it
+            result = subprocess.check_output('python3 update_db.py', shell=True)
+        except Exception as e:
+            logger.error(f'database update error: {e}')
 
     # convert bytes to string
     result = result.decode()
     logger.debug(f'returned string from update_db.py: {result}')
 
+    #global apiary_list 
+
+    # Build apiary id list
+    logger.info('updating apiary id list for drop down menu')
+    apiary_list = hp.get_apiarys()
+
     # return prints from update_db script
-    return result
+    return result, apiary_list
 
 ## CONTAINER health-check
 @app.server.route("/ping")

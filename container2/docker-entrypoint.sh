@@ -8,125 +8,165 @@
 
 set -e
 
-function setTimeZone {
-  if [ -f "/etc/timezone.host" ]
-    then
-      CLIENT_TIMEZONE=$(cat /etc/timezone)
-      HOST_TIMEZONE=$(cat /etc/timezone.host)
+# get container choices - with defaults
+START="${START_TYPE:-Warm_Start}"
+user=$(whoami)
+cores=$(nproc --all)
+workers="${APP_WORKERS:-$cores}"
+port="${APP_PORT:-8050}"
 
-    if [ "${CLIENT_TIMEZONE}" != "${HOST_TIMEZONE}" ]
-      then
-        echo "Reconfigure timezone to "${HOST_TIMEZONE}
-        echo ${HOST_TIMEZONE} > /etc/timezone
-        dpkg-reconfigure -f noninteractive tzdata
-    fi
+threads_default=$(($cores - 1))
+threads="${APP_THREADS:-$threads_default}"
+
+log_level=${APP_LOG_LEVEL:-info}
+log_level_lower=${log_level,,}
+
+# set log locations
+container_log=/home/hivekeeper/persistent/logs/container2/entrypoint.log
+gunicorn_log=/home/hivekeeper/persistent/logs/container2/gunicorn.log
+gunicorn_error_log=/home/hivekeeper/persistent/logs/container2/gunicorn-error.log
+gunicorn_access_log=/home/hivekeeper/persistent/logs/container2/gunicorn-access.log
+monit_log=/home/hivekeeper/persistent/logs/container2/monit.log
+
+# the local database file location
+local_database=/home/hivekeeper/persistent/db/hivekeepers.db
+
+if [[ ! -d /home/hivekeeper/persistent/logs/container2 ]]
+    then
+      mkdir -p /home/hivekeeper/persistent/logs/container2
+fi
+
+# make sure log file exists
+touch $container_log
+
+# log container info
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] === STARTING CONTAINER2 ===" | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] start type: " $START | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] USER ID: " $(id $user) | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] number of cores found: " $cores | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn workers: " $workers | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn threads: " $threads | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn listening port: " $port | tee -a $container_log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting application logging level: " $log_level_lower | tee -a $container_log
+
+start_application() {
+  # check if files exist and have content
+  if [ -s /home/hivekeeper/dash_app/hivekeepers_app.py ]
+    then
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] hivekeepers_app.py is populated!" | tee -a $container_log
+      cd /home/hivekeeper/dash_app/
+      
+      # start dash app via wsgi (gunicorn)
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting application dashboard..." | tee -a $container_log
+      gunicorn3 hivekeepers_app:server \
+      --bind 0.0.0.0:$port \
+      --workers $workers \
+      --worker-tmp-dir /dev/shm \
+      --threads $threads \
+      --log-level=$log_level_lower \
+      --access-logfile=- \
+      --log-file=$gunicorn_log \
+      --error-logfile=$gunicorn_error_log \
+      --access-logfile=$gunicorn_access_log
+    else
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] [ERROR] hivekeepers_app.py is NOT populated!" | tee -a $container_log
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] NOT starting application dashboard!" | tee -a $container_log
   fi
 }
 
-## might want to set tz in compose...
-setTimeZone
+build_local_database() {
+  if [[ ! -d /home/hivekeeper/persistent/db ]]
+    then
+      mkdir -p /home/hivekeeper/persistent/db
+  fi
 
-# make sure log file exists
-touch /home/hivekeeper/logs/container2-entrypoint.log
+  # build local db from remote source
+  if [[ ! -f $local_database ]]
+    then
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] building database..." | tee -a $container_log
+      
+      # no local database found, do initial build from remote db      
+      touch $local_database
+      python3 startup_update_db.py
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] === STARTING CONTAINER2 ===" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+    else
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] database found!" | tee -a $container_log
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] checking for database updates..." | tee -a $container_log
 
-user=$(whoami)
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] ----------- USER ID: " $(id $user) | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+      # local database found, check for updates from remote db
+      db_update_status=$(python3 update_db.py)
 
-# get the CPU core count
-cores=$(nproc --all)
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] number of cores found: " $cores | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+      echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] "$db_update_status | tee -a $container_log
+  fi
+}
 
-# set Gunicorn number of workers - default to nummber of cores
-workers="${APP_WORKERS:-$cores}"
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn workers: " $workers | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+tail_logs () {
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setup tailing of app log" | tee -a $container_log
+  if [[ "$1" == "async" ]]
+    then
+      tail -f $gunicorn_log \
+              $gunicorn_error_log \
+              $gunicorn_access_log \
+              $monit_log &
+    else
+      tail -f $gunicorn_log \
+              $gunicorn_error_log \
+              $gunicorn_access_log \
+              $monit_log
+  fi
+}
 
-# set Gunicorn number of threads - default to number of cores - 1
-threads_default=$(($cores - 1))
-threads="${APP_THREADS:-$threads_default}"
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn threads: " $threads | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+touch_logs () {
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] making sure log files exist" | tee -a $container_log
+  touch $gunicorn_log
+  touch $gunicorn_error_log
+  touch $gunicorn_access_log
+  touch $monit_log
+}
 
-# get Gunicorn/Dash bind port
-port="${APP_PORT:-8050}"
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting gunicorn listening port: " $port | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+clear_storage () {
+  # make sure the file exists, to prevent error when del a non-existent file
+  touch $local_database
 
-# get App logging level
-log_level=${APP_LOG_LEVEL:-info}
-log_level_lower=${log_level,,}
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setting application logging level: " $log_level_lower | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] deleting database file" | tee -a $container_log
+  rm $local_database
+}
+
+start_watchdog() {
+  ## start Monit monitoring service
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a $container_log
+  /etc/init.d/monit start
+}
 
 # cd into app dir
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] changing to dir: /home/hivekeeper/dash_app" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] changing to dir: /home/hivekeeper/dash_app" | tee -a $container_log
 cd /home/hivekeeper/dash_app/
 
-# build local db from remote source
-if [[ ! -s  hivekeepers.db ]]
+if [[ "$START" == "Cold_Start" ]]
   then
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] building database..." | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-
-    # no local database found, do initial build from remote db
-    python3 startup_update_db.py
-
-    if [ -s hivekeepers.db ]
-      then
-        echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] database created!" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-      else
-        echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] [ERROR] database missing!" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-    fi
-  else
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] database found!" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] checking for database updates..." | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-
-    # local database found, check for updates from remote db
-    db_update_status=$(python3 update_db.py)
-
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] "$db_update_status | tee -a /home/hivekeeper/logs/container2-entrypoint.log
+    # start container, flush dns, clear storage, retain logs, start application
+    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting Cold_Start..." | tee -a $container_log
+    clear_storage
+    touch_logs
+    tail_logs "async"
+    start_watchdog
+    start_application
+elif [[ "$START" == "Warm_Start" ]]
+  then
+    # start container, start application
+    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting Warm_Start..." | tee -a $container_log
+    touch_logs
+    tail_logs "async"
+    build_local_database
+    start_watchdog
+    start_application
+elif [[ "$START" == "Init_only" ]]
+ then
+    # start container, not application
+    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting Init_only..." | tee -a $container_log
+    clear_storage
+    touch_logs
+    tail_logs
 fi
 
-# make sure log files exist
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] making sure log files exist" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-touch /home/hivekeeper/logs/monit-container2.log
-touch /home/hivekeeper/logs/gunicorn.log
-touch /home/hivekeeper/logs/gunicorn-error.log
-touch /home/hivekeeper/logs/gunicorn-access.log
-
-# tail app logging
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] setup tailing of app log" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-tail -f /home/hivekeeper/logs/gunicorn.log &
-tail -f /home/hivekeeper/logs/gunicorn-error.log &
-tail -f /home/hivekeeper/logs/gunicorn-access.log &
-tail -f /home/hivekeeper/logs/monit-container2.log &
-
-## kill any process using port 2812 - monit port
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] killing any process unckecked process on port 2812..." | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-/bin/kill -9 $(lsof -t -i:2812) > /dev/null 2>&1 &
-
-## start Monit monitoring service
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-/etc/init.d/monit start
-
-# check if files exist and have content
-if [ -s hivekeepers_app.py ]
-  then
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] hivekeepers_app.py is populated!" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-    
-    # start dash app via wsgi (gunicorn)
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting application dashboard..." | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-    gunicorn3 hivekeepers_app:server \
-    --bind 0.0.0.0:$port \
-    --workers $workers \
-    --worker-tmp-dir /dev/shm \
-    --threads $threads \
-    --log-level=$log_level_lower \
-    --access-logfile=- \
-    --log-file=/home/hivekeeper/logs/gunicorn.log \
-    --error-logfile=/home/hivekeeper/logs/gunicorn-error.log \
-    --access-logfile=/home/hivekeeper/logs/gunicorn-access.log
-    #--log-file=- \
-    #--error-logfile=- \
-    "$@"
-  else
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] [ERROR] hivekeepers_app.py is not unpopulated!" | tee -a /home/hivekeeper/logs/container2-entrypoint.log
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] NOT starting application dashboard!" | tee -a /home/hivekeeper/logs/container2-entrypoint.lo
-fi
+"$@"

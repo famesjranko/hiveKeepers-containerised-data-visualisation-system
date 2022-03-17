@@ -8,69 +8,64 @@
 
 set -e
 
-touch /home/hivekeeper/logs/container1-entrypoint.log
+# set log locations
+container_log=/home/hivekeeper/persistent/logs/container1/entrypoint.log
+nginx_access_log=/home/hivekeeper/persistent/logs/container1/nginx-access.log
+nginx_error_log=/home/hivekeeper/persistent/logs/container1/nginx-error.log
+fail2ban_log=/home/hivekeeper/persistent/logs/container1/fail2ban.log
+monit_log=/home/hivekeeper/persistent/logs/container1/monit.log
 
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] === STARTING CONTAINER1 ===" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+if [[ ! -d /home/hivekeeper/persistent/logs/container1 ]]
+    then
+      mkdir -p /home/hivekeeper/persistent/logs/container1
+fi
+
+# make sure log file exists
+touch $container_log
+
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] === STARTING CONTAINER1 ===" | tee -a $container_log
 
 user=$(whoami)
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id $user) | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ----------- USER ID: " $(id $user) | tee -a $container_log
 
 # get relevant environment variables, otherwise use defaults
-log_level=${PROXY_LOG_LEVEL:-simple}
-log_level_lower=${log_level,,}
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed proxy logging level: " $log_level_lower | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+proxy_log_level=${PROXY_LOG_LEVEL:-simple}
+proxy_log_level_lower=${log_level,,}
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed proxy logging level: " $proxy_log_level_lower | tee -a $container_log
 
-nginx_error_log=${NGINX_ERROR_LOG_LEVEL}
-nginx_error_log_lower=${nginx_error_log,,}
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed nginx error logging level: " $nginx_error_log | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+nginx_log_level=${NGINX_ERROR_LOG_LEVEL}
+nginx_log_level_lower=${nginx_log_level,,}
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed nginx error logging level: " $nginx_log_level_lower | tee -a $container_log
 
 app_proxy_port=${APP_PORT:-8050}
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed app port: " $app_proxy_port | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-
-function setTimeZone {
-  if [ -f "/etc/timezone.host" ]
-    then
-      CLIENT_TIMEZONE=$(cat /etc/timezone)
-      HOST_TIMEZONE=$(cat /etc/timezone.host)
-
-      if [ "${CLIENT_TIMEZONE}" != "${HOST_TIMEZONE}" ]
-        then
-          echo "Reconfigure timezone to "${HOST_TIMEZONE}
-          echo ${HOST_TIMEZONE} > /etc/timezone
-          dpkg-reconfigure -f noninteractive tzdata
-      fi
-  fi
-}
-
-## might want to set tz in compose...
-setTimeZone
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user passed app port: " $app_proxy_port | tee -a $container_log
 
 ## set up nginx reverse proxy access
 if [ -s /scripts/password_script.sh ]; then
     if [ -f /scripts/user_credentials.txt ]; then
         if [ -s /scripts/user_credentials.txt ]
           then
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] found password script." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] found user credentials text file." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file is populated!" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] creating user credentials for proxy..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] found password script." | tee -a $container_log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] found user credentials text file." | tee -a $container_log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file is populated!" | tee -a $container_log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] creating user credentials for proxy..." | tee -a $container_log
 
             ## run user password create script
             /bin/bash /scripts/password_script.sh /scripts/user_credentials.txt
 
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] deleting user credentials text file..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] deleting user credentials text file..." | tee -a $container_log
 
             ## delete plain-text user passwords file
             rm /scripts/user_credentials.txt
 
             if [ ! -f user_credentials.txt ]
               then
-                echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file deleted" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+                echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file deleted" | tee -a $container_log
               else
-                echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] [ERROR] user credentials text file not deleted!" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+                echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] [ERROR] user credentials text file not deleted!" | tee -a$container_log
             fi
           else
-            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file is empty" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+            echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] user credentials text file is empty" | tee -a $container_log
         fi
     fi
 fi
@@ -83,53 +78,47 @@ while read line || [ -n "$line" ];
 do
   # print user log access
   NAME=$(echo $line|cut -d$FS -f1)
-  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ACCESS CREDENTIALS FOUND FOR USER: " $NAME | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] ACCESS CREDENTIALS FOUND FOR USER: " $NAME | tee -a $container_log
 done < /etc/nginx/auth/.htpasswd
 
 ## run nginx env setup script
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] running nginx envsubstitution template script..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] running nginx envsubstitution template script..." | tee -a $container_log
 /bin/bash /docker-entrypoint.d/20-envsubst-on-templates.sh
 
 # make sure log files exist
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] making sure log files exist" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-touch /home/hivekeeper/logs/nginx-access.log
-touch /home/hivekeeper/logs/nginx-error.log
-touch /home/hivekeeper/logs/fail2ban.log
-touch /home/hivekeeper/logs/monit-container1.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] making sure log files exist" | tee -a $container_log
+touch $nginx_access_log
+touch $nginx_error_log
+touch $fail2ban_log
+touch $monit_log
 
 ## setup fail2ban ip banning service
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting up fail2ban service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-service fail2ban status > /dev/null && service fail2ban stop
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting up fail2ban service..." | tee -a $container_log
 rm -f /var/run/fail2ban/*
 
 ## start fail2ban
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting fail2ban service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting fail2ban service..." | tee -a $container_log
 service fail2ban start
 
 ## start nginx reverse proxy service
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting nginx proxy service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting nginx proxy service..." | tee -a $container_log
 nginx
 
-## kill any process using port 2812 - monit port
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] killing any process unckecked process on port 2812..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-/bin/kill -9 $(lsof -t -i:2812) > /dev/null 2>&1 &
-
 ## start Monit monitoring service
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a $container_log
 /etc/init.d/monit start
 
 ## start tail of service logs
-echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] tailing nginx and fail2ban service logs..." | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-if [ "$log_level_lower" == "simple" ]
+echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] tailing nginx and fail2ban service logs..." | tee -a $container_log
+if [ "$proxy_log_level_lower" == "simple" ]
   then
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
-elif [ "$log_level_lower" == "detailed" ]
+    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: simple" | tee -a $container_log
+    exec tail -f $nginx_error_log $fail2ban_log $monit_log
+elif [ "$proxy_log_level_lower" == "detailed" ]
   then
-    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: detailed" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-    exec tail -f /home/hivekeeper/logs/nginx-access.log /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
+    echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to: detailed" | tee -a $container_log
+    exec tail -f $nginx_access_log $nginx_error $fail2ban_log $monit_log
 else # set simple by default
-  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to default: simple" | tee -a /home/hivekeeper/logs/container1-entrypoint.log
-  exec tail -f /home/hivekeeper/logs/nginx-error.log /home/hivekeeper/logs/fail2ban.log /home/hivekeeper/logs/monit-container1.log
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] setting service logs tail verbosity to default: simple" | tee -a $container_log
+  exec tail -f $nginx_error_log $fail2ban_log $monit_log
 fi
-

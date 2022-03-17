@@ -41,10 +41,6 @@ WORKDIR /var/www/html
 COPY ./nginx/html/index.html .
 COPY ./nginx/html/background.jpg .
 
-# setup nginx logging for fail2ban access
-WORKDIR /
-RUN mkdir -p /home/hivekeeper/logs 
-
 # copy fail2ban local/docker configurations
 WORKDIR /etc/fail2ban
 COPY ./fail2ban/jail.local .

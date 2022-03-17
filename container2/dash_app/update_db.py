@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 # set stdout and file log handlers
 handler_stdout = logging.StreamHandler()
-handler_file = logging.FileHandler('/home/hivekeeper/logs/app.log')
+handler_file = logging.FileHandler('/home/hivekeeper/persistent/logs/container2/app.log')
 
 # set log format
 formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')

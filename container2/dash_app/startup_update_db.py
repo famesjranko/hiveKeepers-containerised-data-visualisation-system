@@ -24,7 +24,7 @@ logger = logging.getLogger()
 
 # set stdout and file log handlers
 handler_stdout = logging.StreamHandler()
-handler_file = logging.FileHandler('/home/hivekeeper/logs/app.log')
+handler_file = logging.FileHandler('/home/hivekeeper/persistent/logs/container2/app.log')
 
 # set log format
 formatter = logging.Formatter('%(asctime)s [PYTHON] [%(levelname)s] %(filename)s: %(message)s')
@@ -152,16 +152,16 @@ logger.debug(f'SQLite query1 = {sql_lite_query}')
 
 # open db connection, send query
 try:
-  with sql_lite_engine.connect() as conn:
-      logger.info('sending count(id) query to local SQLite server')
-      result = conn.execute(sql_lite_query)
-      local_index_count = result.fetchone()[0]
+    with sql_lite_engine.connect() as conn:
+        logger.info('sending count(id) query to local SQLite server')
+        result = conn.execute(sql_lite_query)
+        local_index_count = result.fetchone()[0]
 except Exception as e:
     logger.error(f'SQLite database exception: {e}')
 
 logger.debug(f'SQLite local_index_count = {local_index_count}')
 
 # print database size status
-print(f'number of rows in local database: ', local_index_count)
+print(f'database has been created! Rows added: ', local_index_count)
 
 time.sleep(1)

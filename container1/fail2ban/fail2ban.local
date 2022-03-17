@@ -39,7 +39,7 @@ loglevel = INFO
 # Values: [ STDOUT | STDERR | SYSLOG | SYSOUT | FILE ]  Default: STDERR
 #
 #logtarget = /var/log/fail2ban.log
-logtarget = /home/hivekeeper/logs/fail2ban.log
+logtarget = /home/hivekeeper/persistent/logs/container1/fail2ban.log
 
 # Option: syslogsocket
 # Notes: Set the syslog socket file. Only used when logtarget is SYSLOG

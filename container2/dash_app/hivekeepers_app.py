@@ -10,7 +10,7 @@
 
 import os
 import subprocess
-from datetime import date
+from datetime import date,timedelta
 from pathlib import Path
 
 # pandas vers==1.4.0
@@ -131,7 +131,7 @@ app.layout = html.Div(
                     html.Div([
                         dcc.Dropdown(
                             id='apiary-selector',
-                            options=[{'label': f"Apiary: {i}", 'value': i} for i in apiary_list],
+                            options=[{'label': f"{i}", 'value': i} for i in apiary_list],
                             placeholder="Select an apiary",
                             clearable=False,
                             style = {'font-size': '18px', 'width': '287px'})]),
@@ -155,7 +155,7 @@ app.layout = html.Div(
                             value=5,
                             placeholder="Select FFT bin group",
                             clearable=False,
-                            style = {'width': '200px'}),
+                            style = {'font-size': '18px', 'width': '287px'}),
                         # colour selector
                         dcc.Dropdown(
                             id='colorscale', 
@@ -163,7 +163,7 @@ app.layout = html.Div(
                             value='viridis',
                             placeholder="Select FFT colour scale",
                             clearable=False,
-                            style = {'width': '200px'},)
+                            style = {'font-size': '18px', 'width': '287px'},)
                     ]),
 
                     # graph 3 div
@@ -204,36 +204,27 @@ def get_data_options(apiary_name):
     apiary_days_range = [date for numd,date in zip([x for x in range(len(apiary_timestamps['timestamp'].unique()))], apiary_timestamps['timestamp'].dt.date.unique())]
     logger.debug(f'apiary_days_range: {apiary_days_range}')
     
-    # default to showing the most recent single day of data
-    if len(apiary_days_range) > 1:          # data > 1 day
-        min_date = apiary_days_range[0]
-        max_date =  apiary_days_range[-1]
-        start_date = apiary_days_range[-1]
-        end_date =  apiary_days_range[-1]
-
-        logger.debug(f'min_date: {min_date}')
-        logger.debug(f'max_date: {max_date}')
-        logger.debug(f'start_date: {start_date}')
-        logger.debug(f'end_date: {end_date}')
-
-        return min_date, max_date, start_date, end_date
-
-    elif len(apiary_days_range) == 1:       # data <= 1 day
-        min_date = apiary_days_range[0]
-        max_date =  apiary_days_range[0]
-        start_date = min_date
-        end_date =  max_date
-
-        logger.debug(f'min_date: {min_date}')
-        logger.debug(f'max_date: {max_date}')
-        logger.debug(f'start_date: {start_date}')
-        logger.debug(f'end_date: {end_date}')
-        
-        return min_date, max_date, start_date, max_date
-
-    else:                                   # data == zero days
+    if len(apiary_days_range) < 1:          # zero days found
         logger.info('apiary_days_range is zero...')
         return None, None, None, None
+
+    if len(apiary_days_range) > 1:          # data > 1 day
+        max_date =  apiary_days_range[-1] + timedelta(days=1)
+        start_date = apiary_days_range[-1]
+
+    if len(apiary_days_range) == 1:         # data <= 1 day
+        max_date =  apiary_days_range[0] + timedelta(days=1)
+        start_date = apiary_days_range[0]
+
+    min_date = apiary_days_range[0]
+    end_date =  max_date
+
+    logger.debug(f'min_date: {min_date}')
+    logger.debug(f'max_date: {max_date}')
+    logger.debug(f'start_date: {start_date}')
+    logger.debug(f'end_date: {end_date}')
+
+    return min_date, max_date, start_date, end_date
 
 ## date range selector text output
 @app.callback(
@@ -338,10 +329,9 @@ def render_graphs(apiary_name, start_date, end_date, bin_group, scale):
 
     # add internal temp trace
     try:
-        fig1.add_trace(
-            go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
-                       y=filtered_hivekeepers_data['bme680_internal_temperature'],  #y=list(filtered_hivekeepers_data.bme680_internal_temperature),
-                       name="internal_temperature"),
+        fig1.add_trace(go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
+                                  y=filtered_hivekeepers_data['bme680_internal_temperature'],  #y=list(filtered_hivekeepers_data.bme680_internal_temperature),
+                                  name="internal_temperature"),
                        secondary_y=False)
     except Exception as e:
         logger.error(f'fig2 1st trace error: {e}')
@@ -351,10 +341,9 @@ def render_graphs(apiary_name, start_date, end_date, bin_group, scale):
 
     # add external temp trace
     try:
-        fig1.add_trace(
-            go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
-                       y=filtered_hivekeepers_data['bme680_external_temperature'],  #y=list(filtered_hivekeepers_data.bme680_external_temperature),
-                       name="external_temperature"),
+        fig1.add_trace(go.Scatter(x=filtered_hivekeepers_data['timestamp'],                    #x=list(filtered_hivekeepers_data.timestamp),
+                                  y=filtered_hivekeepers_data['bme680_external_temperature'],  #y=list(filtered_hivekeepers_data.bme680_external_temperature),
+                                  name="external_temperature"),
                        secondary_y=True)
     except Exception as e:
         logger.error(f'fig1 2nd trace error: {e}')
@@ -395,10 +384,9 @@ def render_graphs(apiary_name, start_date, end_date, bin_group, scale):
 
     # add internal temp trace
     try:
-        fig2.add_trace(
-            go.Scatter(x=filtered_hivekeepers_data['timestamp'],
-                       y=filtered_hivekeepers_data['bme680_internal_temperature'],
-                       name="internal_temperature"),
+        fig2.add_trace(go.Scatter(x=filtered_hivekeepers_data['timestamp'],
+                                  y=filtered_hivekeepers_data['bme680_internal_temperature'],
+                                  name="internal_temperature"),
                        secondary_y=False)
     except Exception as e:
         logger.error(f'fig2 trace1 error: {e}')
@@ -408,10 +396,10 @@ def render_graphs(apiary_name, start_date, end_date, bin_group, scale):
 
     # add delta temp trace
     try:
-        fig2.add_trace(
-            go.Scatter(x=filtered_hivekeepers_data['timestamp'],
-                       y=filtered_hivekeepers_data['temp_delta'],
-                       name="temp_delta"),
+        fig2.add_trace(go.Scatter(x=filtered_hivekeepers_data['timestamp'],
+                                  y=filtered_hivekeepers_data['temp_delta'],
+                                  name="temp_delta",
+                                  line=dict(color="orange")),
                        secondary_y=True)
     except Exception as e:
         logger.error(f'fig2 trace2 error: {e}')

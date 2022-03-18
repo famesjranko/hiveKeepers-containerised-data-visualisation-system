@@ -21,6 +21,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     monit \
     lsof \
     procps \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # copy nginx configurations

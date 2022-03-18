@@ -20,6 +20,7 @@ services:
       #- '${PWD}/container-logs:/home/hivekeeper/logs'    # persistent host-side logs
       - "container_data:/home/hivekeeper/persistent/"
     environment:
+      - TZ=Australia/Melbourne
       - APP_PORT=8090                 # port must match in both containers
       - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
       - NGINX_ERROR_LOG_LEVEL=warn    # options: info, notice, warn, error, crit, alert, emerg (case sensitive)
@@ -42,6 +43,7 @@ services:
       #- '${PWD}/container-logs:/home/hivekeeper/persistent/logs'    # persistent host-side logs
       - "container_data:/home/hivekeeper/persistent/"
     environment:
+      - TZ=Australia/Melbourne
       - MYSQL_USER=dev_hkapps_platform
       - MYSQL_PASS=R8]NbgN[y-V<L,5X
       - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com

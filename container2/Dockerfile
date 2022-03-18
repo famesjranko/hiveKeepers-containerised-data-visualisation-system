@@ -23,6 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     monit \
     curl \
     lsof \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # set working directory
@@ -52,7 +53,8 @@ WORKDIR /home/hivekeeper
 COPY dash_app /home/hivekeeper/dash_app
 
 # update user app file permissions for user
-RUN chmod -R 664 /home/hivekeeper/
+RUN chmod -R 664 /home/hivekeeper && \
+    chmod +x /home/hivekeeper/dash_app/start_app.sh
 
 # set working directory
 WORKDIR /home/hivekeeper/dash_app

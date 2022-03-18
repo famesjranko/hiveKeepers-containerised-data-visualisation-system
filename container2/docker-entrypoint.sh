@@ -3,8 +3,8 @@
 # HiveKeepers - container2 - docker-entrypoint.sh
 # written by: Andrew McDonald
 # initial: 28/01/22
-# current: 17/03/22
-# version: 0.9
+# current: 19/03/22
+# version: 1.0
 
 set -e
 
@@ -31,6 +31,7 @@ monit_log=/home/hivekeeper/persistent/logs/container2/monit.log
 # the local database file location
 local_database=/home/hivekeeper/persistent/db/hivekeepers.db
 
+# if persistent log location doesn't exist, make it!
 if [[ ! -d /home/hivekeeper/persistent/logs/container2 ]]
     then
       mkdir -p /home/hivekeeper/persistent/logs/container2
@@ -58,16 +59,20 @@ start_application() {
       
       # start dash app via wsgi (gunicorn)
       echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting application dashboard..." | tee -a $container_log
-      gunicorn3 hivekeepers_app:server \
-      --bind 0.0.0.0:$port \
-      --workers $workers \
-      --worker-tmp-dir /dev/shm \
-      --threads $threads \
-      --log-level=$log_level_lower \
-      --access-logfile=- \
-      --log-file=$gunicorn_log \
-      --error-logfile=$gunicorn_error_log \
-      --access-logfile=$gunicorn_access_log
+      # gunicorn3 hivekeepers_app:server \
+      # --bind 0.0.0.0:$port \
+      # --workers $workers \
+      # --worker-tmp-dir /dev/shm \
+      # --threads $threads \
+      # --log-level=$log_level_lower \
+      # --access-logfile=- \
+      # --log-file=$gunicorn_log \
+      # --error-logfile=$gunicorn_error_log \
+      # --access-logfile=$gunicorn_access_log
+
+      # using config for gunicorn allows for easier monit monitoring via PID file and dash_app/start_app.sh
+      gunicorn3 -c gunicorn_config.py hivekeepers_app:server
+
     else
       echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] [ERROR] hivekeepers_app.py is NOT populated!" | tee -a $container_log
       echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] NOT starting application dashboard!" | tee -a $container_log
@@ -133,6 +138,10 @@ clear_storage () {
 }
 
 start_watchdog() {
+  # update watchdog gunicorn conf port - sed inplace
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] updating watchdog port in gunicorn.conf to: ${APP_PORT:-8050}" | tee -a $container_log
+  sed -i "/^  if failed/ s/8050/${APP_PORT:-8050}/" /etc/monit/conf.d/gunicorn3.conf
+
   ## start Monit monitoring service
   echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting Monit monitoring service..." | tee -a $container_log
   /etc/init.d/monit start

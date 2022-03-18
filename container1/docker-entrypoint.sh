@@ -100,6 +100,18 @@ rm -f /var/run/fail2ban/*
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting fail2ban service..." | tee -a $container_log
 service fail2ban start
 
+## set fail2ban log level
+#fail2ban-client set loglevel $fail2ban_log_level
+
+## flush fail2ban log if a file
+## fail2ban-client flushlogs
+
+## == fail2ban info commands ==
+## fail2ban-client get nginx-http-auth banned     # return banned IPs
+## fail2ban-client get nginx-http-auth findtime   # gets the time for which the filter will look back for failures
+## fail2ban-client get nginx-http-auth bantime    # gets the time a host is banned for
+## fail2ban-client get nginx-http-auth maxretry   # gets the number of failures allowed before ban
+
 ## start nginx reverse proxy service
 echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER1] starting nginx proxy service..." | tee -a $container_log
 nginx

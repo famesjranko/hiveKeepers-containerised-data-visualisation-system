@@ -21,7 +21,7 @@ services:
       - "container_data:/home/hivekeeper/persistent/"
     environment:
       - TZ=Australia/Melbourne
-      - APP_PORT=9090                 # port must match in both containers
+      - APP_PORT=8050                 # port must match in both containers
       - PROXY_LOG_LEVEL=detailed      # options: simple (no nginx access logging), detailed (with nginx access logging)
       - NGINX_ERROR_LOG_LEVEL=warn    # options: info, notice, warn, error, crit, alert, emerg (case sensitive)
     networks:
@@ -50,7 +50,7 @@ services:
       - MYSQL_DB=rawdata
       - APP_WORKERS=4               # gunicorn workers - defaults to number of cores
       - APP_THREADS=2               # gunicorn threads - defaults to number of cores - 1
-      - APP_PORT=9090               # port must match in both containers
+      - APP_PORT=8050               # port must match in both containers
       - APP_LOG_LEVEL=info          # options: debug, info, warning, error, critical
       - SQL_VERBOSE=no              # show SQL queries/responses. options: yes,no
       - START_TYPE=Warm_Start       # Cold_Start, Warm_Start, Init_only

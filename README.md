@@ -1,11 +1,17 @@
 # HiveKeepers Internship Project
 La Trobe University and HiveKeepers internship project
 
+---
+
 ### Outline of project:
 Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
 
+---
+
 ### Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
+
+---
 
 ### System Info
 ##### names:
@@ -24,6 +30,8 @@ container2 ip: 172.75.0.3
 ##### Default Visualisation App Access (through proxy; can be changed/removed):
 Username: hivekeepers  
 Password: hivekeepers  
+
+---
 
 ##### Software Versions
 container1:
@@ -125,6 +133,9 @@ project
     ├── password_script.sh
     └── user_credentials.txt
 ```
+
+---
+
 ### Container Info
 #### Container1
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
@@ -154,8 +165,6 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
 ![container1](readme-assets/container2-diagram-git.png)  
 
 ---
-
-
 
 #### Watchdog Services:
 ##### Container1:
@@ -205,6 +214,7 @@ monit quit                  			# Kill the monit daemon process
 monit validate              			# Check all services and start if not running  
 monit procmatch <pattern>   			# Test process matching pattern  
 ```
+
 ---
 
 ### User Authentication

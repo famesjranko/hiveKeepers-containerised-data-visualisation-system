@@ -28,9 +28,9 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
   
   
 ## System Info
-* #### names:
- * container1: reverse-proxy  
- * container2: dash-app  
+> #### names:
+> container1: reverse-proxy  
+> container2: dash-app  
   
 #### services:
 container1: nginx, fail2ban, monit   

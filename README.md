@@ -269,22 +269,17 @@ monit procmatch <pattern>   			# Test process matching pattern
 6.	Browse to http://localhost/app/ to access the data visualisation app.  
   -	Enter username and password  
   -	**default user**  
-  ```bash
-username: hivekeepers   
-password: hivekeepers
-```
+    - username: hivekeepers  
+    - password: hivekeepers  
+
 7.	Enjoy your data visualisations!  
   
 OPTIONAL  
 8.  Browse to http://localhost/monit/ to access container1 watchdog status web portal
   - Enter username and password
-
-
-### default user
-```bash
-username: hivekeepers   
-password: hivekeepers
-```
+  - **default user**  
+    - username: admin  
+    - password: hivekeeper
 
 ### User Authentication
 NGINX basic authentication user access is managed through a txt file container user:password combinations for referencing requests against.  This file needs to be passed/shared with container1.  And while it is possible to simply pass such a file in plain text, it is much safer to first encrypt the passwords listed before doing so…  
@@ -328,6 +323,21 @@ container1 system diagram:
   
 container2 system diagram:  
 ![container1](readme-assets/container2-diagram-git.png)  
+  
+visualisation application header:
+![app header](readme-assets/header.png)  
+  
+visualisation application 2D Chart1:
+![2d chart1](readme-assets/chart1.png)  
+  
+visualisation application 2D Chart2:
+![2d chart2](readme-assets/chart2.png)  
+  
+visualisation application 3D Chart:
+![3d chart](readme-assets/chart3.png)  
+  
+visualisation application 4D Chart1:
+![4d chart](readme-assets/chart4.png)  
   
 container1 monit web portal for manager:  
 ![monit-web-portal](readme-assets/monit-web.png)  

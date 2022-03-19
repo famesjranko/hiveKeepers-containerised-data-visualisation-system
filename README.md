@@ -7,7 +7,7 @@ Build and present a containerised website for presenting apiary data from remote
 ## Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
   
-### Container1  
+### Container1
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
   
 To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file to determine relevant access privileges.  
@@ -16,43 +16,42 @@ To handle requests that fail NGINX basic-auth 5 times, container1 also runs the 
   
 Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
   
-![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container1-diagram-git.png)  
+![container1](readme-assets/container1-diagram-git.png)  
   
   
-### Container2  
+### Container2
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
   
-![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container2-diagram-git.png)  
+![container1](readme-assets/container2-diagram-git.png)  
   
   
-## System Info  
-#### names:  
+## System Info
+#### names:
 container1: reverse-proxy  
 container2: dash-app  
   
-#### services:  
+#### services:
 container1: nginx, fail2ban, monit   
 container2: Dash (Python), Gunicorn, monit   
   
-#### container network:  
+#### container network:
 subnet: 172.75.0.0/16   
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
 
-#### Default Visualisation App Access (through proxy; can be changed/removed):  
+#### Default Visualisation App Access (through proxy; can be changed/removed):
 Username: hivekeepers  
 Password: hivekeepers  
 
-#### Watchdog Services:
-
-##### Container1:  
+### Watchdog Services:
+#### Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
   
-Container1 utilises Monit to handle the service watchdog feature.  Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  
+Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  Nginx is monitored via PID file and /healthcheck on port 80; Fail2ban is monitored via PID file and socket.
   
 Monit also provides a web port to both monitor and control system services.  This portal is located on port 2812 of container1, and access is provided via NGINX reverse proxy features.  
   
@@ -60,13 +59,20 @@ Monit also provides a web port to both monitor and control system services.  Thi
       credentials:  
           username: admin  
           password: hivekeeper  
-
-
-
-
-### Software Versions  
   
-#### container1:   
+![monit-web-portal](readme-assets/monit-web.png)  
+![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
+
+#### Container2:
+Monitoring software: Monit  
+Monitored services: NGINX, Fail2ban  
+Web-monitor portal: No  
+  
+Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py
+
+
+### Software Versions
+#### container1:
   
 | service            | source                        | version       |
 | ------------------ | ----------------------------- | ------------- |
@@ -75,7 +81,7 @@ Monit also provides a web port to both monitor and control system services.  Thi
 | Fail2ban           | Debian repository             | 0.11.2        |
 | Monit              | Debian repository             | 5.27.2        |
   
-#### container2:   
+#### container2:
   
 | service            | source                        | version             |
 | ------------------ | ----------------------------- | ------------------- |
@@ -86,8 +92,8 @@ Monit also provides a web port to both monitor and control system services.  Thi
 | Monit              | Debian repository             | 5.27.2              |
   
   
-### Environment Variablles:  
-  
+### Environment Variables:
+
 #### container1:
     
 |                          |        |                                                                                             |
@@ -97,7 +103,7 @@ Monit also provides a web port to both monitor and control system services.  Thi
 | NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
 
 
-#### container2:  
+#### container2:
   
 |                          |        |                                                                                                   |
 | ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |

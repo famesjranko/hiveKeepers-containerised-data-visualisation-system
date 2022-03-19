@@ -16,9 +16,14 @@ To handle requests that fail NGINX basic-auth 5 times, container1 also runs the 
 Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
   
 ![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container1-diagram-git.png)  
-
-
-
+  
+  
+Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
+  
+Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
+  
+![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container2-diagram-git.png)  
+  
 #### services:
 container1: nginx, fail2ban   
 container2: python Dash, Gunicorn   

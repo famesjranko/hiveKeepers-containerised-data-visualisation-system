@@ -5,82 +5,12 @@ La Trobe University and HiveKeepers internship project
 
 ### Outline of project:
 Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
-
----
-
-### Outline of containers:
+  
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
 
 ---
 
-### System Info
-##### names:
-container1: reverse-proxy  
-container2: dash-app  
-  
-##### services:
-container1: nginx, fail2ban, monit   
-container2: Dash (Python), Gunicorn, monit   
-  
-##### container network:
-subnet: 172.75.0.0/16   
-container1 ip: 172.75.0.2   
-container2 ip: 172.75.0.3   
-
-##### Default Visualisation App Access (through proxy; can be changed/removed):
-Username: hivekeepers  
-Password: hivekeepers  
-
----
-
-##### Software Versions
-container1:
-  
-| service            | source                        | version       |
-| ------------------ | ----------------------------- | ------------- |
-| Docker base Image  | Docker Hub (NGINX official)   | nginx:1.20.2  |
-| NGINX              | Baked into base image         | 1.20.2        |
-| Fail2ban           | Debian repository             | 0.11.2        |
-| Monit              | Debian repository             | 5.27.2        |
-  
-container2:
-  
-| service            | source                        | version             |
-| ------------------ | ----------------------------- | ------------------- |
-| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
-| Pyython            | Debian repository             | 3.9.2               |
-| SQLite             | Debian repository             | 3.34.1              |
-| Gunicorn3          | Debian repository             | 20.1.0              |
-| Monit              | Debian repository             | 5.27.2              |
-
----
-
-#### Environment Variables:
-container1:
-
-|                          |        |                                                                                             |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
-| APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
-| PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
-| NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
-
-container2:
-
-|                          |        |                                                                                                   |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
-| MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
-| MYSQL_PASS               | STRING | password or remote MySQL DB                                                                       |
-| MYSQL_HOST               | STRING | URL for remote MySQL DB                                                                           |
-| MYSQL_DB                 | STRING | database name of remote MySQL DB                                                                  |
-| APP_WORKERS              | INT    | Gunicorn workers - defaults to number of cores                                                    |
-| APP_THREADS              | INT    | Gunicorn threads - defaults to number of cores – 1                                                |
-| APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
-| APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
-| START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
-
----
-
-#### directory structure
+**directory structure**  
 ```bash
 project
 ├── container1
@@ -136,38 +66,74 @@ project
 
 ---
 
-### Container Info
-#### Container1
-Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
+### System Info
+**names:**  
+container1: reverse-proxy  
+container2: dash-app  
   
-To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
+**services:**  
+container1: nginx, fail2ban, monit   
+container2: Dash (Python), Gunicorn, monit   
   
-To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
-    
-To get fail2ban to work with iptables requires container privilege capabilities to be used:  
-```bash
-cap_add:
-  - CAP_NET_ADMIN
-  - CAP_NET_RAW
-```
-  
-Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
-  
-Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
-  
-![container1](readme-assets/container1-diagram-git.png)  
-  
-#### Container2
-Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
-  
-Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
-  
-![container1](readme-assets/container2-diagram-git.png)  
+**container network:**  
+subnet: 172.75.0.0/16   
+container1 ip: 172.75.0.2   
+container2 ip: 172.75.0.3   
+
+**Default Visualisation App Access (through proxy; can be changed/removed):**  
+Username: hivekeepers  
+Password: hivekeepers  
 
 ---
 
-#### Watchdog Services:
-##### Container1:
+**Software Versions**  
+container1:
+  
+| service            | source                        | version       |
+| ------------------ | ----------------------------- | ------------- |
+| Docker base Image  | Docker Hub (NGINX official)   | nginx:1.20.2  |
+| NGINX              | Baked into base image         | 1.20.2        |
+| Fail2ban           | Debian repository             | 0.11.2        |
+| Monit              | Debian repository             | 5.27.2        |
+  
+container2:
+  
+| service            | source                        | version             |
+| ------------------ | ----------------------------- | ------------------- |
+| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
+| Pyython            | Debian repository             | 3.9.2               |
+| SQLite             | Debian repository             | 3.34.1              |
+| Gunicorn3          | Debian repository             | 20.1.0              |
+| Monit              | Debian repository             | 5.27.2              |
+
+---
+
+**Environment Variables:**  
+container1:
+
+|                          |        |                                                                                             |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
+| PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
+| NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
+
+container2:
+
+|                          |        |                                                                                                   |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
+| MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
+| MYSQL_PASS               | STRING | password or remote MySQL DB                                                                       |
+| MYSQL_HOST               | STRING | URL for remote MySQL DB                                                                           |
+| MYSQL_DB                 | STRING | database name of remote MySQL DB                                                                  |
+| APP_WORKERS              | INT    | Gunicorn workers - defaults to number of cores                                                    |
+| APP_THREADS              | INT    | Gunicorn threads - defaults to number of cores – 1                                                |
+| APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
+| APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
+| START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
+
+
+**Watchdog Services:**
+Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -184,14 +150,14 @@ Monit also provides a web port to both monitor and control system services.  Thi
 ![monit-web-portal](readme-assets/monit-web.png)  
 ![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
 
-##### Container2:
+Container2:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
   
 Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
   
-##### Command line access to watchdogs:
+**Command line access to watchdogs:**  
 It is also possible to access and control watchdog states and status via the command line using: docker exec CONTAINER-NAME COMMAND ARGS
   
 ```bash
@@ -214,6 +180,40 @@ monit quit                  			# Kill the monit daemon process
 monit validate              			# Check all services and start if not running  
 monit procmatch <pattern>   			# Test process matching pattern  
 ```
+
+---
+
+
+### Container Info
+**Container1**
+Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
+  
+To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
+  
+To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
+    
+To get fail2ban to work with iptables requires container privilege capabilities to be used:  
+```bash
+cap_add:
+  - CAP_NET_ADMIN
+  - CAP_NET_RAW
+```
+  
+Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
+  
+Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
+  
+![container1](readme-assets/container1-diagram-git.png)  
+  
+**Container2**  
+Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
+  
+Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
+  
+![container1](readme-assets/container2-diagram-git.png)  
+
+---
+
 
 ---
 

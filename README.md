@@ -327,6 +327,8 @@ OPTIONAL
     - username: admin  
     - password: hivekeeper
 
+---
+
 ### User Authentication
 NGINX basic authentication user access is managed through a txt file container user:password combinations for referencing requests against.  This file needs to be passed/shared with container1.  And while it is possible to simply pass such a file in plain text, it is much safer to first encrypt the passwords listed before doing so…  
   

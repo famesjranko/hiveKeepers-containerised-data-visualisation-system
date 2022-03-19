@@ -79,7 +79,22 @@ container2: Dash (Python), Gunicorn, monit
 subnet: 172.75.0.0/16   
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
+  
+**in conantainer main working dir""
+container2: /home/hivekeeper/  
 
+**container persistent storage:**  
+name: container_data:
+stores: logs (both containers), database (container1)  
+container bind directory: /home/hivekeeper/persistent/  
+  
+container1 persistent storage:  
+/home/hivekeeper/persistent/logs/container1  
+  
+container2 persistent storage:  
+/home/hivekeeper/persistent/logs/container2  
+/home/hivekeeper/persistent/db/    
+  
 **Default Visualisation App Access (through proxy; can be changed/removed):**  
 Username: hivekeepers  
 Password: hivekeepers  
@@ -157,6 +172,18 @@ container2:
 | APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
 | APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
 | START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
+  
+**For further explanation of each container settings see relevant file for comments:**  
+docker-compose.yamp - container start, env, and runtime settings: storage, networking  
+Dockerfile - for image build settings  
+docker-entryfile.sh - for runtime start process, services, file management, logging  
+healthcheck.sh - for docker healtcheck status request response  
+  
+**See relevent container sub-dir for releveant service configurations**  
+/monit - for watchdog service  
+/nginx - for proxy service  
+/fail2ban -  for authentification ip banning service  
+/dash_app - for python visualisation application service  
 
 ---
 
@@ -199,6 +226,10 @@ There is also a config file (hivekeepers_config.py) for storing relevant STATIC 
 
 These files are all stored in project folder: container1/dash_app/  
 and on container2 in folder: /home/hivekeeper/dash_app/  
+
+---
+
+### Logging:
 
 ---
 

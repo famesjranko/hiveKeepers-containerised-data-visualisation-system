@@ -26,14 +26,39 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
   
 ![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container2-diagram-git.png)  
   
-#### services:
-container1: nginx, fail2ban   
-container2: python Dash, Gunicorn   
-
-#### container network:
+  
+## System Info  
+#### names:  
+container1: reverse-proxy  
+container2: dash-app  
+  
+#### services:  
+container1: nginx, fail2ban, monit   
+container2: Dash (Python), Gunicorn, monit   
+  
+#### container network:  
 subnet: 172.75.0.0/16   
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
+
+#### Default Visualisation App Access (through proxy; can be changed/removed):  
+Username: hivekeepers  
+Password: hivekeepers  
+
+#### Admin Monit Web Access (/monit) :  
+Username: admin  
+Password: hivekeeper  
+
+### Software Versions  
+  
+#### container1:   
+  
+| service            | source                        | version       |
+| ------------------ | ----------------------------- | ------------- |
+| Docker base Image  | Docker Hub (NGINX official)   | nginx:1.20.2  |
+| NGINX              | Baked into base image         | 1.20.2        |
+| Fail2ban           | Debian repository             | 0.11.2        |
+| Monit              | Debian repository             | 5.27.2        |
 
 #### directory structure
 ```bash

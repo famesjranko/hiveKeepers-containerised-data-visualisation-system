@@ -158,7 +158,14 @@ container1:
 | APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
 | PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
 | NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
-
+  
+To get fail2ban to work with iptables requires container privilege capabilities to be used:  
+```bash
+cap_add:
+  - CAP_NET_ADMIN
+  - CAP_NET_RAW
+```
+  
 container2:
 
 |                          |        |                                                                                                   |
@@ -187,7 +194,7 @@ healthcheck.sh - for docker healtcheck status request response
 
 ---
 
-### Container Info
+### Container Roles
 **Container1**  
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
   
@@ -196,13 +203,6 @@ To handle incoming requests, container1 runs the NGINX service on port 80.  To c
 To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
 
 There is also a root web page for NGINX which shows a bee background and simple text telling which container it is on.  This is currently allowed access to all, but can be easily changed or removed entirely by editting the nginx default.conf.template file in container1/nginx/templates and rebuilding the container image.
-    
-To get fail2ban to work with iptables requires container privilege capabilities to be used:  
-```bash
-cap_add:
-  - CAP_NET_ADMIN
-  - CAP_NET_RAW
-```
   
 Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
   

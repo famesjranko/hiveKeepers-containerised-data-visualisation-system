@@ -1,12 +1,16 @@
 # HiveKeepers Internship Project
 La Trobe University and HiveKeepers internship project
 
+---
+
 ## Outline of project:
 Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
 
+---
+
 ## Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
-  
+
 ### Container1
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
   
@@ -18,15 +22,15 @@ Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban s
   
 ![container1](readme-assets/container1-diagram-git.png)  
   
-  
 ### Container2
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
   
 ![container1](readme-assets/container2-diagram-git.png)  
-  
-  
+
+---
+
 ## System Info
 > #### names:
 > container1: reverse-proxy  
@@ -45,13 +49,15 @@ container2 ip: 172.75.0.3
 Username: hivekeepers  
 Password: hivekeepers  
 
+---
+
 ## Watchdog Services:
 ### Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
   
-Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  Nginx is monitored via PID file and /healthcheck on port 80; Fail2ban is monitored via PID file and socket.
+Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  Nginx is monitored via PID file and /healthcheck on port 80 Nginx that returns http code 200 on success; Fail2ban is monitored via PID file and socket.
   
 Monit also provides a web port to both monitor and control system services.  This portal is located on port 2812 of container1, and access is provided via NGINX reverse proxy features.  
   
@@ -68,9 +74,9 @@ Monitoring software: Monit
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
   
-Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py
+Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
   
-#### Command line access to watchdog:
+#### Command line access to watchdogs:
 It is also possible to access and control watchdog states and status via the command line using: docker exec CONTAINER-NAME COMMAND ARGS
   
 == available monit commands ==  
@@ -92,6 +98,7 @@ monit quit                  			# Kill the monit daemon process
 monit validate              			# Check all services and start if not running  
 monit procmatch <pattern>   			# Test process matching pattern  
 
+---
 
 ### Software Versions
 #### container1:
@@ -112,21 +119,20 @@ monit procmatch <pattern>   			# Test process matching pattern
 | SQLite             | Debian repository             | 3.34.1              |
 | Gunicorn3          | Debian repository             | 20.1.0              |
 | Monit              | Debian repository             | 5.27.2              |
-  
-  
-### Environment Variables:
 
+---
+
+### Environment Variables:
 #### container1:
-    
+
 |                          |        |                                                                                             |
 | ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
 | APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
 | PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
 | NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
 
-
 #### container2:
-  
+
 |                          |        |                                                                                                   |
 | ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
 | MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
@@ -139,7 +145,7 @@ monit procmatch <pattern>   			# Test process matching pattern
 | APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
 | START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
 
-
+---
 
 #### directory structure
 ```bash

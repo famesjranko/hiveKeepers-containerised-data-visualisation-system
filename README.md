@@ -2,8 +2,17 @@
 La Trobe University and HiveKeepers internship project
 
 ## Outline of project:
+Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
 
 ## Outline of containers:
+The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
+Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
+To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file to determine relevant access privileges.  
+To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  
+Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive. 
+![container1](https://github.com/hivekeepers/project/readme-assets/container1-diagram-git.png)  
+
+
 
 #### services:
 container1: nginx, fail2ban   

@@ -179,7 +179,9 @@ container2:
 | APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
 | APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
 | START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
-  
+
+---
+
 **For further explanation of each container settings see relevant file for comments:**  
 docker-compose.yamp - container start, env, and runtime settings: storage, networking  
 Dockerfile - for image build settings  

@@ -70,6 +70,18 @@ Password: hivekeeper
 | Gunicorn3          | Debian repository             | 20.1.0              |
 | Monit              | Debian repository             | 5.27.2              |
   
+  
+### Environment Variablles:  
+  
+#### container1:
+  
+| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
+| Pyython            | Debian repository             | 3.9.2               |
+| SQLite             | Debian repository             | 3.34.1              |
+| Gunicorn3          | Debian repository             | 20.1.0              |
+| Monit              | Debian repository             | 5.27.2              |
+
+
 #### directory structure
 ```bash
 ├├── container1

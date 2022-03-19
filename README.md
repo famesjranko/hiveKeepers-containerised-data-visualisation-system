@@ -1,12 +1,8 @@
 # HiveKeepers Internship Project
 La Trobe University and HiveKeepers internship project
 
----
-
 ## Outline of project:
 Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
-
----
 
 ## Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
@@ -32,9 +28,9 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
 ---
 
 ## System Info
-> #### names:
-> container1: reverse-proxy  
-> container2: dash-app  
+#### names:
+container1: reverse-proxy  
+container2: dash-app  
   
 #### services:
 container1: nginx, fail2ban, monit   
@@ -49,7 +45,97 @@ container2 ip: 172.75.0.3
 Username: hivekeepers  
 Password: hivekeepers  
 
+#### Software Versions
+### container1:
+  
+| service            | source                        | version       |
+| ------------------ | ----------------------------- | ------------- |
+| Docker base Image  | Docker Hub (NGINX official)   | nginx:1.20.2  |
+| NGINX              | Baked into base image         | 1.20.2        |
+| Fail2ban           | Debian repository             | 0.11.2        |
+| Monit              | Debian repository             | 5.27.2        |
+  
+### container2:
+  
+| service            | source                        | version             |
+| ------------------ | ----------------------------- | ------------------- |
+| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
+| Pyython            | Debian repository             | 3.9.2               |
+| SQLite             | Debian repository             | 3.34.1              |
+| Gunicorn3          | Debian repository             | 20.1.0              |
+| Monit              | Debian repository             | 5.27.2              |
+
 ---
+
+#### Environment Variables:
+### container1:
+
+|                          |        |                                                                                             |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
+| PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
+| NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
+
+### container2:
+
+|                          |        |                                                                                                   |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
+| MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
+| MYSQL_PASS               | STRING | password or remote MySQL DB                                                                       |
+| MYSQL_HOST               | STRING | URL for remote MySQL DB                                                                           |
+| MYSQL_DB                 | STRING | database name of remote MySQL DB                                                                  |
+| APP_WORKERS              | INT    | Gunicorn workers - defaults to number of cores                                                    |
+| APP_THREADS              | INT    | Gunicorn threads - defaults to number of cores – 1                                                |
+| APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
+| APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
+| START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
+
+---
+
+### directory structure
+```bash
+├├── container1
+│   ├── docker-entrypoint.sh
+│   ├── Dockerfile
+│   ├── fail2ban
+│   │   ├── action.d
+│   │   │   └── docker-iptables-multiport.conf
+│   │   ├── fail2ban.local
+│   │   ├── filter.d
+│   │   │   └── nginx-http-auth.conf
+│   │   ├── jail.d
+│   │   │   └── nginx.conf
+│   │   └── jail.local
+│   ├── fixed_envsubst-on-templates.sh
+│   ├── healthcheck.sh
+│   ├── nginx
+│   │   ├── default.old
+│   │   ├── html
+│   │   │   ├── background.jpg
+│   │   │   └── index.html
+│   │   ├── nginx.conf
+│   │   └── templates
+│   │       └── default.conf.template
+│   ├── password_script.sh
+│   ├── readme
+│   └── user_credentials.txt
+├── container2
+│   ├── dash_app
+│   │   ├── hivekeepers_app.py
+│   │   ├── hivekeepers_config.py
+│   │   ├── hivekeepers_helpers.py
+│   │   ├── requirements.txt
+│   │   ├── startup_update_db.py
+│   │   └── update_db.py
+│   ├── docker-entrypoint.sh
+│   ├── Dockerfile
+│   └── healthcheck.sh
+├── docker-compose.yml
+├── htpasswd
+├── README.md
+└── scripts
+    └── password_script.sh
+```
 
 ## Watchdog Services:
 ### Container1:
@@ -99,98 +185,6 @@ monit validate              			# Check all services and start if not running
 monit procmatch <pattern>   			# Test process matching pattern  
 
 ---
-
-### Software Versions
-#### container1:
-  
-| service            | source                        | version       |
-| ------------------ | ----------------------------- | ------------- |
-| Docker base Image  | Docker Hub (NGINX official)   | nginx:1.20.2  |
-| NGINX              | Baked into base image         | 1.20.2        |
-| Fail2ban           | Debian repository             | 0.11.2        |
-| Monit              | Debian repository             | 5.27.2        |
-  
-#### container2:
-  
-| service            | source                        | version             |
-| ------------------ | ----------------------------- | ------------------- |
-| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
-| Pyython            | Debian repository             | 3.9.2               |
-| SQLite             | Debian repository             | 3.34.1              |
-| Gunicorn3          | Debian repository             | 20.1.0              |
-| Monit              | Debian repository             | 5.27.2              |
-
----
-
-### Environment Variables:
-#### container1:
-
-|                          |        |                                                                                             |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
-| APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
-| PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
-| NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
-
-#### container2:
-
-|                          |        |                                                                                                   |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
-| MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
-| MYSQL_PASS               | STRING | password or remote MySQL DB                                                                       |
-| MYSQL_HOST               | STRING | URL for remote MySQL DB                                                                           |
-| MYSQL_DB                 | STRING | database name of remote MySQL DB                                                                  |
-| APP_WORKERS              | INT    | Gunicorn workers - defaults to number of cores                                                    |
-| APP_THREADS              | INT    | Gunicorn threads - defaults to number of cores – 1                                                |
-| APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
-| APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
-| START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
-
----
-
-#### directory structure
-```bash
-├├── container1
-│   ├── docker-entrypoint.sh
-│   ├── Dockerfile
-│   ├── fail2ban
-│   │   ├── action.d
-│   │   │   └── docker-iptables-multiport.conf
-│   │   ├── fail2ban.local
-│   │   ├── filter.d
-│   │   │   └── nginx-http-auth.conf
-│   │   ├── jail.d
-│   │   │   └── nginx.conf
-│   │   └── jail.local
-│   ├── fixed_envsubst-on-templates.sh
-│   ├── healthcheck.sh
-│   ├── nginx
-│   │   ├── default.old
-│   │   ├── html
-│   │   │   ├── background.jpg
-│   │   │   └── index.html
-│   │   ├── nginx.conf
-│   │   └── templates
-│   │       └── default.conf.template
-│   ├── password_script.sh
-│   ├── readme
-│   └── user_credentials.txt
-├── container2
-│   ├── dash_app
-│   │   ├── hivekeepers_app.py
-│   │   ├── hivekeepers_config.py
-│   │   ├── hivekeepers_helpers.py
-│   │   ├── requirements.txt
-│   │   ├── startup_update_db.py
-│   │   └── update_db.py
-│   ├── docker-entrypoint.sh
-│   ├── Dockerfile
-│   └── healthcheck.sh
-├── docker-compose.yml
-├── htpasswd
-├── README.md
-└── scripts
-    └── password_script.sh
-```
 
 ### Container1: nginx and fail2ban
 

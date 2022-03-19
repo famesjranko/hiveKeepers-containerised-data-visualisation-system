@@ -134,9 +134,10 @@ container2:
 ---
 
 **Watchdog Services:**  
+  
 Container1:  
-Monitoring software: Monit  
-Monitored services: NGINX, Fail2ban  
+Software: Monit  
+Monitoring: NGINX, Fail2ban  
 Web-monitor portal: Yes  
   
 Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  Nginx is monitored via PID file and /healthcheck on port 80 Nginx that returns http code 200 on success; Fail2ban is monitored via PID file and socket.
@@ -149,17 +150,21 @@ Monit also provides a web port to both monitor and control system services.  Thi
           password: hivekeeper  
  
 Container2:  
-Monitoring software: Monit  
-Monitored services: NGINX, Fail2ban  
+Software: Monit  
+Monitoring: Gunicorn3  
 Web-monitor portal: No  
   
-Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
+Monit is set up to monitor the Guniicorn3 service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
   
 **Command line access to watchdogs:**  
-It is also possible to access and control watchdog states and status via the command line using: docker exec CONTAINER-NAME COMMAND ARGS
-  
+It is also possible to access and control watchdog states and status via the command line.  
+using: 
 ```bash
-== available monit commands ==  
+docker exec CONTAINER-NAME COMMAND ARGS
+```
+  
+Available monit commands:
+```bash
 monit start all             			# Start all services  
 monit start <name>          			# Only start the named service  
 monit stop all              			# Stop all services  

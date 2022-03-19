@@ -7,7 +7,7 @@ Build and present a containerised website for presenting apiary data from remote
 ## Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
   
-# Container1  
+#### Container1  
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
   
 To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file to determine relevant access privileges.  
@@ -19,7 +19,7 @@ Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban s
 ![container1](https://github.com/hivekeepers/project/blob/master/readme-assets/container1-diagram-git.png)  
   
   
-# Container2  
+#### Container2  
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  

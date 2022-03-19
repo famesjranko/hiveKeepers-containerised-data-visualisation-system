@@ -45,8 +45,8 @@ container2 ip: 172.75.0.3
 Username: hivekeepers  
 Password: hivekeepers  
 
-### Watchdog Services:
-#### Container1:
+## Watchdog Services:
+### Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -63,12 +63,34 @@ Monit also provides a web port to both monitor and control system services.  Thi
 ![monit-web-portal](readme-assets/monit-web.png)  
 ![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
 
-#### Container2:
+### Container2:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
   
 Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py
+  
+#### Command line access to watchdog:
+It is also possible to access and control watchdog states and status via the command line using: docker exec CONTAINER-NAME COMMAND ARGS
+  
+== available monit commands ==  
+monit start all             			# Start all services  
+monit start <name>          			# Only start the named service  
+monit stop all              			# Stop all services  
+monit stop <name>           			# Stop the named service  
+monit restart all           			# Stop and start all services  
+monit restart <name>        			# Only restart the named service  
+monit monitor all           			# Enable monitoring of all services  
+monit monitor <name>        			# Only enable monitoring of the named service  
+monit unmonitor all         			# Disable monitoring of all services  
+monit unmonitor <name>      			# Only disable monitoring of the named service  
+monit reload                			# Reinitialize monit  
+monit status [name]         			# Print full status information for service(s)  
+monit summary [name]        			# Print short status information for service(s)  
+monit report [up|down|..]   			# Report state of services. See manual for options  
+monit quit                  			# Kill the monit daemon process  
+monit validate              			# Check all services and start if not running  
+monit procmatch <pattern>   			# Test process matching pattern  
 
 
 ### Software Versions

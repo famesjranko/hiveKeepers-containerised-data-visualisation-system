@@ -80,11 +80,11 @@ subnet: 172.75.0.0/16
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
   
-**in conantainer main working dir""
+**in conantainer main working dir:**  
 container2: /home/hivekeeper/  
-
+  
 **container persistent storage:**  
-name: container_data:
+name: container_data:  
 stores: logs (both containers), database (container1)  
 container bind directory: /home/hivekeeper/persistent/  
   
@@ -93,7 +93,7 @@ container1 persistent storage:
   
 container2 persistent storage:  
 /home/hivekeeper/persistent/logs/container2  
-/home/hivekeeper/persistent/db/    
+/home/hivekeeper/persistent/db/  
   
 **Default Visualisation App Access (through proxy; can be changed/removed):**  
 Username: hivekeepers  

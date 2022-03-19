@@ -319,28 +319,31 @@ user3:password3
 
 ### System Images
 container1 system diagram:  
-![container1](readme-assets/container1-diagram-git.png)  
+![container1](readme-assets/container1-diagram-git.png)
   
 container2 system diagram:  
-![container1](readme-assets/container2-diagram-git.png)  
+![container1](readme-assets/container2-diagram-git.png)
   
-visualisation application header:
-![app header](readme-assets/header.png)  
+visualisation application header:  
+![app header](readme-assets/header.png)
   
-visualisation application 2D Chart1:
-![2d chart1](readme-assets/chart1.png)  
+visualisation application 2D Chart1:  
+![2d chart1](readme-assets/chart1.png)
   
-visualisation application 2D Chart2:
-![2d chart2](readme-assets/chart2.png)  
+visualisation application 2D Chart2:  
+![2d chart2](readme-assets/chart2.png)
   
-visualisation application 3D Chart:
-![3d chart](readme-assets/chart3.png)  
+visualisation application 3D Chart:  
+![3d chart](readme-assets/chart3.png)
   
-visualisation application 4D Chart1:
-![4d chart](readme-assets/chart4.png)  
+visualisation application 4D Chart1:  
+![4d chart](readme-assets/chart4.png)
   
 container1 monit web portal for manager:  
-![monit-web-portal](readme-assets/monit-web.png)  
-
-container1 monit web portal for service (eg. ngix):
-![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
+![monit-web-portal](readme-assets/monit-web.png)
+  
+container1 monit web portal for service (eg. ngix):  
+![monit-web-portal-service](readme-assets/monit-nginx-web.png)
+  
+container1 root web page:  
+![monit-web-portal-service](readme-assets/proxy_root_page.png)

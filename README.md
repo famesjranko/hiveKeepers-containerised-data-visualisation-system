@@ -133,7 +133,7 @@ container2:
 
 
 **Watchdog Services:**
-Container1:
+Container1:  
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -146,11 +146,8 @@ Monit also provides a web port to both monitor and control system services.  Thi
       credentials:  
           username: admin  
           password: hivekeeper  
-  
-![monit-web-portal](readme-assets/monit-web.png)  
-![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
-
-Container2:
+ 
+Container2:  
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
@@ -183,7 +180,6 @@ monit procmatch <pattern>   			# Test process matching pattern
 
 ---
 
-
 ### Container Info
 **Container1**
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
@@ -203,15 +199,11 @@ Nginx only using port 80 currently - atm don't see any need for SSL, but that mi
   
 Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
   
-![container1](readme-assets/container1-diagram-git.png)  
-  
 **Container2**  
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
   
-![container1](readme-assets/container2-diagram-git.png)  
-
 ---
 
 
@@ -284,3 +276,14 @@ Once both containers have initialised, web access via http://localhost/app/
 username: hivekeepers   
 password: hivekeepers
 ```
+container1 system diagram:  
+![container1](readme-assets/container1-diagram-git.png)  
+  
+container2 system diagram:  
+![container1](readme-assets/container2-diagram-git.png)  
+  
+container1 monit web portal for manager:  
+![monit-web-portal](readme-assets/monit-web.png)  
+
+container1 monit web portal for service (eg. ngix):
+![monit-web-portal-service](readme-assets/monit-nginx-web.png)  

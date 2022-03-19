@@ -160,6 +160,48 @@ container2:
 
 ---
 
+### Container Info
+**Container1**  
+Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
+  
+To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
+  
+To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
+
+There is also a root web page for NGINX which shows a bee background and simple text telling which container it is on.  This is currently allowed access to all, but can be easily changed or removed entirely by editting the nginx default.conf.template file in container1/nginx/templates and rebuilding the container image.
+    
+To get fail2ban to work with iptables requires container privilege capabilities to be used:  
+```bash
+cap_add:
+  - CAP_NET_ADMIN
+  - CAP_NET_RAW
+```
+  
+Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
+  
+Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
+  
+**Container2**  
+Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
+  
+Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
+
+---
+
+### Data Visualisation Application (Dash)
+The data visualisation application is written using the Dash Plotl framework and consists of 4 plotted charts from data aquired from the Hivekeeper MySQL aviary database. 
+
+The app is built using the main hivekeeper_app.py for the central logic, and the buiilding and displaying of charts.  There are two seperate database update scripts one for initial startup (startup_update_db.py) and one for updating incremental updates once a local database is in place.
+
+There is also a helper script (hivekeepers_helpers.py) which houses the main functions for data handling (getting data from local SQLite db), data cleaning and data building for charts.
+
+There is also a config file (hivekeepers_config.py) for storing relevant STATIC variables and the MySQL remote database credentials.  
+
+These files are all stored in project folder: container1/dash_app/  
+and on container2 in folder: /home/hivekeeper/dash_app/  
+
+---
+
 ### Watchdog Services:
 **Container1:**  
 Software: Monit  
@@ -170,7 +212,7 @@ Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports t
   
 Monit also provides a web port to both monitor and control system services.  This portal is located on port 2812 of container1, and access is provided via NGINX reverse proxy features.  
   
-  To access Monit’s web portal, visit http://[host-IP]/monit  
+  To access Monit’s web portal, visit http://localhost/monit/
       **credentials:**  
           username: admin  
           password: hivekeeper  
@@ -215,48 +257,6 @@ monit procmatch <pattern>   			# Test process matching pattern
 
 ---
 
-### Container Info
-**Container1**
-Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
-  
-To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
-  
-To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
-
-There is also a root web page for NGINX which shows a bee background and simple text telling which container it is on.  This is currently allowed access to all, but can be easily changed or removed entirely by editting the nginx default.conf.template file in container1/nginx/templates and rebuilding the container image.
-    
-To get fail2ban to work with iptables requires container privilege capabilities to be used:  
-```bash
-cap_add:
-  - CAP_NET_ADMIN
-  - CAP_NET_RAW
-```
-  
-Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
-  
-Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
-  
-**Container2**  
-Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
-  
-Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
-
----
-
-### Data Visualisation Application (Dash)
-The data visualisation application is written using the Dash Plotl framework and consists of 4 plotted charts from data aquired from the Hivekeeper MySQL aviary database. 
-
-The app is built using the main hivekeeper_app.py for the central logic, and the buiilding and displaying of charts.  There are two seperate database update scripts one for initial startup (startup_update_db.py) and one for updating incremental updates once a local database is in place.
-
-There is also a helper script (hivekeepers_helpers.py) which houses the main functions for data handling (getting data from local SQLite db), data cleaning and data building for charts.
-
-There is also a config file (hivekeepers_config.py) for storing relevant STATIC variables and the MySQL remote database credentials.  
-
-These files are all stored in project folder: container1/dash_app/  
-and on container2 in folder: /home/hivekeeper/dash_app/  
-
----
-  
 ### Getting started
 1.	Clone the hivekeepers project repo to your local host  
 2.	Install Docker  
@@ -276,7 +276,7 @@ password: hivekeepers
 7.	Enjoy your data visualisations!  
   
 OPTIONAL  
-8.  Browse to http://localhost/monit to access container1 watchdog status web portal
+8.  Browse to http://localhost/monit/ to access container1 watchdog status web portal
   - Enter username and password
 
 

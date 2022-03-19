@@ -59,7 +59,17 @@ Password: hivekeeper
 | NGINX              | Baked into base image         | 1.20.2        |
 | Fail2ban           | Debian repository             | 0.11.2        |
 | Monit              | Debian repository             | 5.27.2        |
-
+  
+#### container2:   
+  
+| service            | source                        | version             |
+| ------------------ | ----------------------------- | ------------------- |
+| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
+| Pyython            | Debian repository             | 3.9.2               |
+| SQLite             | Debian repository             | 3.34.1              |
+| Gunicorn3          | Debian repository             | 20.1.0              |
+| Monit              | Debian repository             | 5.27.2              |
+  
 #### directory structure
 ```bash
 ├├── container1

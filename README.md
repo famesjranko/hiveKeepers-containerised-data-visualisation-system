@@ -7,26 +7,6 @@ Build and present a containerised website for presenting apiary data from remote
 ## Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
 
-### Container1
-Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
-  
-To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file to determine relevant access privileges.  
-  
-To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  
-  
-Monit is used to as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
-  
-![container1](readme-assets/container1-diagram-git.png)  
-  
-### Container2
-Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
-  
-Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
-  
-![container1](readme-assets/container2-diagram-git.png)  
-
----
-
 ## System Info
 #### names:
 container1: reverse-proxy  
@@ -94,7 +74,8 @@ Password: hivekeepers
 
 ### directory structure
 ```bash
-├├── container1
+project
+├── container1
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
 │   ├── fail2ban
@@ -108,6 +89,10 @@ Password: hivekeepers
 │   │   └── jail.local
 │   ├── fixed_envsubst-on-templates.sh
 │   ├── healthcheck.sh
+│   ├── monit
+│   │   ├── fail2ban.conf
+│   │   ├── monitrc
+│   │   └── nginx.conf
 │   ├── nginx
 │   │   ├── default.old
 │   │   ├── html
@@ -116,29 +101,64 @@ Password: hivekeepers
 │   │   ├── nginx.conf
 │   │   └── templates
 │   │       └── default.conf.template
-│   ├── password_script.sh
-│   ├── readme
-│   └── user_credentials.txt
+│   └── password_script.sh
 ├── container2
 │   ├── dash_app
+│   │   ├── gunicorn_config.py
 │   │   ├── hivekeepers_app.py
 │   │   ├── hivekeepers_config.py
 │   │   ├── hivekeepers_helpers.py
 │   │   ├── requirements.txt
+│   │   ├── start_app.sh
 │   │   ├── startup_update_db.py
 │   │   └── update_db.py
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
-│   └── healthcheck.sh
+│   ├── healthcheck.sh
+│   └── monit
+│       ├── gunicorn3.conf
+│       └── monitrc
 ├── docker-compose.yml
 ├── htpasswd
 ├── README.md
 └── scripts
-    └── password_script.sh
+    ├── password_script.sh
+    └── user_credentials.txt
 ```
+## Container Info
+### Container1
+Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
+  
+To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
+  
+To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
+    
+To get fail2ban to work with iptables requires container privilege capabilities to be used:  
+```bash
+cap_add:
+  - CAP_NET_ADMIN
+  - CAP_NET_RAW
+```
+  
+Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...  
+  
+Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban services and restarts if either are found to be down/unresponsive.  
+  
+![container1](readme-assets/container1-diagram-git.png)  
+  
+### Container2
+Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
+  
+Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
+  
+![container1](readme-assets/container2-diagram-git.png)  
 
-## Watchdog Services:
-### Container1:
+---
+
+
+
+### Watchdog Services:
+#### Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -155,16 +175,17 @@ Monit also provides a web port to both monitor and control system services.  Thi
 ![monit-web-portal](readme-assets/monit-web.png)  
 ![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
 
-### Container2:
+#### Container2:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
   
 Monit is set up to monitor the Guniicorn service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
   
-#### Command line access to watchdogs:
+##### Command line access to watchdogs:
 It is also possible to access and control watchdog states and status via the command line using: docker exec CONTAINER-NAME COMMAND ARGS
   
+```bash
 == available monit commands ==  
 monit start all             			# Start all services  
 monit start <name>          			# Only start the named service  
@@ -183,7 +204,7 @@ monit report [up|down|..]   			# Report state of services. See manual for option
 monit quit                  			# Kill the monit daemon process  
 monit validate              			# Check all services and start if not running  
 monit procmatch <pattern>   			# Test process matching pattern  
-
+```
 ---
 
 ### Container1: nginx and fail2ban
@@ -208,6 +229,29 @@ Nginx only using port 80 currently - atm don't see any need for SSL, but that mi
 
 ### Continer2: python Dash
 
+## User Authentication
+NGINX basic authentication user access is managed through a txt file container user:password combinations for referencing requests against.  This file needs to be passed/shared with container1.  And while it is possible to simply pass such a file in plain text, it is much safer to first encrypt the passwords listed before doing so…  
+  
+The simplest way to make such an encrypted user:password file is to use the apache2-utils library on Linux – the following is for Debian systems but can be modified for others.  
+  
+To get the library installed, run: ‘apt-get update && apt-get install apache2-utils -y’  
+Then run as root, run: ‘htpasswd -c .htpasswd username’  
+This will start the application, create the file, then ask you to input the password.  
+  
+To add more users, simply rerun the command, but use the -b flag in place of the -c flag.  
+  
+Or, if you have many users you wish to add, I have included a small BASH script (password_script.sh) that can automate the process by reading a plain text user:password structured file and converting it to an encrypted password version using apache2-utils.  
+  
+This script is located within the /script directory within the main project directory.  
+to use, create a text file with a user:password text pair per user, per line.   Then call script with the text file as the first argument. e.g.: ‘ ./password_script user_credentials.txt’  
+  
+e.g., user_credentials.txt file layout for creating 3 users:  
+```bash
+user1:password1
+user2:password2
+user3:password3
+```
+  
 ## Getting started
 First, clone the repositoriy to local machine and cd into project directory. 
 

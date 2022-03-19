@@ -138,8 +138,13 @@ clear_storage () {
 }
 
 start_watchdog() {
+  # reset the gunicorn config file in case of gunicorn port changes - replaces ln 12 back to original
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] resetting gunicorn3.conf..." | tee -a $container_log
+  awk 'NR==12 {$0="  if failed host 127.0.0.1 port 8050 protocol http request '/ping' for 3 cycles then restart"} 1' /etc/monit/conf.d/gunicorn3.conf > /etc/monit/conf.d/gunicorn3.temp
+  mv /etc/monit/conf.d/gunicorn3.temp /etc/monit/conf.d/gunicorn3.conf
+
   # update watchdog gunicorn conf port - sed inplace
-  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] updating watchdog port in gunicorn.conf to: ${APP_PORT:-8050}" | tee -a $container_log
+  echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] updating watchdog port in gunicorn3.conf to: ${APP_PORT:-8050}" | tee -a $container_log
   sed -i "/^  if failed/ s/8050/${APP_PORT:-8050}/" /etc/monit/conf.d/gunicorn3.conf
 
   ## start Monit monitoring service

@@ -45,9 +45,24 @@ container2 ip: 172.75.0.3
 Username: hivekeepers  
 Password: hivekeepers  
 
-#### Admin Monit Web Access (/monit) :  
-Username: admin  
-Password: hivekeeper  
+#### Watchdog Services:
+
+##### Container1:  
+Monitoring software: Monit  
+Monitored services: NGINX, Fail2ban  
+Web-monitor portal: Yes  
+  
+Container1 utilises Monit to handle the service watchdog feature.  Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports the status of each and handles service restart duties if they are found to be inactive.  
+  
+Monit also provides a web port to both monitor and control system services.  This portal is located on port 2812 of container1, and access is provided via NGINX reverse proxy features.  
+  
+  To access Monit’s web portal, visit http://[host-IP]/monit  
+      credentials:  
+          username: admin  
+          password: hivekeeper  
+
+
+
 
 ### Software Versions  
   
@@ -75,13 +90,27 @@ Password: hivekeeper
   
 #### container1:
     
-|                    |                               |                     |
-| ------------------ | ----------------------------- | ------------------- |
-| Docker base Image  | Docker Hub (Debian official)  | debian:stable-slim  |
-| Pyython            | Debian repository             | 3.9.2               |
-| SQLite             | Debian repository             | 3.34.1              |
-| Gunicorn3          | Debian repository             | 20.1.0              |
-| Monit              | Debian repository             | 5.27.2              |
+|                          |        |                                                                                             |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
+| APP_PORT                 | INT    | Port to proxy to on container2, must match in both containers (defaults to 8050 if not set) |
+| PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
+| NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
+
+
+#### container2:  
+  
+|                          |        |                                                                                                   |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
+| MYSQL_USER               | STRING | username for remote MySQL DB                                                                      |
+| MYSQL_PASS               | STRING | password or remote MySQL DB                                                                       |
+| MYSQL_HOST               | STRING | URL for remote MySQL DB                                                                           |
+| MYSQL_DB                 | STRING | database name of remote MySQL DB                                                                  |
+| APP_WORKERS              | INT    | Gunicorn workers - defaults to number of cores                                                    |
+| APP_THREADS              | INT    | Gunicorn threads - defaults to number of cores – 1                                                |
+| APP_PORT                 | INT    | listening port for Gunicorn WSGI, must match in both containers (defaults to 8050 if not set)     |
+| APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
+| START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
+
 
 
 #### directory structure

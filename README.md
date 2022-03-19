@@ -131,8 +131,9 @@ container2:
 | APP_LOG_LEVEL            | STRING | options: debug, info, warning, error, critical                                                    |
 | START_TYPE               | STRING | options: Warm_Start, Cold_Start, Init_start (case sensitive) (defaults to  Warm_Start if not set) |
 
+---
 
-**Watchdog Services:**
+**Watchdog Services:**  
 Container1:  
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  

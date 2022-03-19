@@ -180,7 +180,7 @@ elif [[ "$START" == "Init_only" ]]
     echo $(date +"%Y-%m-%d %H:%M:%S") "[CONTAINER2] starting Init_only..." | tee -a $container_log
     clear_storage
     touch_logs
-    tail_logs
+    tail_logs "async"
 fi
 
 "$@"

@@ -16,7 +16,7 @@ project
 ├── container1
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
-│   ├── fail2ban
+│   ├── fail2ban                      <- fail2ban config dir
 │   │   ├── action.d
 │   │   │   └── docker-iptables-multiport.conf
 │   │   ├── fail2ban.local
@@ -27,11 +27,11 @@ project
 │   │   └── jail.local
 │   ├── fixed_envsubst-on-templates.sh
 │   ├── healthcheck.sh
-│   ├── monit
+│   ├── monit                          <- monit watchdog config dir
 │   │   ├── fail2ban.conf
 │   │   ├── monitrc
 │   │   └── nginx.conf
-│   ├── nginx
+│   ├── nginx                          <- nginx proxy config dir
 │   │   ├── default.old
 │   │   ├── html
 │   │   │   ├── background.jpg
@@ -41,7 +41,7 @@ project
 │   │       └── default.conf.template
 │   └── password_script.sh
 ├── container2
-│   ├── dash_app
+│   ├── dash_app                       <- Python visual application config dir
 │   │   ├── gunicorn_config.py
 │   │   ├── hivekeepers_app.py
 │   │   ├── hivekeepers_config.py
@@ -53,15 +53,15 @@ project
 │   ├── docker-entrypoint.sh
 │   ├── Dockerfile
 │   ├── healthcheck.sh
-│   └── monit
+│   └── monit                          <- monit watchdog config dir
 │       ├── gunicorn3.conf
 │       └── monitrc
 ├── docker-compose.yml
-├── htpasswd
+├── htpasswd                           <- default user:password file
 ├── README.md
 └── scripts
-    ├── password_script.sh
-    └── user_credentials.txt
+    ├── password_script.sh             <- encrypted password script
+    └── user_credentials.txt           <- example user:password file for script
 ```
 
 ---
@@ -105,7 +105,34 @@ container2:
 | SQLite             | Debian repository             | 3.34.1              |
 | Gunicorn3          | Debian repository             | 20.1.0              |
 | Monit              | Debian repository             | 5.27.2              |
+  
+Python Libraries (requirements.txt):  
+```bash
+Brotli==1.0.9
+click==8.0.3
+colorama==0.4.4
+dash==2.1.0
+dash-bootstrap-components==1.0.3
+dash-core-components==2.0.0
+dash-html-components==2.0.0
+dash-table==5.0.0
+Flask==2.0.2
+Flask-Compress==1.10.1
+itsdangerous==2.0.1
+Jinja2==3.0.3
+MarkupSafe==2.0.1
+multiprocess==0.70.12.2
+numpy==1.22.2
+pandas==1.4.0
+plotly==5.6.0
+python-dateutil==2.8.2
+pytz==2021.3
+six==1.16.0
+tenacity==8.0.1
+Werkzeug==2.0.3
+sqlalchemy==1.4.31
 
+```
 ---
 
 **Environment Variables:**  
@@ -133,9 +160,8 @@ container2:
 
 ---
 
-**Watchdog Services:**  
-  
-Container1:  
+### Watchdog Services:
+**Container1:**  
 Software: Monit  
 Monitoring: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -145,24 +171,27 @@ Monit is set up to monitor NGINX and Fail2ban services every 2mins and reports t
 Monit also provides a web port to both monitor and control system services.  This portal is located on port 2812 of container1, and access is provided via NGINX reverse proxy features.  
   
   To access Monit’s web portal, visit http://[host-IP]/monit  
-      credentials:  
+      **credentials:**  
           username: admin  
           password: hivekeeper  
- 
-Container2:  
+  
+Monit config files are stored in project dir: container1/monit/  
+  
+**Container2:**  
 Software: Monit  
 Monitoring: Gunicorn3  
 Web-monitor portal: No  
   
 Monit is set up to monitor the Guniicorn3 service every 2mins and reports the status and handles service restart duties if they are found to be inactive.  Gunicorn is monitored via PID file and /ping on port 80 - /ping located in hivekeepers_app.py, which returns string: 'status: ok'  
   
+Monit config files are stored in project dir: container2/monit/  
+Gunicorn restart script is stored in project dir: container2/dash_app/start_app.sh  
+  
 **Command line access to watchdogs:**  
-It is also possible to access and control watchdog states and status via the command line.  
-using: 
+It is also possible to access and control watchdog states and status via the command line using: 
 ```bash
 docker exec CONTAINER-NAME COMMAND ARGS
 ```
-  
 Available monit commands:
 ```bash
 monit start all             			# Start all services  
@@ -193,6 +222,8 @@ Container1 handles all incoming network requests to the container network, and p
 To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
   
 To handle requests that fail NGINX basic-auth 5 times, container1 also runs the service Fail2ban.  Fail2ban monitors the NGINX error log and records the IP address of failed access attempts to its log for future reference.  Once an IP address has reached 5 failed attempts within a given time span (10 mins) the IP address is banned from future access for 10 minutes – the number of attempts. the time frame for attempts, and the ban time can all be configured within Fail2bans configuration file before container1 build time if desired.  See authentification section for further explanation.  
+
+There is also a root web page for NGINX which shows a bee background and simple text telling which container it is on.  This is currently allowed access to all, but can be easily changed or removed entirely by editting the nginx default.conf.template file in container1/nginx/templates and rebuilding the container image.
     
 To get fail2ban to work with iptables requires container privilege capabilities to be used:  
 ```bash
@@ -209,27 +240,78 @@ Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban serv
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
+
+---
+
+### Data Visualisation Application (Dash)
+The data visualisation application is written using the Dash Plotl framework and consists of 4 plotted charts from data aquired from the Hivekeeper MySQL aviary database. 
+
+The app is built using the main hivekeeper_app.py for the central logic, and the buiilding and displaying of charts.  There are two seperate database update scripts one for initial startup (startup_update_db.py) and one for updating incremental updates once a local database is in place.
+
+There is also a helper script (hivekeepers_helpers.py) which houses the main functions for data handling (getting data from local SQLite db), data cleaning and data building for charts.
+
+There is also a config file (hivekeepers_config.py) for storing relevant STATIC variables and the MySQL remote database credentials.  
+
+These files are all stored in project folder: container1/dash_app/  
+and on container2 in folder: /home/hivekeeper/dash_app/  
+
+---
   
----
+### Getting started
+1.	Clone the hivekeepers project repo to your local host  
+2.	Install Docker  
+3.	Create the user:password file using your preferred method – see below for options.  
+4.	Edit the docker-compose.yml file to your preferred setting, adjust the options to fit your desired log level and location (hosted or in container only) and make sure the container1 htpasswd volume is pointing to your created user:password file  
+ - or If wanting to store logs on host, make sure the log volume is pointing to the desired local directory path  
+5.	Start build and start process with:  
+  - To run live and see outputs: ‘docker-compose up  --build --remove-orphans’  
+  - To run daemonised: ‘docker-compose up  -d --build --remove-orphans’  
+6.	Browse to http://localhost/app/ to access the data visualisation app.  
+  -	Enter username and password  
+  -	**default user**  
+  ```bash
+username: hivekeepers   
+password: hivekeepers
+```
+7.	Enjoy your data visualisations!  
+  
+OPTIONAL  
+8.  Browse to http://localhost/monit to access container1 watchdog status web portal
+  - Enter username and password
 
 
----
+### default user
+```bash
+username: hivekeepers   
+password: hivekeepers
+```
 
 ### User Authentication
 NGINX basic authentication user access is managed through a txt file container user:password combinations for referencing requests against.  This file needs to be passed/shared with container1.  And while it is possible to simply pass such a file in plain text, it is much safer to first encrypt the passwords listed before doing so…  
   
 The simplest way to make such an encrypted user:password file is to use the apache2-utils library on Linux – the following is for Debian systems but can be modified for others.  
   
-To get the library installed, run: ‘apt-get update && apt-get install apache2-utils -y’  
-Then run as root, run: ‘htpasswd -c .htpasswd username’  
+To get the library installed run:  
+```bash
+‘apt-get update && apt-get install apache2-utils -y’
+```
+Then run as root, run:  
+```bash
+‘htpasswd -c .htpasswd username’
+```
 This will start the application, create the file, then ask you to input the password.  
   
 To add more users, simply rerun the command, but use the -b flag in place of the -c flag.  
   
-Or, if you have many users you wish to add, I have included a small BASH script (password_script.sh) that can automate the process by reading a plain text user:password structured file and converting it to an encrypted password version using apache2-utils.  
+Or, if you have many users you wish to add, I have included a small BASH script (password_script.sh) that can automate the process by reading a plain text user:password structured file and converting it to an encrypted password version for you.  
   
-This script is located within the /script directory within the main project directory.  
-to use, create a text file with a user:password text pair per user, per line.   Then call script with the text file as the first argument. e.g.: ‘ ./password_script user_credentials.txt’  
+This script is located within the /scripts directory within the main project directory.  
+  
+to use, create a text file with a user:password text pair per user, per line (see example file user_credentials.txt, also located in /scripts).  
+Then call script with the text file as the first argument. e.g.:  
+```bash
+‘ ./password_script user_credentials.txt’
+```
   
 e.g., user_credentials.txt file layout for creating 3 users:  
 ```bash
@@ -237,51 +319,10 @@ user1:password1
 user2:password2
 user3:password3
 ```
-  
-### Getting started
-First, clone the repositoriy to local machine and cd into project directory. 
 
-Then create a user and encrypted password for nginx access.   
-   
-Simplest way to do this is to use apache2-utils (Debian, Ubuntu) or httpd-tools (RHEL/CentOS/Oracle Linux) for this purpose.
+---
 
-Debian example: in the project directory, run (-c to create file):
-```bash
-sudo htpasswd -c container1/auth/.htpasswd username
-```
-To create more than 1 user, simply run the command again with -b flag instead of -c   
-
-Or use the password_script.sh file to automatically make the password file from a text file of user:passwords   
-to use, create a text file with one user:password text pair per line:   
-for example:   
-```bash
-user1:password1
-user2:password2
-user3:password3
-```
-
-to run script, simply pass the text file in as argument when running:   
-```bash
-./password_script.sh user_pass.txt
-```
-
-Once finished, a hidden file with encrypted user:password file is created in the cwd:   
-```bash
-.htpasswd
-```
-
-Once user:password created, run docker compose in base directory (-d to daemonise):
-```bash
-docker-compose up 
-```
-
-Once both containers have initialised, web access via http://localhost/app/
-
-### default user
-```bash
-username: hivekeepers   
-password: hivekeepers
-```
+### System Images
 container1 system diagram:  
 ![container1](readme-assets/container1-diagram-git.png)  
   

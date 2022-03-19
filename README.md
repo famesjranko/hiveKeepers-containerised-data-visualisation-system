@@ -1,32 +1,32 @@
 # HiveKeepers Internship Project
 La Trobe University and HiveKeepers internship project
 
-## Outline of project:
+### Outline of project:
 Build and present a containerised website for presenting apiary data from remote MySQL server, with user authentication and IP banning services.
 
-## Outline of containers:
+### Outline of containers:
 The system comprises of two distinct Docker containers, running on their own private container network.  Each container is given a static IP address for reliable inter-container communication and referencing.  
 
-## System Info
-#### names:
+### System Info
+##### names:
 container1: reverse-proxy  
 container2: dash-app  
   
-#### services:
+##### services:
 container1: nginx, fail2ban, monit   
 container2: Dash (Python), Gunicorn, monit   
   
-#### container network:
+##### container network:
 subnet: 172.75.0.0/16   
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
 
-#### Default Visualisation App Access (through proxy; can be changed/removed):
+##### Default Visualisation App Access (through proxy; can be changed/removed):
 Username: hivekeepers  
 Password: hivekeepers  
 
-#### Software Versions
-### container1:
+##### Software Versions
+container1:
   
 | service            | source                        | version       |
 | ------------------ | ----------------------------- | ------------- |
@@ -35,7 +35,7 @@ Password: hivekeepers
 | Fail2ban           | Debian repository             | 0.11.2        |
 | Monit              | Debian repository             | 5.27.2        |
   
-### container2:
+container2:
   
 | service            | source                        | version             |
 | ------------------ | ----------------------------- | ------------------- |
@@ -48,7 +48,7 @@ Password: hivekeepers
 ---
 
 #### Environment Variables:
-### container1:
+container1:
 
 |                          |        |                                                                                             |
 | ------------------------ | ------ | ------------------------------------------------------------------------------------------- |
@@ -56,7 +56,7 @@ Password: hivekeepers
 | PROXY_LOG_LEVEL          | STRING | options: simple (no nginx access logging), detailed (with nginx access logging)             |
 | NGINX_ERROR_LOG_LEVEL    | STRING | options: info, notice, warn, error, crit, alert, emerg (case sensitive)                     |
 
-### container2:
+container2:
 
 |                          |        |                                                                                                   |
 | ------------------------ | ------ | ------------------------------------------------------------------------------------------------- |
@@ -72,7 +72,7 @@ Password: hivekeepers
 
 ---
 
-### directory structure
+#### directory structure
 ```bash
 project
 ├── container1
@@ -125,8 +125,8 @@ project
     ├── password_script.sh
     └── user_credentials.txt
 ```
-## Container Info
-### Container1
+### Container Info
+#### Container1
 Container1 handles all incoming network requests to the container network, and proxies any permissible requests destined for container2 to its respective static IP address.  
   
 To handle incoming requests, container1 runs the NGINX service on port 80.  To control access to the container network, NGINX has basic-auth turned on and references a user:password file (.htpasswd) to determine relevant access privileges.  I Have made it so the password file can be created outside of the container and either passed in via the Dockerfile, or shared via a --volume -v in docker-compose.yaml
@@ -146,7 +146,7 @@ Monit is used as the watchdog handler for monitoring the NGINX and Fail2ban serv
   
 ![container1](readme-assets/container1-diagram-git.png)  
   
-### Container2
+#### Container2
 Container2 runs the HiveKeepers data visualisation web application, which displays 2d and 3d charts from timeseries data collected from apiaries. The application is written in Python and relies heavily on the Plotly Dash visualisation library.  The Web Server Gateway Interface (WSGI) Gunicorn is used to handle all web requests to and from the application, and data for visualising is pulled from the HiveKeepers remote MySQL database and stored locally in an SQLite database.  
   
 Contiainer2 has no exposed ports and is only accessible from outside the container network via the container1 reverse proxy.  
@@ -157,8 +157,8 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
 
 
 
-### Watchdog Services:
-#### Container1:
+#### Watchdog Services:
+##### Container1:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: Yes  
@@ -175,7 +175,7 @@ Monit also provides a web port to both monitor and control system services.  Thi
 ![monit-web-portal](readme-assets/monit-web.png)  
 ![monit-web-portal-service](readme-assets/monit-nginx-web.png)  
 
-#### Container2:
+##### Container2:
 Monitoring software: Monit  
 Monitored services: NGINX, Fail2ban  
 Web-monitor portal: No  
@@ -207,29 +207,7 @@ monit procmatch <pattern>   			# Test process matching pattern
 ```
 ---
 
-### Container1: nginx and fail2ban
-
-So far, have nginx running as simple webserver/reverse-proxy with fail2ban banning IPs that fail nginx basic-auth.
-Nginx's basic-auth file .htpasswd is stored locally in dir container1/auth/.  Have made it so the password file can
-be created outside of container and either passed in via the Dockerfile, or shared via --volume -v in docker-compose.yaml
-
-Nginx's proxy redirection to dash implemented in file nginx/default.
-
-Nginx also has a basic health check location /healthcheck that returns http code 200 on success.
-This is implemented as a basic container HEALTHCHECK within the Dockerfile
-
-To get fail2ban to work with iptables requires container privilege capabilities to be used:
-```bash
-cap_add:
-  - CAP_NET_ADMIN
-  - CAP_NET_RAW
-```
-
-Nginx only using port 80 currently - atm don't see any need for SSL, but that might change...
-
-### Continer2: python Dash
-
-## User Authentication
+### User Authentication
 NGINX basic authentication user access is managed through a txt file container user:password combinations for referencing requests against.  This file needs to be passed/shared with container1.  And while it is possible to simply pass such a file in plain text, it is much safer to first encrypt the passwords listed before doing so…  
   
 The simplest way to make such an encrypted user:password file is to use the apache2-utils library on Linux – the following is for Debian systems but can be modified for others.  
@@ -252,7 +230,7 @@ user2:password2
 user3:password3
 ```
   
-## Getting started
+### Getting started
 First, clone the repositoriy to local machine and cd into project directory. 
 
 Then create a user and encrypted password for nginx access.   

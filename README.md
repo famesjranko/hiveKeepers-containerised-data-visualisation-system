@@ -88,12 +88,12 @@ name: container_data:
 stores: logs (both containers), database (container1)  
 container bind directory: /home/hivekeeper/persistent/  
   
-container1 persistent storage:  
-/home/hivekeeper/persistent/logs/container1  
+**container1 persistent storage:**  
+logs: /home/hivekeeper/persistent/logs/container1  
   
-container2 persistent storage:  
-/home/hivekeeper/persistent/logs/container2  
-/home/hivekeeper/persistent/db/  
+**container2 persistent storage:**  
+logs: /home/hivekeeper/persistent/logs/container2  
+database: /home/hivekeeper/persistent/db/  
   
 **Default Visualisation App Access (through proxy; can be changed/removed):**  
 Username: hivekeepers  
@@ -230,6 +230,19 @@ and on container2 in folder: /home/hivekeeper/dash_app/
 ---
 
 ### Logging:
+**Container1 logs:**  
+entrypoint_log: /home/hivekeeper/persistent/logs/container1/entrypoint.log  
+nginx_access_log: /home/hivekeeper/persistent/logs/container1/nginx-access.log  
+nginx_error_log: /home/hivekeeper/persistent/logs/container1/nginx-error.log  
+fail2ban_log: /home/hivekeeper/persistent/logs/container1/fail2ban.log  
+monit_log: /home/hivekeeper/persistent/logs/container1/monit.log  
+  
+**Container2 logs:**  
+entrypoint_log: /home/hivekeeper/persistent/logs/container2/entrypoint.log  
+gunicorn_log: /home/hivekeeper/persistent/logs/container2/gunicorn.log  
+gunicorn_error_log: /home/hivekeeper/persistent/logs/container2/gunicorn-error.log  
+gunicorn_access_log: /home/hivekeeper/persistent/logs/container2/gunicorn-access.log  
+monit_log: /home/hivekeeper/persistent/logs/container2/monit.log  
 
 ---
 

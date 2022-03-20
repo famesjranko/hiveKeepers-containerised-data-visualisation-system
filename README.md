@@ -217,7 +217,7 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
 
 ---
 
-### Data Visualisation Application (Dash)
+### Data Visualisation Application (HiveKeepers Dash App)
 The data visualisation application is written using the Dash Plotly framework and consists of 4 plotted charts from data acquired from the HiveKeepers MySQL aviary database.  
   
 The app is built using the main hivekeeper_app.py for the central logic, and the building and displaying of charts. There are two separate database update scripts one for initial start-up (startup_update_db.py) and one for updating incremental updates once a local database is in place.  
@@ -229,22 +229,59 @@ There is also a config file (hivekeepers_config.py) for storing relevant STATIC 
 These files are all stored in project folder: container1/dash_app/  
 and on the running container2 in folder: /home/hivekeeper/dash_app/  
 
+**Application Logic**
+Once the user has accessed the HiveKeepers Dash App, they are presented with an ‘update database’ button, a ‘date selector’ and an ‘aviary selector’ drop-down menu.  
+  
+Depending on the environment ‘start_type’ chosen when starting the containers, the local database may or may not already be populated.  If the container has been started using ‘warm_start’, then the user simply chooses an aviary from the drop down and the date selector will automatically choose the most recent single days’ worth of data to represent in the charts.  If container was started with ‘cold_start’, then the user must update the database before the drop-down aviary selector will be populated.  
+  
+Each of the 2d charts also have their own respective date range sliders, so that the user can move around and select specific subsets of days data for viewing.  
+  
+The 3d and 4d charts have a further two drop down menus for affecting how they are represented.  The first selects subsets of FFT-bin data; there are 64 FFT-bins in total, which have been divided into 4 groups of 16 and the drop down lets you choose between each group or to view the entirety at once.  
+  
+There is also a further drop-down menu that lets you choose alternative colour-scales to represent the c-axis, the fourth dimensional aspect the charts.  
+  
+All charts are fully interactive, letting you move between ranges, rotate them, and even download a copy of the graph that is currently set by the user.  
+
 ---
 
 ### Logging:
 **Container1 logs:**  
-entrypoint_log: /home/hivekeeper/persistent/logs/container1/entrypoint.log  
-nginx_access_log: /home/hivekeeper/persistent/logs/container1/nginx-access.log  
-nginx_error_log: /home/hivekeeper/persistent/logs/container1/nginx-error.log  
-fail2ban_log: /home/hivekeeper/persistent/logs/container1/fail2ban.log  
-monit_log: /home/hivekeeper/persistent/logs/container1/monit.log  
+|                       |                     |                                           |
+| --------------------- | ------------------- | ----------------------------------------- |
+| entrypoint.log        | Docker              | Start-up script log for container1        |
+| fail2ban.log          | IP ban service      | records failed attempts and IP bans       |
+| nginx-access.log      | proxy service       | webserver for container1 access log       |
+| nginx-error.log       | proxy service       | webserver for container1 error log        |
+| monit.log             | watchdog service    | watchdog for container1 services          |
+
+location: /home/hivekeeper/persistent/logs/container1
   
 **Container2 logs:**  
-entrypoint_log: /home/hivekeeper/persistent/logs/container2/entrypoint.log  
-gunicorn_log: /home/hivekeeper/persistent/logs/container2/gunicorn.log  
-gunicorn_error_log: /home/hivekeeper/persistent/logs/container2/gunicorn-error.log  
-gunicorn_access_log: /home/hivekeeper/persistent/logs/container2/gunicorn-access.log  
-monit_log: /home/hivekeeper/persistent/logs/container2/monit.log  
+|                       |                     |                                           |
+| --------------------- | ------------------- | ----------------------------------------- |
+| entrypoint.log        | Docker              | Start-up script log for container2        |
+| app.log               | Python/SQL          | The main visualisation app log            |
+| gunicorn-access.log   | WSGI service        | webserver for container2 access log       |
+| gunicorn-error.log    | WSGI service        | webserver for container2 error log        |
+| monit.log             | watchdog service    | watchdog for container2 services          |
+
+location: /home/hivekeeper/persistent/logs/container2
+  
+Log format: 'YYYY-MM-DD HH:MM:SS [SOURCE] [LEVEL] file.ext: message'  
+Example: '2022-03-15 11:11:41,522 [PYTHON] [INFO] hivekeepers_app.py: init app server...'  
+
+**Log Options**
+Logging level and detail/verbosity can be set for both containers within the docker-compose.yaml file.  
+  
+Container1:  
+The container log level can be set system-wide for nginx and fail2ban services.  Available options are info, notice, warn, error, crit, alert, or emerg  
+  
+There is also the choice to log all NGINX access requests or to turn this feature off.  Available options are simple (no nginx access logging), or detailed (with nginx access logging).  
+  
+Container2:  
+The container log level can be set system-wide for the Plotly Dash application and Gunicorn service.  Available options are debug, info, warning, error, or critical.  
+  
+There is also the choice to log SQL queries or to turn this feature off. Available options are yes (all SQL queries will be logged) and no (SQL queries will not be logged).  
 
 ---
 

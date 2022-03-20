@@ -80,7 +80,7 @@ subnet: 172.75.0.0/16
 container1 ip: 172.75.0.2   
 container2 ip: 172.75.0.3   
   
-**in conantainer main working dir:**  
+**in container main working dir:**  
 container2: /home/hivekeeper/  
   
 **container persistent storage:**  

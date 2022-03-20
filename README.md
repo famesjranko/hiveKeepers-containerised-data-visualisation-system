@@ -218,16 +218,16 @@ Contiainer2 has no exposed ports and is only accessible from outside the contain
 ---
 
 ### Data Visualisation Application (Dash)
-The data visualisation application is written using the Dash Plotl framework and consists of 4 plotted charts from data aquired from the Hivekeeper MySQL aviary database. 
-
-The app is built using the main hivekeeper_app.py for the central logic, and the buiilding and displaying of charts.  There are two seperate database update scripts one for initial startup (startup_update_db.py) and one for updating incremental updates once a local database is in place.
-
-There is also a helper script (hivekeepers_helpers.py) which houses the main functions for data handling (getting data from local SQLite db), data cleaning and data building for charts.
-
+The data visualisation application is written using the Dash Plotly framework and consists of 4 plotted charts from data acquired from the HiveKeepers MySQL aviary database.  
+  
+The app is built using the main hivekeeper_app.py for the central logic, and the building and displaying of charts. There are two separate database update scripts one for initial start-up (startup_update_db.py) and one for updating incremental updates once a local database is in place.  
+  
+There is also a helper script (hivekeepers_helpers.py) which houses the main functions for data handling (getting data from local SQLite db), data cleaning and data building for charts.  
+  
 There is also a config file (hivekeepers_config.py) for storing relevant STATIC variables and the MySQL remote database credentials.  
-
+  
 These files are all stored in project folder: container1/dash_app/  
-and on container2 in folder: /home/hivekeeper/dash_app/  
+and on the running container2 in folder: /home/hivekeeper/dash_app/  
 
 ---
 

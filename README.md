@@ -229,7 +229,7 @@ There is also a config file (hivekeepers_config.py) for storing relevant STATIC 
 These files are all stored in project folder: container1/dash_app/  
 and on the running container2 in folder: /home/hivekeeper/dash_app/  
 
-**Application Logic**
+**Application Logic**  
 Once the user has accessed the HiveKeepers Dash App, they are presented with an ‘update database’ button, a ‘date selector’ and an ‘aviary selector’ drop-down menu.  
   
 Depending on the environment ‘start_type’ chosen when starting the containers, the local database may or may not already be populated.  If the container has been started using ‘warm_start’, then the user simply chooses an aviary from the drop down and the date selector will automatically choose the most recent single days’ worth of data to represent in the charts.  If container was started with ‘cold_start’, then the user must update the database before the drop-down aviary selector will be populated.  

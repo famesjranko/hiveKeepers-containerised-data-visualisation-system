@@ -3,7 +3,7 @@ La Trobe University and HiveKeepers internship project
 
 pull to local via:
 ```bash
-git clone --single-branch --branch master .git
+git clone --single-branch --branch master https://github.com/hivekeepers/project.git
 ```
 
 ---

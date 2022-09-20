@@ -1,6 +1,11 @@
 # HiveKeepers Internship Project
 La Trobe University and HiveKeepers internship project
 
+pull to local via:
+```bash
+git clone --single-branch --branch master .git
+```
+
 ---
 
 ### Outline of project:

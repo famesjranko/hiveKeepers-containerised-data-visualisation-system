@@ -44,9 +44,9 @@ services:
       - "container_data:/home/hivekeeper/persistent/"
     environment:
       - TZ=Australia/Melbourne
-      - MYSQL_USER=dev_hkapps_platform
-      - MYSQL_PASS=R8]NbgN[y-V<L,5X
-      - MYSQL_HOST=hivekeepers.cvn1llvgfho9.us-east-2.rds.amazonaws.com
+      - MYSQL_USER=
+      - MYSQL_PASS=
+      - MYSQL_HOST=
       - MYSQL_DB=rawdata
       - APP_WORKERS=4               # gunicorn workers - defaults to number of cores
       - APP_THREADS=2               # gunicorn threads - defaults to number of cores - 1
